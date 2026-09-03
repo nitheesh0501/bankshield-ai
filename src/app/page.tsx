@@ -6,69 +6,60 @@ import {
   ArrowRight,
   Clock,
   CheckCircle2,
-  AlertTriangle,
-  Radio,
-  LogIn,
-  Send,
   Download,
   Search,
   Filter,
   Ban,
   Check,
-  AlertCircle,
-  PhoneCall,
-  Lock
+  Send,
+  LogIn
 } from 'lucide-react';
 
-import { PageStage, PortalSubTab, UserRole, AuditItem } from '../types/bankshield';
-import { evaluateDuressRisk } from '../lib/riskEngine';
-import { INITIAL_AUDIT_LOGS, exportAuditLogsCSV } from '../lib/auditLedger';
+import { PageStage, PortalSubTab, UserRole, AuditItem } from '../types';
+import { evaluateDuressRisk } from '../backend/riskEngine';
+import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV } from '../backend/auditService';
 
-import { HeaderNav } from '../components/HeaderNav';
-import { SeniorPayPhone } from '../components/SeniorPayPhone';
-import { GuardianDeck } from '../components/GuardianDeck';
+import { Navigation } from '../frontend/Navigation';
+import { SeniorPhone } from '../frontend/SeniorPhone';
+import { GuardianDeck } from '../frontend/GuardianDeck';
 
 export default function BankShieldApp() {
-  // 3-Stage Navigation State
+  // Navigation State
   const [pageStage, setPageStage] = useState<PageStage>('landing');
   const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>('dual');
-  const [userRole, setUserRole] = useState<UserRole>('ramesh');
+  const [userRole, setUserRole] = useState<UserRole>('customer');
 
-  // Authentication Form State
+  // Login Form State
   const [loginId, setLoginId] = useState('ACC-9241805');
   const [loginPin, setLoginPin] = useState('••••••');
 
-  // Transfer Form & Telemetry State
+  // Senior Phone Input State
   const [recipientName, setRecipientName] = useState('DCP Cyber Cell Official Escrow');
   const [upiId, setUpiId] = useState('dcp.cyber.cell@official-escrow');
   const [amount, setAmount] = useState('85000');
-  const [reason, setReason] = useState('Urgent Utility Disconnection');
+  const [category, setCategory] = useState('Digital Arrest Warrant');
   const [isActiveCall, setIsActiveCall] = useState(true);
-  const [isNewBeneficiary, setIsNewBeneficiary] = useState(true);
 
   // Active Incident & Escrow State
   const [activeEscrow, setActiveEscrow] = useState<AuditItem | null>({
-    txnId: 'TXN-7094',
+    id: 'TXN-7094',
     timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
     payee: 'DCP Cyber Cell Official Escrow',
     vpa: 'dcp.cyber.cell@official-escrow',
     amount: 85000,
-    status: 'Escrow Hold',
     riskScore: 100,
-    hasActiveCall: true,
+    status: 'Escrow Hold',
     notes: '71x Baseline Surge, Authority Coercion Keyword, Active Call Telemetry',
   });
 
   const [countdown, setCountdown] = useState<number>(847); // 14:07
 
-  // Audit Logs Ledger
+  // Ledger State
   const [auditLogs, setAuditLogs] = useState<AuditItem[]>(INITIAL_AUDIT_LOGS);
-
-  // Search & Filter State for Audit Log
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
 
-  // Dynamic multiplier calculation
+  // Dynamic multiplier calculation against ₹1,200 baseline
   const currentMultiplier = amount && parseFloat(amount) > 0 ? (parseFloat(amount) / 1200).toFixed(1) : '70.8';
 
   // Live Countdown Effect
@@ -102,82 +93,39 @@ export default function BankShieldApp() {
     }
   };
 
-  // Quick Vector Presets
-  const applyVectorPreset = (vector: 'arrest' | 'utility' | 'kyc' | 'icu' | 'remote' | 'safe') => {
-    stopSpeech();
-    if (vector === 'arrest') {
-      setRecipientName('DCP Cyber Cell Official Escrow');
-      setUpiId('dcp.cyber.cell@official-escrow');
-      setAmount('85000');
-      setReason('Digital Arrest Warrant');
-      setIsActiveCall(true);
-      setIsNewBeneficiary(true);
-    } else if (vector === 'utility') {
-      setRecipientName('Rajesh Electricals');
-      setUpiId('pay-rajesh@upi');
-      setAmount('48500');
-      setReason('Urgent Utility Disconnection');
-      setIsActiveCall(true);
-      setIsNewBeneficiary(true);
-    } else if (vector === 'kyc') {
-      setRecipientName('HDFC Re-verification Cell');
-      setUpiId('hdfc.kyc.update@upi');
-      setAmount('35000');
-      setReason('Bank Account Suspension Threat');
-      setIsActiveCall(true);
-      setIsNewBeneficiary(true);
-    } else if (vector === 'icu') {
-      setRecipientName('City Hospital Emergency ICU');
-      setUpiId('icu.emergency.deposit@upi');
-      setAmount('60000');
-      setReason('Urgent Medical Deposit');
-      setIsActiveCall(true);
-      setIsNewBeneficiary(true);
-    } else if (vector === 'remote') {
-      setRecipientName('AnyDesk QuickSupport Tech');
-      setUpiId('quicksupport.tech@upi');
-      setAmount('25000');
-      setReason('Remote Device Support');
-      setIsActiveCall(true);
-      setIsNewBeneficiary(true);
-    } else if (vector === 'safe') {
-      setRecipientName('Nilgiris Groceries');
-      setUpiId('nilgiris.groceries@upi');
-      setAmount('350');
-      setReason('Essentials');
-      setIsActiveCall(false);
-      setIsNewBeneficiary(false);
-    }
-  };
-
-  // Trigger Transfer & Escrow Escalation
+  // Authorize Transfer Handled via backend riskEngine
   const handleAuthorizeTransfer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || parseFloat(amount) <= 0) return;
 
     const numAmount = parseFloat(amount);
-    const riskEval = evaluateDuressRisk(numAmount, recipientName, upiId, reason, isActiveCall, isNewBeneficiary);
+    const evalResult = evaluateDuressRisk({
+      amount: numAmount,
+      category,
+      isCallActive: isActiveCall,
+      payeeVpa: upiId,
+      historicalAvg: 1200,
+    });
 
     const newTxnId = `TXN-${Math.floor(1000 + Math.random() * 9000)}`;
-    const isHighRisk = riskEval.tier === 'critical';
+    const isHighRisk = evalResult.tier === 'High';
 
     const newAuditItem: AuditItem = {
-      txnId: newTxnId,
+      id: newTxnId,
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       payee: recipientName,
       vpa: upiId,
       amount: numAmount,
+      riskScore: evalResult.score,
       status: isHighRisk ? 'Escrow Hold' : 'Completed',
-      riskScore: riskEval.riskScore,
-      hasActiveCall: isActiveCall,
-      notes: isHighRisk ? `${riskEval.multiplier}x Surge, Coercion Keywords, Active Call Telemetry` : 'Low Risk Frictionless Transfer',
+      notes: isHighRisk ? `${evalResult.deviationSurge}, Coercion Keywords, Active Call Telemetry` : 'Low Risk Frictionless Transfer',
     };
 
-    setAuditLogs(prev => [newAuditItem, ...prev]);
+    setAuditLogs(prev => appendAuditRecord(prev, newAuditItem));
 
     if (isHighRisk) {
       setActiveEscrow(newAuditItem);
-      setCountdown(847); // 14:07
+      setCountdown(847);
       triggerSpeech();
     } else {
       setActiveEscrow(null);
@@ -188,10 +136,10 @@ export default function BankShieldApp() {
   const handleFreezeAndAbort = () => {
     stopSpeech();
     if (activeEscrow) {
-      const updatedTxnId = activeEscrow.txnId;
+      const updatedId = activeEscrow.id;
       setAuditLogs(prev =>
         prev.map(item =>
-          item.txnId === updatedTxnId
+          item.id === updatedId
             ? { ...item, status: 'Aborted & Frozen', notes: 'Aborted by Guardian Ananya. Funds secured in savings A/C.' }
             : item
         )
@@ -204,10 +152,10 @@ export default function BankShieldApp() {
   const handleGuardianOverride = () => {
     stopSpeech();
     if (activeEscrow) {
-      const updatedTxnId = activeEscrow.txnId;
+      const updatedId = activeEscrow.id;
       setAuditLogs(prev =>
         prev.map(item =>
-          item.txnId === updatedTxnId
+          item.id === updatedId
             ? { ...item, status: 'Guardian Cleared', notes: 'Manually authorized by Guardian Ananya.' }
             : item
         )
@@ -218,20 +166,24 @@ export default function BankShieldApp() {
 
   // Simulate Incident Trigger
   const handleSimulateIncident = () => {
-    applyVectorPreset('arrest');
+    setRecipientName('DCP Cyber Cell Official Escrow');
+    setUpiId('dcp.cyber.cell@official-escrow');
+    setAmount('85000');
+    setCategory('Digital Arrest Warrant');
+    setIsActiveCall(true);
+
     const newAuditItem: AuditItem = {
-      txnId: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+      id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       payee: 'DCP Cyber Cell Official Escrow',
       vpa: 'dcp.cyber.cell@official-escrow',
       amount: 85000,
-      status: 'Escrow Hold',
       riskScore: 100,
-      hasActiveCall: true,
+      status: 'Escrow Hold',
       notes: '71x Baseline Surge, Authority Coercion Keyword, Active Call Telemetry',
     };
 
-    setAuditLogs(prev => [newAuditItem, ...prev]);
+    setAuditLogs(prev => appendAuditRecord(prev, newAuditItem));
     setActiveEscrow(newAuditItem);
     setCountdown(847);
     triggerSpeech();
@@ -243,7 +195,7 @@ export default function BankShieldApp() {
       const matchesSearch =
         log.payee.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.vpa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.txnId.toLowerCase().includes(searchTerm.toLowerCase());
+        log.id.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'All' || log.status === statusFilter;
       return matchesSearch && matchesStatus;
@@ -258,13 +210,17 @@ export default function BankShieldApp() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
-      {/* Global Header Navigation Component */}
-      <HeaderNav
+      {/* Top Navigation Component */}
+      <Navigation
         pageStage={pageStage}
         setPageStage={setPageStage}
         portalSubTab={portalSubTab}
         setPortalSubTab={setPortalSubTab}
         userRole={userRole}
+        activeEscrow={activeEscrow}
+        countdown={countdown}
+        formatCountdown={formatCountdown}
+        handleFreezeAndAbort={handleFreezeAndAbort}
       />
 
       {/* STAGE 1: PUBLIC LANDING PAGE */}
@@ -355,30 +311,30 @@ export default function BankShieldApp() {
                 <button
                   type="button"
                   onClick={() => {
-                    setUserRole('ramesh');
+                    setUserRole('customer');
                     setLoginId('ACC-9241805');
                   }}
                   className={`p-3 rounded-xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
-                    userRole === 'ramesh'
+                    userRole === 'customer'
                       ? 'bg-white border-emerald-500 text-slate-900 font-bold shadow-xs'
                       : 'bg-slate-100 border-slate-200 text-slate-600'
                   }`}
                 >
                   <div>
                     <span className="block font-extrabold">Option A: Ramesh Kumar (Senior Citizen)</span>
-                    <span className="text-[11px] text-slate-500">Age: 68 • A/C *9241 • Customer</span>
+                    <span className="text-[11px] text-slate-500">Age: 68 • A/C ...9241 • Customer</span>
                   </div>
-                  {userRole === 'ramesh' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
+                  {userRole === 'customer' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
-                    setUserRole('ananya');
+                    setUserRole('guardian');
                     setLoginId('GUARDIAN-ANANYA');
                   }}
                   className={`p-3 rounded-xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
-                    userRole === 'ananya'
+                    userRole === 'guardian'
                       ? 'bg-white border-rose-500 text-slate-900 font-bold shadow-xs'
                       : 'bg-slate-100 border-slate-200 text-slate-600'
                   }`}
@@ -387,7 +343,7 @@ export default function BankShieldApp() {
                     <span className="block font-extrabold">Option B: Ananya Kumar (Guardian)</span>
                     <span className="text-[11px] text-slate-500">Designated Guardian • Command Deck</span>
                   </div>
-                  {userRole === 'ananya' && <CheckCircle2 className="w-4 h-4 text-rose-600 shrink-0" />}
+                  {userRole === 'guardian' && <CheckCircle2 className="w-4 h-4 text-rose-600 shrink-0" />}
                 </button>
               </div>
             </div>
@@ -443,48 +399,22 @@ export default function BankShieldApp() {
       {/* STAGE 3: AUTHENTICATED PORTAL */}
       {pageStage === 'portal' && (
         <div>
-          {/* Incident Alert Banner */}
-          {activeEscrow && activeEscrow.status === 'Escrow Hold' && (
-            <div className="bg-rose-600 text-white px-4 py-2.5 shadow-md flex items-center justify-between text-xs sm:text-sm animate-in slide-in-from-top duration-300">
-              <div className="flex items-center gap-2 font-bold max-w-4xl truncate">
-                <Radio className="w-4 h-4 animate-ping text-white shrink-0" />
-                <span className="truncate">
-                  🚨 REAL-TIME DURESS INCIDENT BROADCAST: Ramesh Kumar (Father) transfer of ₹{activeEscrow.amount.toLocaleString('en-IN')} to {activeEscrow.payee} held in escrow ({formatCountdown(countdown)} remaining).
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => setPortalSubTab('guardian')}
-                  className="px-3 py-1 rounded bg-white text-rose-700 font-extrabold hover:bg-rose-50 transition text-xs shadow-xs cursor-pointer"
-                >
-                  Inspect in Guardian Deck
-                </button>
-                <button
-                  onClick={handleFreezeAndAbort}
-                  className="px-3 py-1 rounded bg-rose-950 text-white font-extrabold hover:bg-rose-900 transition text-xs border border-rose-400 cursor-pointer"
-                >
-                  Instant Freeze & Abort
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* SUB-TAB 1: DUAL SCREEN MODE */}
           {portalSubTab === 'dual' && (
             <main className="max-w-7xl mx-auto px-4 py-6 space-y-6 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <SeniorPayPhone
+                <SeniorPhone
                   recipientName={recipientName}
                   setRecipientName={setRecipientName}
                   upiId={upiId}
                   setUpiId={setUpiId}
                   amount={amount}
                   setAmount={setAmount}
+                  category={category}
+                  setCategory={setCategory}
                   isActiveCall={isActiveCall}
                   setIsActiveCall={setIsActiveCall}
                   currentMultiplier={currentMultiplier}
-                  applyVectorPreset={applyVectorPreset}
                   handleAuthorizeTransfer={handleAuthorizeTransfer}
                 />
 
@@ -512,13 +442,13 @@ export default function BankShieldApp() {
                       Senior Customer Portal
                     </span>
                     <h2 className="text-2xl font-extrabold text-slate-900 mt-1">Ramesh Kumar (Father)</h2>
-                    <p className="text-xs text-slate-500 font-mono">Savings Account *9241 • Bal: ₹1,42,800</p>
+                    <p className="text-xs text-slate-500 font-mono">Savings Account ...9241 • Bal: ₹1,42,800</p>
                   </div>
                 </div>
 
                 <form onSubmit={handleAuthorizeTransfer} className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Recipient Name / VPA</label>
+                    <label className="block text-xs font-bold text-slate-700">Beneficiary Name / VPA</label>
                     <input
                       type="text"
                       required
@@ -529,7 +459,7 @@ export default function BankShieldApp() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Amount (₹ INR)</label>
+                    <label className="block text-xs font-bold text-slate-700">Transfer Amount (₹ INR)</label>
                     <input
                       type="number"
                       required
@@ -585,7 +515,7 @@ export default function BankShieldApp() {
                   </div>
 
                   <button
-                    onClick={() => exportAuditLogsCSV(auditLogs)}
+                    onClick={() => exportAuditCSV(auditLogs)}
                     className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-md flex items-center gap-2 shrink-0 cursor-pointer"
                   >
                     <Download className="w-4 h-4 text-emerald-400" />
@@ -639,7 +569,7 @@ export default function BankShieldApp() {
                     <tbody className="divide-y divide-slate-200 bg-white font-medium">
                       {filteredAuditLogs.map((log, idx) => (
                         <tr key={idx} className="hover:bg-slate-50/80 transition">
-                          <td className="py-4 px-4 font-mono font-bold text-slate-900">{log.txnId}</td>
+                          <td className="py-4 px-4 font-mono font-bold text-slate-900">{log.id}</td>
                           <td className="py-4 px-4 text-slate-500">{log.timestamp}</td>
                           <td className="py-4 px-4">
                             <span className="block font-bold text-slate-900">{log.payee}</span>
