@@ -64,8 +64,9 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* Container Header */}
       <div className="flex items-center justify-between px-2">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5 leading-tight">
           <Smartphone className="w-4 h-4 text-emerald-600" />
           <span>[ DEVICE 1 ] Ramesh's Senior UPI Phone Client (/pay)</span>
         </h3>
@@ -74,16 +75,17 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
         </span>
       </div>
 
-      <div className="bg-zinc-950 text-zinc-100 border-4 border-zinc-800 rounded-[36px] p-6 shadow-2xl space-y-5">
+      {/* Mobile Mockup Container */}
+      <div className="bg-zinc-950 text-zinc-100 border-4 border-zinc-800 rounded-[36px] p-6 shadow-2xl space-y-5 overflow-hidden">
         {/* Account Header */}
         <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center border border-emerald-500/30">
               RK
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white">Ramesh Kumar (Age: 68)</h4>
-              <p className="text-[11px] text-zinc-400 font-mono">Savings A/C ...9241 • Bal: ₹1,42,800</p>
+              <h4 className="text-sm font-bold text-white leading-tight">Ramesh Kumar (Age: 68)</h4>
+              <p className="text-[11px] text-zinc-400 font-mono leading-normal mt-0.5">Savings A/C ...9241 • Bal: ₹1,42,800</p>
             </div>
           </div>
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -120,7 +122,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               required
               value={recipientName}
               onChange={e => setRecipientName(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-medium text-xs focus:border-emerald-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-medium text-xs focus:border-emerald-500 focus:outline-none transition"
             />
           </div>
 
@@ -136,7 +138,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               required
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-base focus:border-emerald-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-base focus:border-emerald-500 focus:outline-none transition"
             />
           </div>
 
@@ -147,7 +149,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               required
               value={category}
               onChange={e => setCategory(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-medium text-xs focus:border-emerald-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-medium text-xs focus:border-emerald-500 focus:outline-none transition"
             />
           </div>
 
@@ -158,8 +160,8 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 <PhoneCall className="w-4 h-4" />
               </div>
               <div>
-                <span className="block text-xs font-bold text-white">Simulate Background Phone Call (Duress Sensor)</span>
-                <span className="text-[10px] text-zinc-400">
+                <span className="block text-xs font-bold text-white leading-tight">Simulate Background Phone Call (Duress Sensor)</span>
+                <span className="text-[10px] text-zinc-400 leading-normal">
                   {isActiveCall ? 'Active caller claiming official authority (+15 pts)' : 'No active phone call detected'}
                 </span>
               </div>
@@ -176,22 +178,20 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             </button>
           </div>
 
-          {/* Contextual Warning Card with Native Audio Button */}
-          <div className="p-3.5 rounded-xl bg-gradient-to-r from-zinc-900 to-zinc-900/90 border border-zinc-800 space-y-2">
+          {/* Contextual Voice Assist Card */}
+          <div className="p-3.5 bg-zinc-900/90 border border-rose-900/50 rounded-xl space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-extrabold uppercase text-rose-400">
-                Contextual Voice Assist
-              </span>
+              <span className="text-xs font-bold text-rose-400 uppercase tracking-wide">Contextual Voice Assist</span>
               <button
                 type="button"
                 onClick={triggerSpeech}
-                className="px-2.5 py-1 rounded-md bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] flex items-center gap-1 cursor-pointer transition"
+                className="text-xs px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-medium flex items-center gap-1.5 cursor-pointer transition"
               >
-                <Volume2 className={`w-3 h-3 ${isSpeaking ? 'animate-bounce' : ''}`} />
+                <Volume2 className={`w-3.5 h-3.5 ${isSpeaking ? 'animate-bounce' : ''}`} />
                 <span>Read Warning Aloud</span>
               </button>
             </div>
-            <p className="text-xs text-zinc-300 leading-snug">
+            <p className="text-xs text-zinc-300 leading-relaxed font-normal">
               "Authority coercion pattern detected. Transfers to official escrow VPAs over phone calls are intercepted."
             </p>
           </div>
