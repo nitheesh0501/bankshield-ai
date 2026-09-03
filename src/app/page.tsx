@@ -21,6 +21,7 @@ import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV } from '../backen
 
 import { Navigation } from '../frontend/Navigation';
 import { LandingPage } from '../frontend/LandingPage';
+import { LoginPage } from '../frontend/LoginPage';
 import { SeniorPhone } from '../frontend/SeniorPhone';
 import { GuardianDeck } from '../frontend/GuardianDeck';
 
@@ -224,114 +225,24 @@ export default function BankShieldApp() {
         handleFreezeAndAbort={handleFreezeAndAbort}
       />
 
-      {/* STAGE 1: COMPREHENSIVE PRODUCT SHOWCASE PUBLIC LANDING PAGE */}
+      {/* STAGE 1: PUBLIC LANDING PAGE */}
       {pageStage === 'landing' && (
         <LandingPage onAccessPortal={() => setPageStage('login')} />
       )}
 
-      {/* STAGE 2: LOGIN PAGE */}
+      {/* STAGE 2: ENTERPRISE SPLIT-SCREEN AUTHENTICATION PAGE */}
       {pageStage === 'login' && (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-md w-full space-y-6">
-            <div className="text-center space-y-2">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
-                <ShieldCheck className="w-8 h-8" />
-              </div>
-              <h2 className="text-2xl font-extrabold text-slate-900">BankShield NetBanking Portal</h2>
-              <p className="text-xs text-slate-500">Secure Customer & Guardian Authentication</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-              <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                Hackathon Presentation Quick Login:
-              </span>
-              <div className="grid grid-cols-1 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUserRole('customer');
-                    setLoginId('ACC-9241805');
-                  }}
-                  className={`p-3 rounded-xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
-                    userRole === 'customer'
-                      ? 'bg-white border-emerald-500 text-slate-900 font-bold shadow-xs'
-                      : 'bg-slate-100 border-slate-200 text-slate-600'
-                  }`}
-                >
-                  <div>
-                    <span className="block font-extrabold">Option A: Ramesh Kumar (Senior Citizen)</span>
-                    <span className="text-[11px] text-slate-500">Age: 68 • A/C ...9241 • Customer</span>
-                  </div>
-                  {userRole === 'customer' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUserRole('guardian');
-                    setLoginId('GUARDIAN-ANANYA');
-                  }}
-                  className={`p-3 rounded-xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
-                    userRole === 'guardian'
-                      ? 'bg-white border-rose-500 text-slate-900 font-bold shadow-xs'
-                      : 'bg-slate-100 border-slate-200 text-slate-600'
-                  }`}
-                >
-                  <div>
-                    <span className="block font-extrabold">Option B: Ananya Kumar (Guardian)</span>
-                    <span className="text-[11px] text-slate-500">Designated Guardian • Command Deck</span>
-                  </div>
-                  {userRole === 'guardian' && <CheckCircle2 className="w-4 h-4 text-rose-600 shrink-0" />}
-                </button>
-              </div>
-            </div>
-
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                setPageStage('portal');
-              }}
-              className="space-y-4"
-            >
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-700">Customer ID / Phone Number</label>
-                <input
-                  type="text"
-                  required
-                  value={loginId}
-                  onChange={e => setLoginId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-medium text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-700">6-Digit MPIN / Password</label>
-                <input
-                  type="password"
-                  required
-                  value={loginPin}
-                  onChange={e => setLoginPin(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-medium text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Authenticate & Enter Protected Portal</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
-
-            <button
-              onClick={() => setPageStage('landing')}
-              className="w-full text-center text-xs font-bold text-slate-500 hover:text-slate-800 transition cursor-pointer"
-            >
-              ← Return to Public Landing Page
-            </button>
-          </div>
-        </div>
+        <LoginPage
+          userRole={userRole}
+          setUserRole={setUserRole}
+          loginId={loginId}
+          setLoginId={setLoginId}
+          loginPin={loginPin}
+          setLoginPin={setLoginPin}
+          setPortalSubTab={setPortalSubTab}
+          onAuthenticate={() => setPageStage('portal')}
+          onReturnHome={() => setPageStage('landing')}
+        />
       )}
 
       {/* STAGE 3: AUTHENTICATED PORTAL */}

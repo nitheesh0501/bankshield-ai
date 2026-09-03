@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Monitor, Smartphone, ShieldAlert, Activity, LogOut, LogIn, Radio } from 'lucide-react';
+import { Shield, Monitor, Smartphone, ShieldAlert, Activity, LogOut, LogIn, Radio, ChevronLeft } from 'lucide-react';
 import { PageStage, PortalSubTab, UserRole, AuditItem } from '../types';
 
 interface NavigationProps {
@@ -46,13 +46,21 @@ export const Navigation: React.FC<NavigationProps> = ({
             </div>
           </div>
 
-          {pageStage === 'landing' || pageStage === 'login' ? (
+          {pageStage === 'landing' ? (
             <button
               onClick={() => setPageStage('login')}
               className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition shadow-xs flex items-center gap-2 cursor-pointer"
             >
               <LogIn className="w-4 h-4 text-emerald-400" />
               <span>NetBanking Login</span>
+            </button>
+          ) : pageStage === 'login' ? (
+            <button
+              onClick={() => setPageStage('landing')}
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4 text-slate-500" />
+              <span>Back to Home</span>
             </button>
           ) : (
             <>
