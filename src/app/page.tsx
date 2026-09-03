@@ -19,7 +19,7 @@ import {
 
 import { PageStage, PortalSubTab, UserRole, AuditItem } from '../types';
 import { evaluateDuressRisk } from '../backend/riskEngine';
-import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV, exportAuditODS, exportAuditPDF } from '../backend/auditService';
+import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV, exportAuditODS, downloadAuditPDF } from '../backend/auditService';
 
 import { Navigation } from '../frontend/Navigation';
 import { LandingPage } from '../frontend/LandingPage';
@@ -30,8 +30,8 @@ import { GuardianDeck } from '../frontend/GuardianDeck';
 export default function BankShieldApp() {
   // Navigation State
   const [pageStage, setPageStage] = useState<PageStage>('landing');
-  const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>('dual');
-  const [userRole, setUserRole] = useState<UserRole>('customer');
+  const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>('pay');
+  const [userRole, setUserRole] = useState<UserRole>('senior');
 
   // Login Form State
   const [loginId, setLoginId] = useState('ACC-9241805');
@@ -384,11 +384,11 @@ export default function BankShieldApp() {
                     </button>
 
                     <button
-                      onClick={() => exportAuditPDF(auditLogs)}
-                      className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                      onClick={() => downloadAuditPDF(auditLogs)}
+                      className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer"
                     >
-                      <Printer className="w-3.5 h-3.5 text-white" />
-                      <span>Print PDF</span>
+                      <span>📄</span>
+                      <span>Download Audit (PDF)</span>
                     </button>
                   </div>
                 </div>

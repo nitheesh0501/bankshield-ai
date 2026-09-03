@@ -144,99 +144,107 @@ export function exportAuditODS(logs: AuditItem[]): void {
   URL.revokeObjectURL(url);
 }
 
-export function exportAuditPDF(logs: AuditItem[]): void {
+export function downloadAuditPDF(logs: AuditItem[]): void {
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
-    alert('Please allow pop-ups to download the PDF report.');
+    alert('Please enable pop-ups to generate and download the PDF report.');
     return;
   }
 
-  const htmlContent = `
+  const content = `
     <!DOCTYPE html>
-    <html>
-      <head>
-        <title>BankShield AI — Transaction & Duress Audit Report</title>
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 28px; color: #18181b; }
-          .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #059669; padding-bottom: 12px; margin-bottom: 20px; }
-          .brand { font-size: 20px; font-weight: 800; color: #059669; }
-          .meta { font-size: 11px; color: #71717a; text-align: right; }
-          .summary { background: #f4f4f5; padding: 12px; border-radius: 8px; font-size: 12px; margin-bottom: 20px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-          th { background: #f4f4f5; text-align: left; padding: 8px; font-weight: 700; border-bottom: 1px solid #e4e4e7; }
-          td { padding: 8px; border-bottom: 1px solid #f4f4f5; vertical-align: top; }
-          .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
-          .badge-hold { background: #ffe4e6; color: #e11d48; }
-          .badge-frozen { background: #fee2e2; color: #b91c1c; }
-          .badge-cleared { background: #dcfce7; color: #15803d; }
-          .badge-safe { background: #ecfdf5; color: #047857; }
-          .risk-high { font-weight: bold; color: #e11d48; }
-          .risk-med { font-weight: bold; color: #d97706; }
-          .risk-low { font-weight: bold; color: #059669; }
-          @media print {
-            body { padding: 0; }
-            @page { margin: 1.5cm; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div>
-            <div class="brand">BankShield.AI</div>
-            <div style="font-size: 13px; font-weight: 600;">Transaction & Duress Incident Audit Report</div>
-            <div style="font-size: 11px; color: #71717a;">Protected Customer: Ramesh Kumar (Age 68) | Designated Guardian: Ananya Kumar</div>
-          </div>
-          <div class="meta">
-            <div>Generated: ${new Date().toLocaleString()}</div>
-            <div>Compliance: RBI Digital Safety Guidelines</div>
-          </div>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>BankShield AI — Incident & Duress Audit Ledger</title>
+      <style>
+        @page { size: A4 landscape; margin: 15mm; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #09090b; margin: 0; padding: 12px; font-size: 11px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #059669; padding-bottom: 12px; margin-bottom: 16px; }
+        .title { font-size: 18px; font-weight: 800; color: #059669; letter-spacing: -0.5px; }
+        .subtitle { font-size: 11px; color: #52525b; margin-top: 3px; }
+        .meta { text-align: right; font-size: 10px; color: #71717a; line-height: 1.5; }
+        .tag { display: inline-block; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th { background: #f4f4f5; text-align: left; padding: 8px 10px; font-weight: 700; font-size: 10px; text-transform: uppercase; color: #52525b; border-bottom: 1px solid #e4e4e7; }
+        td { padding: 8px 10px; border-bottom: 1px solid #f4f4f5; vertical-align: top; }
+        .txn-id { font-family: monospace; font-weight: 700; color: #18181b; }
+        .amount { font-family: monospace; font-weight: 800; font-size: 12px; }
+        .score-pill { display: inline-block; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-weight: 700; font-size: 10px; }
+        .score-high { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .score-med { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .score-low { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .status-pill { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 600; }
+        .status-cleared { background: #dcfce7; color: #166534; }
+        .status-frozen { background: #fee2e2; color: #991b1b; }
+        .status-advised { background: #fef3c7; color: #854d0e; }
+        .status-completed { background: #f4f4f5; color: #3f3f46; }
+        .footer { margin-top: 24px; font-size: 9px; color: #a1a1aa; border-top: 1px solid #f4f4f5; padding-top: 8px; display: flex; justify-content: space-between; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div>
+          <div class="title">BankShield.AI <span class="tag">FORENSIC AUDIT LEDGER</span></div>
+          <div class="subtitle">Protected Customer: <strong>Ramesh Kumar (Age 68)</strong> • Designated Guardian: <strong>Ananya Kumar</strong></div>
         </div>
-
-        <div class="summary">
-          <strong>Executive Forensics Summary:</strong> Immutable record of real-time payments, sub-50ms heuristic duress scoring, and guardian circuit-breaker interventions.
+        <div class="meta">
+          <div>Report Timestamp: <strong>${new Date().toLocaleString()}</strong></div>
+          <div>Security Compliance: <strong>RBI Contextual Fraud Directive</strong></div>
         </div>
+      </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>TXN ID</th>
-              <th>Timestamp</th>
-              <th>Payee & UPI VPA</th>
-              <th>Amount (INR)</th>
-              <th>Duress Score</th>
-              <th>Final Outcome</th>
-              <th>Incident Telemetry Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${logs.map(log => {
-              const riskClass = log.riskScore >= 75 ? 'risk-high' : log.riskScore >= 45 ? 'risk-med' : 'risk-low';
-              const badgeClass = log.status.includes('Hold') ? 'badge-hold' : log.status.includes('Frozen') || log.status.includes('Aborted') ? 'badge-frozen' : log.status.includes('Cleared') ? 'badge-cleared' : 'badge-safe';
-              return `
-                <tr>
-                  <td><strong>${log.id}</strong></td>
-                  <td>${log.timestamp}</td>
-                  <td><strong>${log.payee}</strong><br><span style="color:#71717a; font-size:10px;">${log.vpa}</span></td>
-                  <td><strong>₹${log.amount.toLocaleString()}</strong></td>
-                  <td class="${riskClass}">${log.riskScore} / 100</td>
-                  <td><span class="badge ${badgeClass}">${log.status}</span></td>
-                  <td style="color:#52525b;">${log.notes}</td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-        <script>
-          window.onload = () => {
+      <table>
+        <thead>
+          <tr>
+            <th>TXN ID</th>
+            <th>Timestamp</th>
+            <th>Payee & UPI VPA</th>
+            <th>Amount (INR)</th>
+            <th>Duress Risk</th>
+            <th>Outcome Status</th>
+            <th>Audit Telemetry Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${logs.map(l => {
+            const scoreClass = l.riskScore >= 75 ? 'score-high' : l.riskScore >= 45 ? 'score-med' : 'score-low';
+            const statusClass = l.status.includes('Cleared') ? 'status-cleared' : l.status.includes('Frozen') || l.status.includes('Aborted') ? 'status-frozen' : l.status.includes('Advised') ? 'status-advised' : 'status-completed';
+            return `
+              <tr>
+                <td class="txn-id">${l.id}</td>
+                <td style="color:#71717a;">${l.timestamp}</td>
+                <td><strong>${l.payee}</strong><br><span style="font-size:9px; color:#71717a;">${l.vpa}</span></td>
+                <td class="amount">₹${l.amount.toLocaleString()}</td>
+                <td><span class="score-pill ${scoreClass}">${l.riskScore} / 100</span></td>
+                <td><span class="status-pill ${statusClass}">${l.status}</span></td>
+                <td style="color:#52525b;">${l.notes}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+
+      <div class="footer">
+        <span>BankShield AI Edge Architecture • Real-Time Cognitive Duress Protection</span>
+        <span>Page 1 of 1 • Tamper-Evident System Log</span>
+      </div>
+
+      <script>
+        window.onload = () => {
+          setTimeout(() => {
             window.print();
             window.onafterprint = () => window.close();
-          };
-        </script>
-      </body>
+          }, 300);
+        };
+      <\/script>
+    </body>
     </html>
   `;
 
   printWindow.document.open();
-  printWindow.document.write(htmlContent);
+  printWindow.document.write(content);
   printWindow.document.close();
 }
+
+export const exportAuditPDF = downloadAuditPDF;

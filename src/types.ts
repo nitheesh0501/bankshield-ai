@@ -1,6 +1,6 @@
 export type PageStage = 'landing' | 'login' | 'portal';
 export type PortalSubTab = 'dual' | 'pay' | 'guardian' | 'audit';
-export type UserRole = 'customer' | 'guardian';
+export type UserRole = 'senior' | 'guardian' | 'customer';
 
 export interface AuditItem {
   id: string;

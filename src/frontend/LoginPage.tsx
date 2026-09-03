@@ -11,8 +11,6 @@ import {
   CheckCircle2,
   PhoneCall,
   Webhook,
-  Sparkles,
-  HelpCircle,
   Key,
   ChevronLeft
 } from 'lucide-react';
@@ -47,7 +45,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
   const selectPersona = (role: UserRole) => {
     setUserRole(role);
-    if (role === 'customer') {
+    if (role === 'senior' || role === 'customer') {
       setLoginId('ACC-9241805');
       setLoginPin('••••••');
       setPortalSubTab('pay');
@@ -153,60 +151,68 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 <Lock className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-extrabold text-slate-900">Customer & Guardian Sign-In</h2>
-                <p className="text-xs text-slate-500">Enter your registered credentials or select a test role.</p>
+                <h2 className="text-2xl font-extrabold text-slate-900">Role-Based NetBanking Sign-In</h2>
+                <p className="text-xs text-slate-500">Select your persona to route to your protected dashboard.</p>
               </div>
             </div>
 
-            {/* Interactive Hackathon Persona Selector */}
+            {/* Role-Based Persona Selector */}
             <div className="space-y-2">
               <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                Hackathon Presentation Interactive Persona Switcher:
+                Select Active Persona & Access Scope:
               </span>
 
-              <div className="grid grid-cols-1 gap-2.5">
-                {/* Persona 1: Ramesh Kumar */}
+              <div className="grid grid-cols-1 gap-3">
+                {/* Option A: Senior Citizen Ramesh Kumar */}
                 <button
                   type="button"
-                  onClick={() => selectPersona('customer')}
-                  className={`p-3.5 rounded-2xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
-                    userRole === 'customer'
-                      ? 'bg-emerald-50/60 border-2 border-emerald-500 text-slate-900 shadow-sm'
+                  onClick={() => selectPersona('senior')}
+                  className={`p-4 rounded-2xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
+                    userRole === 'senior' || userRole === 'customer'
+                      ? 'bg-emerald-50/70 border-2 border-emerald-500 text-slate-900 shadow-sm'
                       : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-slate-900">Persona 1: Ramesh Kumar</span>
+                      <span className="font-extrabold text-slate-900 text-sm">Login as Senior Citizen (Ramesh Kumar, 68)</span>
                       <span className="text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 rounded">
                         Protected Ward
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500">Senior Citizen (Age: 68) • Savings A/C ...9241 • Baseline: ₹1,200/day</p>
+                    <p className="text-xs text-slate-600 font-medium">
+                      Opens Senior UPI Payment Portal with active voice duress protection.
+                    </p>
                   </div>
-                  {userRole === 'customer' && <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />}
+                  {(userRole === 'senior' || userRole === 'customer') && (
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 ml-2" />
+                  )}
                 </button>
 
-                {/* Persona 2: Ananya Kumar */}
+                {/* Option B: Guardian Ananya Kumar */}
                 <button
                   type="button"
                   onClick={() => selectPersona('guardian')}
-                  className={`p-3.5 rounded-2xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
+                  className={`p-4 rounded-2xl border text-left text-xs transition cursor-pointer flex items-center justify-between ${
                     userRole === 'guardian'
-                      ? 'bg-rose-50/60 border-2 border-rose-500 text-slate-900 shadow-sm'
+                      ? 'bg-rose-50/70 border-2 border-rose-500 text-slate-900 shadow-sm'
                       : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-slate-900">Persona 2: Ananya Kumar</span>
+                      <span className="font-extrabold text-slate-900 text-sm">Login as Guardian (Ananya Kumar)</span>
                       <span className="text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-300 px-1.5 py-0.5 rounded">
-                        Designated Escrow Approver
+                        Designated Guardian
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500">Nominated Guardian • Mobile ...43210 • Linked to Ramesh</p>
+                    <p className="text-xs text-slate-600 font-medium">
+                      Opens Guardian Escrow Command Deck with remote intervention controls.
+                    </p>
                   </div>
-                  {userRole === 'guardian' && <CheckCircle2 className="w-5 h-5 text-rose-600 shrink-0" />}
+                  {userRole === 'guardian' && (
+                    <CheckCircle2 className="w-5 h-5 text-rose-600 shrink-0 ml-2" />
+                  )}
                 </button>
               </div>
             </div>
