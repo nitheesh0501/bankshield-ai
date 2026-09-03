@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import BankShieldApp from '../page';
 
-export default function SplitPageRedirect() {
-  redirect('/demo');
+export default function SplitPage() {
+  return <BankShieldApp />;
 }

@@ -1,5 +1,5 @@
-import { CustomerPortal } from '../../components/CustomerPortal';
+import BankShieldApp from '../page';
 
 export default function PayPage() {
-  return <CustomerPortal />;
+  return <BankShieldApp />;
 }

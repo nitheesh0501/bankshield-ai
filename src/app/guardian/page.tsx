@@ -1,5 +1,5 @@
-import { GuardianDeck } from '../../components/GuardianDeck';
+import BankShieldApp from '../page';
 
 export default function GuardianPage() {
-  return <GuardianDeck />;
+  return <BankShieldApp />;
 }

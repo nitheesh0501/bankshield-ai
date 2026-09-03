@@ -1,296 +1,186 @@
-'use client';
+import React from 'react';
+import { ShieldAlert, BellRing, Zap, Webhook, AlertTriangle, AlertCircle, PhoneCall, Lock, Volume2, CheckCircle2, Ban } from 'lucide-react';
+import { AuditItem } from '../types/bankshield';
 
-import React, { useState, useEffect } from 'react';
-import {
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
-  Ban,
-  CheckCircle2,
-  Clock,
-  PhoneCall,
-  User,
-  Activity,
-  Trash2,
-  AlertTriangle,
-  RotateCcw,
-} from 'lucide-react';
-import { useBankshieldChannel } from '../lib/useBankshieldChannel';
-import { Transaction } from '../lib/types';
-import { StatusBadge } from './StatusBadge';
+interface GuardianDeckProps {
+  activeEscrow: AuditItem | null;
+  countdown: number;
+  formatCountdown: (sec: number) => string;
+  currentMultiplier: string;
+  triggerSpeech: () => void;
+  handleGuardianOverride: () => void;
+  handleFreezeAndAbort: () => void;
+  handleSimulateIncident: () => void;
+}
 
-export function GuardianDeck() {
-  const { transactions, resolveTransaction, clearAll, isLoaded } = useBankshieldChannel();
-  const [timers, setTimers] = useState<{ [key: string]: number }>({});
-
-  // Countdown timer updater for active HELD transactions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newTimers: { [key: string]: number } = {};
-      transactions.forEach(t => {
-        if (t.status === 'HELD') {
-          const remainingMs = t.escrowExpiresAt - Date.now();
-          newTimers[t.id] = Math.max(0, Math.floor(remainingMs / 1000));
-        }
-      });
-      setTimers(newTimers);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [transactions]);
-
-  const formatTime = (totalSeconds: number | undefined) => {
-    if (totalSeconds === undefined) return '15:00';
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const pendingIncidents = transactions.filter(t => t.status === 'HELD');
-  const pastIncidents = transactions.filter(t => t.status !== 'HELD');
-
+export const GuardianDeck: React.FC<GuardianDeckProps> = ({
+  activeEscrow,
+  countdown,
+  formatCountdown,
+  currentMultiplier,
+  triggerSpeech,
+  handleGuardianOverride,
+  handleFreezeAndAbort,
+  handleSimulateIncident,
+}) => {
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8">
-      {/* Header Banner */}
-      <div className="bg-obsidian-card border border-obsidian-border rounded-2xl p-6 sm:p-8 shadow-xl text-white">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-obsidian-border">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-xl border border-emerald-500/30 text-emerald-400">
-              <Shield className="w-8 h-8" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-950/60 px-2.5 py-0.5 rounded border border-cyan-800/60">
-                  Family Safety Portal
-                </span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
-                Guardian Incident Safety Deck
-              </h1>
-              <p className="text-sm text-slate-400">
-                Real-Time Duress Monitoring & Remote Payment Freeze Control
-              </p>
-            </div>
+    <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 space-y-6 shadow-xl">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>GUARDIAN OVERSIGHT ACTIVE</span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <StatusBadge compact />
-            {transactions.length > 0 && (
-              <button
-                onClick={clearAll}
-                className="p-2 rounded-xl bg-obsidian border border-obsidian-border text-slate-400 hover:text-rose-400 hover:border-rose-500/40 transition text-xs font-semibold flex items-center gap-1.5"
-                title="Clear demo transactions"
-              >
-                <Trash2 className="w-4 h-4" /> Clear History
-              </button>
-            )}
-          </div>
+          <h1 className="text-3xl font-extrabold text-slate-900 mt-2">
+            Senior Safety Escrow Command Deck
+          </h1>
+          <p className="text-sm text-slate-600 mt-1">
+            Designated Guardian: <strong>Ananya Kumar</strong> protecting <strong>Ramesh Kumar (Father)</strong>
+          </p>
         </div>
 
-        {/* Monitored Ward Profile Summary */}
-        <div className="mt-6 bg-obsidian/70 border border-obsidian-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-slate-800 border-2 border-cyan-500/40 flex items-center justify-center text-cyan-300 font-bold text-lg">
-              RK
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-base font-extrabold text-white">Ramesh Kumar (Father)</span>
-                <span className="text-xs text-slate-400 font-mono">A/C *9241</span>
-              </div>
-              <p className="text-xs text-slate-400">
-                Senior Savings Account • Automated 15-Minute Safety Escrow Active
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-obsidian-card p-3 rounded-lg border border-obsidian-border">
-            <div className="text-right">
-              <span className="block text-[10px] text-slate-400 font-bold uppercase">Active Duress Holds</span>
-              <span className={`text-lg font-black ${pendingIncidents.length > 0 ? 'text-rose-400 animate-pulse' : 'text-emerald-400'}`}>
-                {pendingIncidents.length} Pending
-              </span>
-            </div>
-          </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            type="button"
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition shadow-xs flex items-center gap-2 cursor-pointer"
+          >
+            <BellRing className="w-4 h-4 text-emerald-600" />
+            <span>Enable Browser Push Alerts</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleSimulateIncident}
+            className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-md flex items-center gap-2 cursor-pointer"
+          >
+            <Zap className="w-4 h-4 text-white fill-white" />
+            <span>Simulate Incident</span>
+          </button>
         </div>
       </div>
 
-      {/* Active Flagged Incident Cards */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-rose-400" />
-            <span>Active Flagged Incidents Requiring Review</span>
-            {pendingIncidents.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-black bg-rose-500/20 text-rose-400 border border-rose-500/40">
-                {pendingIncidents.length}
-              </span>
-            )}
-          </h2>
+      {/* Sync Status Banner */}
+      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-700">
+            <Webhook className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="block font-bold text-slate-900">Native Browser Push & n8n Webhook Active</span>
+            <span className="text-slate-500">Real-time desktop and mobile push alerts synchronized across tabs.</span>
+          </div>
         </div>
+        <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">
+          n8n STATUS: 200 OK CONNECTED
+        </span>
+      </div>
 
-        {pendingIncidents.length === 0 ? (
-          <div className="bg-obsidian-card border border-obsidian-border rounded-2xl p-10 text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto">
-              <ShieldCheck className="w-6 h-6" />
+      {/* Active Interception Card */}
+      {activeEscrow && activeEscrow.status === 'Escrow Hold' ? (
+        <div className="bg-rose-50 border-2 border-rose-500 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in zoom-in-95 duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-rose-200 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-rose-100 border border-rose-300 rounded-2xl text-rose-700 animate-pulse">
+                <ShieldAlert className="w-7 h-7" />
+              </div>
+              <div>
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300">
+                  HIGH DURESS SCAM SUSPECTED
+                </span>
+                <h3 className="text-xl font-black text-slate-900 mt-1">
+                  In-Flight Intervention Required
+                </h3>
+              </div>
             </div>
-            <h3 className="text-lg font-bold text-white">All Clear — No Active Duress Alerts</h3>
-            <p className="text-sm text-slate-400 max-w-md mx-auto">
-              No high-risk coercive transfers are currently on hold. Use the <strong className="text-cyan-400">Customer View (/pay)</strong> or <strong className="text-cyan-400">Split View (/split)</strong> to simulate a Digital Arrest scam attempt.
+
+            <div className="bg-rose-600 text-white px-4 py-2 rounded-xl font-mono font-black text-sm shadow-md animate-pulse shrink-0">
+              AUTO-ABORT IN: {formatCountdown(countdown)}
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-white border border-rose-200 space-y-2 shadow-xs">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Attempted Outflow Transfer Details:
+            </span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span className="text-3xl font-black text-rose-600">
+                  ₹{activeEscrow.amount.toLocaleString('en-IN')}
+                </span>
+                <span className="text-sm font-bold text-slate-900 ml-2">to {activeEscrow.payee}</span>
+              </div>
+              <span className="text-xs font-mono bg-slate-100 px-3 py-1 rounded-lg border border-slate-300 text-slate-700">
+                VPA: {activeEscrow.vpa}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <span className="block font-bold text-rose-900 uppercase tracking-wider text-xs">
+              Itemized Risk Factors & Telemetry Signals:
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-white border border-rose-200 space-y-1 font-medium text-rose-950 shadow-xs">
+                <span className="block font-bold text-rose-700">71x Baseline Surge</span>
+                <p className="text-[11px] text-slate-600">Typical monthly spend is &lt;₹1,200.</p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-white border border-rose-200 space-y-1 font-medium text-rose-950 shadow-xs">
+                <span className="block font-bold text-rose-700">Active Phone Call Sensor</span>
+                <p className="text-[11px] text-slate-600">Coercer is actively on the line dictating actions.</p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-white border border-rose-200 space-y-1 font-medium text-rose-950 shadow-xs">
+                <span className="block font-bold text-rose-700">Coercion Keywords</span>
+                <p className="text-[11px] text-slate-600">'dcp', 'cyber', 'escrow' pattern detected.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-rose-200">
+            <button
+              onClick={triggerSpeech}
+              className="py-3.5 px-5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Volume2 className="w-4 h-4 text-emerald-600" />
+              <span>Remote Voice Intercom Challenge</span>
+            </button>
+
+            <button
+              onClick={handleGuardianOverride}
+              className="py-3.5 px-5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>I Verified — Authorize Transfer</span>
+            </button>
+
+            <button
+              onClick={handleFreezeAndAbort}
+              className="flex-1 py-3.5 px-6 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-sm transition shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Ban className="w-4 h-4" />
+              <span>Freeze & Abort Transfer</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="p-12 rounded-3xl bg-emerald-50 border border-emerald-200 text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto shadow-xs">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <div className="space-y-1 max-w-md mx-auto">
+            <h4 className="text-xl font-extrabold text-slate-900">All Systems Secure & Protected</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              No active duress incidents requiring intervention. Click below to simulate a digital arrest scam vector.
             </p>
           </div>
-        ) : (
-          pendingIncidents.map(tx => (
-            <div
-              key={tx.id}
-              className="bg-obsidian-card border-2 border-rose-500/70 rounded-2xl p-6 sm:p-8 text-white shadow-2xl shadow-rose-500/10 space-y-6 animate-in slide-in-from-top-4 duration-300"
-            >
-              {/* Card Top Meta Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-obsidian-border">
-                <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse">
-                    DUCHESS RISK SCORE: {tx.riskScore} / 100
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    Attempted at {tx.timestamp}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 bg-rose-950/50 border border-rose-500/40 px-3.5 py-1.5 rounded-xl text-rose-300">
-                  <Clock className="w-4 h-4 animate-spin text-rose-400" />
-                  <span className="text-xs font-bold uppercase">Escrow Hold Expires in:</span>
-                  <span className="font-mono font-black text-lg text-rose-400">
-                    {formatTime(timers[tx.id])}
-                  </span>
-                </div>
-              </div>
-
-              {/* Main Incident Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left Column: Account & Transfer Info */}
-                <div className="space-y-4">
-                  <div>
-                    <span className="block text-xs uppercase tracking-wider text-slate-400 font-bold">
-                      Account Owner (Ward)
-                    </span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <User className="w-4 h-4 text-cyan-400" />
-                      <span className="text-base font-extrabold text-white">{tx.senderName}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-obsidian p-4 rounded-xl border border-obsidian-border space-y-2">
-                    <span className="block text-xs uppercase tracking-wider text-slate-400 font-bold">
-                      Flagged Payment Details
-                    </span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-black text-rose-400">
-                        ₹{tx.amount.toLocaleString('en-IN')}
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        (Baseline avg: ₹{tx.baselineAmount.toLocaleString('en-IN')})
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t border-obsidian-border">
-                      <span className="block text-xs text-slate-400 font-medium">Target Recipient (VPA):</span>
-                      <span className="text-sm font-bold text-cyan-300 font-mono break-all">{tx.recipientVpa}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column: Risk Badges */}
-                <div className="space-y-3">
-                  <span className="block text-xs uppercase tracking-wider text-slate-400 font-bold">
-                    Risk Badges & Telemetry Signals:
-                  </span>
-                  <div className="space-y-2">
-                    {tx.amount > 5000 && (
-                      <div className="flex items-center gap-2.5 p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-sm font-semibold">
-                        <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                        <span>Amount surge &gt;10x baseline average</span>
-                      </div>
-                    )}
-                    {tx.riskReasons.some(r => r.includes('Authority') || r.includes('coercion')) && (
-                      <div className="flex items-center gap-2.5 p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-sm font-semibold">
-                        <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
-                        <span>Authority coercion keyword detected in recipient VPA</span>
-                      </div>
-                    )}
-                    {tx.isActiveCall && (
-                      <div className="flex items-center gap-2.5 p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-300 text-sm font-semibold">
-                        <PhoneCall className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
-                        <span>Active phone call in progress during transaction</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Guardian Action Controls */}
-              <div className="pt-4 border-t border-obsidian-border flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => resolveTransaction(tx.id, 'BLOCKED')}
-                  className="flex-1 py-4 px-6 rounded-xl bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-black text-base transition shadow-xl shadow-rose-600/20 flex items-center justify-center gap-2 group cursor-pointer"
-                >
-                  <Ban className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span>Freeze & Abort Transfer (Crimson Action)</span>
-                </button>
-
-                <button
-                  onClick={() => resolveTransaction(tx.id, 'COMPLETED')}
-                  className="py-4 px-6 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-base transition flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  <span>Authorize Transfer (Override)</span>
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Incident History & Resolved Logs */}
-      {pastIncidents.length > 0 && (
-        <div className="bg-obsidian-card border border-obsidian-border rounded-2xl p-6 sm:p-8 space-y-4">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <Activity className="w-5 h-5 text-cyan-400" />
-            <span>Recent Incident History & Resolutions</span>
-          </h3>
-
-          <div className="divide-y divide-obsidian-border">
-            {pastIncidents.map(tx => (
-              <div key={tx.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-extrabold text-white">₹{tx.amount.toLocaleString('en-IN')}</span>
-                    <span className="text-xs text-slate-400">to {tx.recipientName}</span>
-                    <span className="text-xs text-slate-500 font-mono">({tx.timestamp})</span>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-0.5">{tx.recipientVpa}</p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {tx.status === 'BLOCKED' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">
-                      <Ban className="w-3.5 h-3.5" /> FROZEN & ABORTED
-                    </span>
-                  )}
-                  {tx.status === 'COMPLETED' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> COMPLETED / AUTHORIZED
-                    </span>
-                  )}
-                  {tx.status === 'WARNING_PASSED' && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">
-                      <AlertTriangle className="w-3.5 h-3.5" /> ADVISORY ACKNOWLEDGED
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          <button
+            onClick={handleSimulateIncident}
+            className="px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-md inline-flex items-center gap-2 cursor-pointer"
+          >
+            <Zap className="w-4 h-4 text-white fill-white" />
+            <span>Simulate High-Risk Incident</span>
+          </button>
         </div>
       )}
     </div>
   );
-}
+};
