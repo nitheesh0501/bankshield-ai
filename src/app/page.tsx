@@ -20,6 +20,7 @@ import { evaluateDuressRisk } from '../backend/riskEngine';
 import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV } from '../backend/auditService';
 
 import { Navigation } from '../frontend/Navigation';
+import { LandingPage } from '../frontend/LandingPage';
 import { SeniorPhone } from '../frontend/SeniorPhone';
 import { GuardianDeck } from '../frontend/GuardianDeck';
 
@@ -223,72 +224,9 @@ export default function BankShieldApp() {
         handleFreezeAndAbort={handleFreezeAndAbort}
       />
 
-      {/* STAGE 1: PUBLIC LANDING PAGE */}
+      {/* STAGE 1: COMPREHENSIVE PRODUCT SHOWCASE PUBLIC LANDING PAGE */}
       {pageStage === 'landing' && (
-        <div className="min-h-screen flex flex-col justify-between">
-          <main className="max-w-6xl mx-auto px-4 py-16 sm:py-24 space-y-16">
-            <section className="text-center space-y-6 max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>COGNITIVE CIRCUIT-BREAKER FOR DIGITAL PAYMENTS</span>
-              </div>
-
-              <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-                Stop the Scam Before <br />
-                <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                  the Money Moves.
-                </span>
-              </h1>
-
-              <p className="text-base sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                BankShield AI introduces real-time cognitive circuit-breakers into digital payments, shielding seniors and vulnerable users from digital arrest, fake police threats, and coerced transfers.
-              </p>
-
-              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button
-                  onClick={() => setPageStage('login')}
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Access Protected Banking Portal</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
-            </section>
-
-            <section id="architecture" className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
-              <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-3 py-1 rounded-md border border-rose-200">
-                  THE SYSTEM GAP
-                </span>
-                <h3 className="text-xl font-extrabold text-slate-900">Legacy Authentication (OTP / PIN)</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Traditional 2FA verifies <strong>Who is paying?</strong> but completely ignores psychological coercion. Under digital arrest or fake electricity threats, victims willingly enter their correct PIN.
-                </p>
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-700">
-                  Result: ₹1,000+ Cr lost annually to coercive financial scams.
-                </div>
-              </div>
-
-              <div className="p-8 rounded-3xl bg-white border border-emerald-300 shadow-sm space-y-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200">
-                  THE BANKSHIELD INNOVATION
-                </span>
-                <h3 className="text-xl font-extrabold text-slate-900">Contextual Duress Intelligence</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Evaluates <strong>Why are they paying?</strong> in &lt;50ms. Detects active phone calls, baseline surges (&gt;5x), and authority coercion keywords before triggering 15-minute reversible escrow holds.
-                </p>
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-900">
-                  Result: 100% loss prevention with zero database complexity.
-                </div>
-              </div>
-            </section>
-          </main>
-
-          <footer className="bg-white border-t border-slate-200 py-8 text-center text-xs text-slate-500 space-y-2">
-            <p className="font-bold text-slate-700">BankShield AI Enterprise Security System • Regulatory Compliance Standards</p>
-            <p>24x7 Senior Emergency Helpline: 1800-BANK-SHIELD | Approved for Next-Gen Financial Institutions</p>
-          </footer>
-        </div>
+        <LandingPage onAccessPortal={() => setPageStage('login')} />
       )}
 
       {/* STAGE 2: LOGIN PAGE */}
