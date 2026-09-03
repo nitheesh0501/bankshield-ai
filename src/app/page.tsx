@@ -12,12 +12,14 @@ import {
   Ban,
   Check,
   Send,
-  LogIn
+  LogIn,
+  FileText,
+  Printer
 } from 'lucide-react';
 
 import { PageStage, PortalSubTab, UserRole, AuditItem } from '../types';
 import { evaluateDuressRisk } from '../backend/riskEngine';
-import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV } from '../backend/auditService';
+import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV, exportAuditODS, exportAuditPDF } from '../backend/auditService';
 
 import { Navigation } from '../frontend/Navigation';
 import { LandingPage } from '../frontend/LandingPage';
@@ -363,13 +365,32 @@ export default function BankShieldApp() {
                     </p>
                   </div>
 
-                  <button
-                    onClick={() => exportAuditCSV(auditLogs)}
-                    className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-md flex items-center gap-2 shrink-0 cursor-pointer"
-                  >
-                    <Download className="w-4 h-4 text-emerald-400" />
-                    <span>Export Audit Log (CSV)</span>
-                  </button>
+                  {/* Multi-Format Export Controls */}
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                    <button
+                      onClick={() => exportAuditCSV(auditLogs)}
+                      className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>CSV</span>
+                    </button>
+
+                    <button
+                      onClick={() => exportAuditODS(auditLogs)}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-emerald-200" />
+                      <span>ODS</span>
+                    </button>
+
+                    <button
+                      onClick={() => exportAuditPDF(auditLogs)}
+                      className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Printer className="w-3.5 h-3.5 text-white" />
+                      <span>Print PDF</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
