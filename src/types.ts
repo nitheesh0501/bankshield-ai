@@ -16,7 +16,7 @@ export interface AuditItem {
   vpa: string;
   amount: number;
   riskScore: number;
-  status: 'Escrow Hold' | 'Aborted & Frozen' | 'Advised & Paid' | 'Completed' | 'Guardian Cleared' | 'Guardian Authorized';
+  status: 'Escrow Hold' | 'Aborted & Frozen' | 'Advised & Paid' | 'Completed' | 'Guardian Cleared' | 'Guardian Authorized' | 'Credit Cleared';
   notes: string;
 }
 
