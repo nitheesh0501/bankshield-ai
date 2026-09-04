@@ -379,7 +379,7 @@ export default function BankShieldApp() {
           {/* SUB-TAB 1: DUAL SCREEN MODE */}
           {portalSubTab === 'dual' && (
             <main className="max-w-7xl mx-auto px-4 py-6 space-y-6 animate-in fade-in duration-300">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                 <SeniorPhone
                   recipientName={recipientName}
                   setRecipientName={setRecipientName}
@@ -414,6 +414,7 @@ export default function BankShieldApp() {
                   handleTransferToPocket={handleTransferToPocket}
                   balance={balance}
                   pocketBalance={pocketBalance}
+                  auditLogs={auditLogs}
                 />
               </div>
             </main>
@@ -459,6 +460,7 @@ export default function BankShieldApp() {
                 handleTransferToPocket={handleTransferToPocket}
                 balance={balance}
                 pocketBalance={pocketBalance}
+                auditLogs={auditLogs}
               />
             </main>
           )}
