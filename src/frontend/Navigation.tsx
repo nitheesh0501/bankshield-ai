@@ -57,7 +57,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           {pageStage === 'landing' ? (
             <button
               onClick={() => setPageStage('login')}
-              className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition shadow-sm flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition shadow-sm flex items-center gap-2 cursor-pointer min-h-[44px]"
             >
               <LogIn className="w-4 h-4 text-emerald-400" />
               <span>NetBanking Login</span>
@@ -65,15 +65,15 @@ export const Navigation: React.FC<NavigationProps> = ({
           ) : pageStage === 'login' ? (
             <button
               onClick={() => setPageStage('landing')}
-              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5 border border-slate-200 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5 border border-slate-200 cursor-pointer min-h-[44px]"
             >
               <ChevronLeft className="w-4 h-4 text-slate-500" />
               <span>Back to Home</span>
             </button>
           ) : (
             <>
-              {/* Central Unified Console Tabs */}
-              <nav className="flex items-center gap-1 p-1 bg-slate-100 border border-slate-200 rounded-2xl">
+              {/* Central Unified Console Tabs (Desktop) */}
+              <nav className="hidden md:flex items-center gap-1 p-1 bg-slate-100 border border-slate-200 rounded-2xl">
                 <button
                   onClick={() => setPortalSubTab('dual')}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
@@ -83,8 +83,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                   }`}
                 >
                   <Monitor className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="hidden sm:inline">Co-Pilot Console</span>
-                  <span className="sm:hidden">Console</span>
+                  <span>Co-Pilot Console</span>
                 </button>
 
                 <button
@@ -156,35 +155,83 @@ export const Navigation: React.FC<NavigationProps> = ({
 
       {/* Global Real-Time Incident Alert Banner (Refined Light Rose Banner) */}
       {pageStage === 'portal' && activeEscrow && activeEscrow.status === 'Escrow Hold' && (
-        <div className="w-full bg-rose-100 text-rose-950 text-xs py-2.5 px-6 font-semibold shadow-sm border-b border-rose-200 animate-in slide-in-from-top-2 duration-200">
-          <div className="w-full flex items-center justify-between gap-4">
+        <div className="w-full bg-rose-100 text-rose-950 text-xs py-2.5 px-4 sm:px-6 font-semibold shadow-sm border-b border-rose-200 animate-in slide-in-from-top-2 duration-200">
+          <div className="w-full flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 truncate">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping shrink-0" />
               <span className="truncate font-black text-rose-900">
-                🚨 ACTIVE ESCROW HOLD: ₹{activeEscrow.amount.toLocaleString('en-IN')} transfer paused pending Guardian {guardianInfo.name}'s review ({formatCountdown(countdown)} remaining).
+                🚨 ACTIVE ESCROW HOLD: ₹{activeEscrow.amount.toLocaleString('en-IN')} paused pending review ({formatCountdown(countdown)} left).
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-[11px] bg-rose-200 px-2.5 py-0.5 rounded-md text-rose-900 border border-rose-300 shrink-0 hidden md:inline-block font-mono font-bold">
-                Sub-50ms Circuit Breaker Armed
+                Sub-50ms Circuit Breaker
               </span>
-              {portalSubTab !== 'dual' && portalSubTab !== 'guardian' && (
-                <button
-                  onClick={() => setPortalSubTab('dual')}
-                  className="px-3 py-1 rounded-xl bg-white text-rose-800 font-black hover:bg-rose-50 border border-rose-200 transition text-xs shadow-xs cursor-pointer"
-                >
-                  Review Incident
-                </button>
-              )}
+              <button
+                onClick={() => setPortalSubTab('guardian')}
+                className="px-3 py-1.5 rounded-xl bg-white text-rose-800 font-black hover:bg-rose-50 border border-rose-200 transition text-xs shadow-xs cursor-pointer min-h-[36px] flex items-center justify-center"
+              >
+                Review & Approve
+              </button>
               <button
                 onClick={handleFreezeAndAbort}
-                className="px-3 py-1 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-black transition text-xs border border-rose-800 shadow-xs cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-black transition text-xs border border-rose-800 shadow-xs cursor-pointer min-h-[36px] hidden sm:flex items-center justify-center"
               >
                 Instant Freeze
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* MOBILE NATIVE BOTTOM NAVIGATION TAB BAR */}
+      {pageStage === 'portal' && (
+        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-1.5 flex items-center justify-around md:hidden shadow-lg">
+          <button
+            onClick={() => setPortalSubTab('pay')}
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition cursor-pointer min-h-[48px] justify-center ${
+              portalSubTab === 'pay' ? 'text-emerald-700 font-black' : 'text-slate-500 font-medium'
+            }`}
+          >
+            <Smartphone className="w-5 h-5" />
+            <span className="text-[10px]">Senior Wallet</span>
+          </button>
+
+          <button
+            onClick={() => setPortalSubTab('guardian')}
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition cursor-pointer relative min-h-[48px] justify-center ${
+              portalSubTab === 'guardian' ? 'text-rose-700 font-black' : 'text-slate-500 font-medium'
+            }`}
+          >
+            <div className="relative">
+              <ShieldAlert className="w-5 h-5 text-rose-600" />
+              {activeEscrow && activeEscrow.status === 'Escrow Hold' && (
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping absolute -top-1 -right-1" />
+              )}
+            </div>
+            <span className="text-[10px]">Guardian Deck</span>
+          </button>
+
+          <button
+            onClick={() => setPortalSubTab('dual')}
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition cursor-pointer min-h-[48px] justify-center ${
+              portalSubTab === 'dual' ? 'text-slate-900 font-black' : 'text-slate-500 font-medium'
+            }`}
+          >
+            <Monitor className="w-5 h-5 text-emerald-600" />
+            <span className="text-[10px]">Co-Pilot</span>
+          </button>
+
+          <button
+            onClick={() => setPortalSubTab('audit')}
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition cursor-pointer min-h-[48px] justify-center ${
+              portalSubTab === 'audit' ? 'text-cyan-700 font-black' : 'text-slate-500 font-medium'
+            }`}
+          >
+            <Activity className="w-5 h-5 text-cyan-600" />
+            <span className="text-[10px]">Audit Logs</span>
+          </button>
+        </nav>
       )}
     </>
   );

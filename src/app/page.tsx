@@ -376,7 +376,7 @@ export default function BankShieldApp() {
 
         {/* STAGE 3: UNIFIED FULL-WIDTH AUTHENTICATED PORTAL */}
         {pageStage === 'portal' && (
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-4 pb-24 md:pb-6">
             {/* SUB-TAB 1: UNIFIED CO-PILOT DASHBOARD (DEFAULTS TO FULL-WIDTH 2-COLUMN) */}
             {portalSubTab === 'dual' && (
               <main className="w-full space-y-6 animate-in fade-in duration-300">
