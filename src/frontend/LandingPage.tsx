@@ -21,18 +21,41 @@ import {
   HelpCircle,
   TrendingUp,
   Layers,
-  Sparkles
+  Sparkles,
+  Database,
+  Key,
+  XCircle,
+  Check,
+  SmartphoneNfc,
+  UserCheck,
+  User
 } from 'lucide-react';
 
 interface LandingPageProps {
   onAccessPortal: () => void;
+  onLaunchSeniorPay?: () => void;
+  onLaunchGuardianDeck?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onAccessPortal }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({
+  onAccessPortal,
+  onLaunchSeniorPay,
+  onLaunchGuardianDeck,
+}) => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
+  const handleSeniorClick = () => {
+    if (onLaunchSeniorPay) onLaunchSeniorPay();
+    else onAccessPortal();
+  };
+
+  const handleGuardianClick = () => {
+    if (onLaunchGuardianDeck) onLaunchGuardianDeck();
+    else onAccessPortal();
   };
 
   return (
@@ -40,498 +63,406 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onAccessPortal }) => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-24">
         
         {/* ========================================================================= */}
-        {/* SECTION 1: HERO & IMPACT METRICS BAR                                      */}
+        {/* 1. HERO SECTION                                                           */}
         {/* ========================================================================= */}
-        <section className="text-center space-y-10 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>COGNITIVE CIRCUIT-BREAKER FOR DIGITAL PAYMENTS</span>
+        <section className="text-center space-y-8 max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-xs font-black shadow-xs">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+            <span>ZERO-TRUST DUAL-CUSTODY CO-PILOT FOR SENIORS</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-            Stop the Scam Before <br />
+          <h1 className="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
+            Zero-Trust Dual-Custody UPI for <br />
             <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-              the Money Moves.
+              Seniors & First-Time Digital Bankers
             </span>
           </h1>
 
-          <p className="text-base sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-normal">
-            BankShield AI introduces real-time cognitive circuit-breakers into digital payments, shielding seniors and vulnerable users from digital arrest, fake police threats, and coerced transfers.
+          <p className="text-base sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium">
+            Empowering elderly users with a clean, clutter-free BHIM-inspired UPI interface, backed by real-time guardian co-signing, dynamic spending caps, and duress circuit breakers.
           </p>
 
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* Action Buttons */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={onAccessPortal}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer"
+              onClick={handleSeniorClick}
+              className="w-full sm:w-auto px-8 py-4 min-h-[52px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-black text-base transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Access Protected Banking Portal</span>
+              <Smartphone className="w-5 h-5 text-emerald-200" />
+              <span>Launch Senior UPI Portal</span>
               <ArrowRight className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={handleGuardianClick}
+              className="w-full sm:w-auto px-8 py-4 min-h-[52px] rounded-2xl bg-slate-900 hover:bg-slate-800 active:scale-98 text-white font-black text-base transition shadow-xl shadow-slate-900/30 flex items-center justify-center gap-2 cursor-pointer border border-slate-800"
+            >
+              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              <span>Open Guardian Co-Pilot Deck</span>
             </button>
           </div>
 
-          {/* 4-Column Live Statistics Grid */}
-          <div className="pt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-emerald-300 transition">
+          {/* Metric Highlights */}
+          <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
               <span className="block text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">₹1,000+ Cr</span>
-              <span className="block text-xs font-bold text-slate-500 mt-1">Lost Annually in Coerced Transfers</span>
-              <p className="text-[11px] text-slate-400 mt-1">Coercive social engineering scams targeting seniors.</p>
+              <span className="block text-xs font-bold text-slate-500 mt-1">Senior Scam Loss Annually</span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-emerald-300 transition">
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
               <span className="block text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight">&lt;50ms</span>
-              <span className="block text-xs font-bold text-slate-500 mt-1">Sub-Frame Latency</span>
-              <p className="text-[11px] text-slate-400 mt-1">Client-edge heuristic risk score calculation.</p>
+              <span className="block text-xs font-bold text-slate-500 mt-1">Client Edge Sensor Latency</span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-emerald-300 transition">
-              <span className="block text-2xl sm:text-3xl font-black text-cyan-600 tracking-tight">15-Minute</span>
-              <span className="block text-xs font-bold text-slate-500 mt-1">Reversible Escrow Window</span>
-              <p className="text-[11px] text-slate-400 mt-1">Cognitive cooldown period before ledger finality.</p>
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+              <span className="block text-2xl sm:text-3xl font-black text-cyan-600 tracking-tight">5% Cap</span>
+              <span className="block text-xs font-bold text-slate-500 mt-1">Dynamic Pocket Rule</span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-emerald-300 transition">
-              <span className="block text-2xl sm:text-3xl font-black text-purple-600 tracking-tight">3-Tier</span>
-              <span className="block text-xs font-bold text-slate-500 mt-1">Progressive Friction</span>
-              <p className="text-[11px] text-slate-400 mt-1">Low (0-44), Medium (45-74), High (75-100).</p>
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+              <span className="block text-2xl sm:text-3xl font-black text-purple-600 tracking-tight">432100</span>
+              <span className="block text-xs font-bold text-slate-500 mt-1">Independent Guardian MPIN</span>
             </div>
           </div>
         </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 2: TARGET DEMOGRAPHICS & VULNERABILITY VECTORS (SLIDE 01 & 02)     */}
+        {/* 2. CORE CAPABILITY HIGHLIGHTS                                             */}
         {/* ========================================================================= */}
         <section className="space-y-8">
           <div className="text-center space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-3 py-1 rounded-md border border-rose-200">
-              SLIDE 01 & 02 • THREAT MATRIX
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3.5 py-1 rounded-full border border-emerald-300">
+              CORE INNOVATIONS
             </span>
-            <h2 className="text-3xl font-extrabold text-slate-900">Target Demographics & Coercion Vectors</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              How malicious actors exploit psychological fear, urgency, and technical isolation to override traditional 2FA safety.
+            <h2 className="text-3xl font-black text-slate-900">Built Specifically for Elderly & First-Time Bankers</h2>
+            <p className="text-sm text-slate-600 max-w-2xl mx-auto font-medium">
+              Eliminating financial anxiety with proactive safeguards before money leaves the bank account.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Demographic Targets (4 Cards) */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                <Users className="w-4 h-4 text-emerald-600" />
-                <span>Vulnerable Demographic Cohorts (4 Cards)</span>
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
-                    01
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Senior Citizens</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Digitally isolated elders who panic under threat of legal summons or digital arrest warrants.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
-                    02
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">First-Time Digital Users</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    New Smartphone payment adopters unfamiliar with instant payment finality and non-reversibility.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
-                    03
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Digitally Inexperienced</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Users prone to remote screen-sharing manipulation via AnyDesk/TeamViewer apps under duress.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
-                    04
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Rural Banking Cohorts</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Underserved account holders lacking localized vernacular audio guidance during checkout.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Targeted Coercion Vectors (4 Cards) */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-600" />
-                <span>Targeted Social Engineering Vectors (4 Cards)</span>
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-5 rounded-2xl bg-white border border-rose-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold text-xs">
-                    V1
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Digital Arrest Scams</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Scammers impersonate Police/CBI/ED over video calls, demanding transfer to "official escrow VPAs".
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-white border border-rose-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold text-xs">
-                    V2
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Utility Disconnection Fraud</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Fake electricity/gas cut-off warnings demanding immediate bill settlement within 30 minutes.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-white border border-rose-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold text-xs">
-                    V3
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Bank KYC Re-verification</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Fake SMS links threatening account suspension unless immediate verification payment is executed.
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-white border border-rose-200 shadow-xs space-y-2">
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold text-xs">
-                    V4
-                  </div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Remote Screen Exploits</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Tech support scams tricking victims into granting remote desktop access to drain savings balances.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* SECTION 3: THE FUNDAMENTAL SECURITY GAP COMPARISON MATRIX (SLIDE 02 & 03) */}
-        {/* ========================================================================= */}
-        <section id="architecture" className="space-y-8">
-          <div className="text-center space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200">
-              SLIDE 02 & 03 • COMPARISON MATRIX
-            </span>
-            <h2 className="text-3xl font-extrabold text-slate-900">The Fundamental Security Gap</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              Why legacy authentication fails under duress, and how BankShield provides contextual protection.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left Column: Legacy System Verification */}
-            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-md space-y-6">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 bg-slate-100 px-3 py-1 rounded-md">
-                  LEGACY SYSTEM VERIFICATION
-                </span>
-                <span className="text-xs font-mono font-bold text-rose-600">INSUFFICIENT</span>
-              </div>
-
-              <div>
-                <h3 className="text-2xl font-extrabold text-slate-900">Core Focus: "Who is transacting?"</h3>
-                <p className="text-xs text-slate-500 mt-1">Verifies identity credentials but ignores psychological intent.</p>
-              </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Capability 1 */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Authentication Checks:</h4>
-                <ul className="space-y-2 text-xs text-slate-600">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>2FA SMS / Email One-Time Passwords (OTP)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>6-Digit Secret UPI MPIN Credentials</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>Hardware Device Binding & SIM Card Tokenization</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>Biometric FaceID / Fingerprint Scans</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-1">
-                <span className="text-xs font-bold text-rose-900">The Fatal Blindspot:</span>
-                <p className="text-xs text-rose-800 leading-relaxed">
-                  Passes authentic credentials cleanly because the victim willingly enters their correct PIN while operating under intense coercion and panic.
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-extrabold border border-emerald-300">
+                  <SmartphoneNfc className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-900">Clean Visual UPI</h3>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  High-contrast layout, oversized 48px+ touch targets, visual trusted contact cards, voice assistant guidance, and zero ads or clutter.
                 </p>
               </div>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200 inline-block w-fit">
+                BHIM-Inspired Accessible UX
+              </span>
             </div>
 
-            {/* Right Column: BankShield Contextual Safety Layer */}
-            <div className="p-8 rounded-3xl bg-white border-2 border-emerald-500 shadow-xl space-y-6">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200">
-                  BANKSHIELD CONTEXTUAL SAFETY LAYER
-                </span>
-                <span className="text-xs font-mono font-bold text-emerald-600">ACTIVE PROTECTION</span>
-              </div>
-
-              <div>
-                <h3 className="text-2xl font-extrabold text-slate-900">Core Focus: "Why are they paying?"</h3>
-                <p className="text-xs text-slate-500 mt-1">Evaluates psychological coercion and real-time behavioral telemetry.</p>
-              </div>
-
+            {/* Capability 2 */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Contextual Heuristic Checks:</h4>
-                <ul className="space-y-2 text-xs text-slate-700 font-medium">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Surge Multiplier vs. 30-Day Baseline Spend</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Active In-Call Background Telemetry Sensors (+15 pts)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Beneficiary VPA Registration Age (&lt;10 mins ago)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Authority Coercion Pattern Match ('dcp', 'cyber', 'escrow')</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-1">
-                <span className="text-xs font-bold text-emerald-900">The BankShield Result:</span>
-                <p className="text-xs text-emerald-800 leading-relaxed">
-                  Triggers 15-minute reversible escrow holds before final ledger settlement, providing time for family guardian review.
+                <div className="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-extrabold border border-cyan-300">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-900">Dynamic Algorithmic Cap</h3>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Daily safe allowances dynamically calculated at 5% of cleared savings (bounded between ₹1,000 and ₹10,000), halving automatically for unverified VPAs.
                 </p>
               </div>
+              <span className="text-[11px] font-bold text-cyan-700 bg-cyan-50 px-2.5 py-1 rounded-xl border border-cyan-200 inline-block w-fit">
+                5% Safe Pocket Rule
+              </span>
+            </div>
+
+            {/* Capability 3 */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center font-extrabold border border-purple-300">
+                  <Lock className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-900">Dual-Custody Co-Sign</h3>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Coercion threats and high-value transfers route to Supabase escrow, unlocking only when the guardian validates via independent MPIN (<code className="font-mono bg-purple-100 text-purple-900 px-1 py-0.5 rounded">432100</code>).
+                </p>
+              </div>
+              <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-xl border border-purple-200 inline-block w-fit">
+                Pre-Settlement Guardian Escrow
+              </span>
+            </div>
+
+            {/* Capability 4 */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center font-extrabold border border-rose-300">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-900">Duress Circuit Breaker</h3>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Sub-50ms engine intercepts active phone calls, digital arrest threats, and coercive social engineering before funds leave the bank account.
+                </p>
+              </div>
+              <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200 inline-block w-fit">
+                Sub-50ms Active Call Sensor
+              </span>
             </div>
           </div>
         </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 4: OPERATIONAL 3-TIER WORKFLOW (SLIDE 04 & 05)                    */}
-        {/* ========================================================================= */}
-        <section id="how-it-works" className="space-y-8">
-          <div className="text-center space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-cyan-700 bg-cyan-50 px-3 py-1 rounded-md border border-cyan-200">
-              SLIDE 04 & 05 • PROGRESSIVE PIPELINE
-            </span>
-            <h2 className="text-3xl font-extrabold text-slate-900">Operational 3-Tier Response Workflow</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              How BankShield dynamically scales friction based on real-time calculated threat levels.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-slate-500">STAGE 01</span>
-                <span className="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">SCORE 0–44</span>
-              </div>
-              <h3 className="text-lg font-extrabold text-slate-900">Stage 01: Detect</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Sub-50ms edge scoring evaluates transaction amount surges, beneficiary creation age, and midnight velocity.
-              </p>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-700 font-mono">
-                Low Risk: Frictionless instant execution.
-              </div>
-            </div>
-
-            <div className="p-6 rounded-3xl bg-white border border-amber-300 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-amber-600">STAGE 02</span>
-                <span className="text-xs font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">SCORE 45–74</span>
-              </div>
-              <h3 className="text-lg font-extrabold text-slate-900">Stage 02: Challenge</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Triggers plain-language warning modals and Web Speech API vernacular voice assist in English, Hindi, or Tamil.
-              </p>
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-mono">
-                Medium Risk: Vernacular voice advisory challenge.
-              </div>
-            </div>
-
-            <div className="p-6 rounded-3xl bg-white border-2 border-rose-500 shadow-md space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-rose-600">STAGE 03</span>
-                <span className="text-xs font-mono font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded">SCORE 75–100</span>
-              </div>
-              <h3 className="text-lg font-extrabold text-slate-900">Stage 03: Escalate</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Initiates 15-minute reversible escrow cooldown, dispatches n8n webhook alerts to registered guardians, and offers 1-click remote freeze.
-              </p>
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-[11px] text-rose-900 font-mono">
-                High Risk: Reversible Senior Safety Escrow hold.
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* SECTION 5: TECHNICAL SYSTEM ARCHITECTURE (SLIDE 06 & 07)                  */}
+        {/* 3. PLATFORM COMPARISON MATRIX                                            */}
         {/* ========================================================================= */}
         <section className="space-y-8">
           <div className="text-center space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-3 py-1 rounded-md border border-purple-200">
-              SLIDE 06 & 07 • TECHNICAL ARCHITECTURE
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700 bg-slate-200 px-3.5 py-1 rounded-full border border-slate-300">
+              PLATFORM COMPARISON MATRIX
             </span>
-            <h2 className="text-3xl font-extrabold text-slate-900">Technical System Architecture</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              Client-edge heuristic evaluation with zero backend database schema mutations.
+            <h2 className="text-3xl font-black text-slate-900">Why Legacy & Youth Wallets Fail Seniors</h2>
+            <p className="text-sm text-slate-600 max-w-2xl mx-auto font-medium">
+              Comparing standard consumer UPI apps, youth allowance wallets, and BankShield AI's senior defense engine.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-                <Cpu className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-extrabold text-slate-900">Column 1: Dual Signals Capture</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Captures transaction payload parameters (amount, beneficiary VPA) combined with real-time mobile sensor telemetry (background phone call sensor).
-              </p>
-            </div>
+          <div className="overflow-x-auto rounded-3xl border-2 border-slate-200 bg-white shadow-xl">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-900 text-white uppercase font-black tracking-wider text-[11px] border-b border-slate-800">
+                <tr>
+                  <th className="py-4 px-5 w-1/4">Feature / Capability</th>
+                  <th className="py-4 px-5 w-1/4 text-slate-300">Standard UPI Apps (BHIM, Google Pay)</th>
+                  <th className="py-4 px-5 w-1/4 text-amber-300">Youth Wallets (FamPay, Prepaid)</th>
+                  <th className="py-4 px-5 w-1/4 text-emerald-400 bg-slate-800/90 font-black">BankShield AI Senior Co-Pilot</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 font-medium">
+                <tr className="hover:bg-slate-50">
+                  <td className="py-4 px-5 font-extrabold text-slate-900">Target Demographic</td>
+                  <td className="py-4 px-5 text-slate-600">General Population (Tech-savvy)</td>
+                  <td className="py-4 px-5 text-slate-600">Teenagers & Kids</td>
+                  <td className="py-4 px-5 font-extrabold text-emerald-700 bg-emerald-50/60">Senior Citizens (60+), Rural & Vulnerable Bankers</td>
+                </tr>
 
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                <Activity className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-extrabold text-slate-900">Column 2: Edge Risk Aggregator</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Sub-50ms client-side heuristic engine computes aggregate risk score (0–100) based on historical surge multipliers and coercion keyword pattern matching.
-              </p>
-            </div>
+                <tr className="hover:bg-slate-50">
+                  <td className="py-4 px-5 font-extrabold text-slate-900">Authorization Model</td>
+                  <td className="py-4 px-5 text-slate-600">1-PIN Single Device (Coerced victim enters PIN)</td>
+                  <td className="py-4 px-5 text-slate-600">Parent Balance Top-Up Load</td>
+                  <td className="py-4 px-5 font-extrabold text-emerald-700 bg-emerald-50/60">Dual-Custody Pre-Settlement Escrow & Co-Sign</td>
+                </tr>
 
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold">
-                <Zap className="w-5 h-5" />
-              </div>
-              <h3 className="text-base font-extrabold text-slate-900">Column 3: Action Dispatcher</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Synthesizes browser-native Web Speech API warnings and fires asynchronous n8n webhooks to family guardian devices.
-              </p>
-            </div>
+                <tr className="hover:bg-slate-50">
+                  <td className="py-4 px-5 font-extrabold text-slate-900">Spending Limit Rule</td>
+                  <td className="py-4 px-5 text-slate-600">Static Daily Bank Limit (₹1,00,000)</td>
+                  <td className="py-4 px-5 text-slate-600">Fixed Manual Pocket Allowance</td>
+                  <td className="py-4 px-5 font-extrabold text-emerald-700 bg-emerald-50/60">Dynamic 5% Safe Cap Rule (Bounded ₹1,000–₹10,000)</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50">
+                  <td className="py-4 px-5 font-extrabold text-slate-900">Duress & Scam Defense</td>
+                  <td className="py-4 px-5 text-rose-700 font-semibold flex items-center gap-1">
+                    <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>None (Victim enters PIN voluntarily)</span>
+                  </td>
+                  <td className="py-4 px-5 text-slate-600">Basic Merchant Category Restrictions</td>
+                  <td className="py-4 px-5 font-extrabold text-emerald-700 bg-emerald-50/60 flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Sub-50ms Active Call & Coercion Circuit-Breaker</span>
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-slate-50">
+                  <td className="py-4 px-5 font-extrabold text-slate-900">Guardian Co-Pilot Control</td>
+                  <td className="py-4 px-5 text-slate-600">Zero Guardian / Family Oversight</td>
+                  <td className="py-4 px-5 text-slate-600">Parent Wallet Load Approval</td>
+                  <td className="py-4 px-5 font-extrabold text-emerald-700 bg-emerald-50/60">Independent Guardian MPIN (<code className="font-mono">432100</code>) & 1-Click Freeze</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50">
+                  <td className="py-4 px-5 font-extrabold text-slate-900">Audit Ledger & Settlement</td>
+                  <td className="py-4 px-5 text-slate-600">Instant Non-Reversible Outflow</td>
+                  <td className="py-4 px-5 text-slate-600">Prepaid Wallet Settlement</td>
+                  <td className="py-4 px-5 font-extrabold text-emerald-700 bg-emerald-50/60">Supabase Real-Time Dual Audit Ledger</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 6: BUSINESS ALIGNMENT & INSTITUTIONAL DEPLOYMENT (SLIDE 08 & 09)  */}
+        {/* 4. ARCHITECTURE & LIVE EVALUATOR CREDENTIALS                              */}
         {/* ========================================================================= */}
-        <section id="about" className="space-y-8">
+        <section className="space-y-8">
           <div className="text-center space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-3 py-1 rounded-md border border-slate-200">
-              SLIDE 08 & 09 • ENTERPRISE DEPLOYMENT
+            <span className="text-xs font-black uppercase tracking-wider text-purple-800 bg-purple-100 px-3.5 py-1 rounded-full border border-purple-300">
+              EVALUATOR QUICK-TEST PANEL
             </span>
-            <h2 className="text-3xl font-extrabold text-slate-900">Institutional Deployment & Compliance</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              Designed for seamless integration into existing mobile banking apps without infrastructure overhauls.
+            <h2 className="text-3xl font-black text-slate-900">Architecture & Test Credentials</h2>
+            <p className="text-sm text-slate-600 max-w-2xl mx-auto font-medium">
+              Powered by Supabase PostgreSQL audit ledger with real-time state synchronization.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <Building2 className="w-8 h-8 text-emerald-600" />
-              <h3 className="text-base font-extrabold text-slate-900">Target Deployments</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Commercial Retail Banks, Small Finance Banks (SFBs), and Payment Service Providers (PSPs) seeking senior safety compliance.
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            {/* Column 1: Technical Architecture */}
+            <div className="p-8 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-xl space-y-5 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                    <Database className="w-4 h-4" />
+                    <span>Supabase PostgreSQL Architecture</span>
+                  </span>
+                  <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded">
+                    REALTIME SYNC
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                  BankShield AI persists all transaction logs, escrow holds, and guardian overrides into an immutable Supabase <code className="font-mono text-emerald-400">audit_ledger</code> table. Real-time webhooks dispatch instant status transitions to both Ramesh's UPI Phone and Ananya's Guardian Deck.
+                </p>
+
+                <div className="space-y-2 text-xs font-mono text-slate-300 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Database:</span>
+                    <span className="text-emerald-400 font-bold">Supabase PostgreSQL 15</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Table:</span>
+                    <span className="text-white">public.audit_ledger</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">State Sync:</span>
+                    <span className="text-cyan-400">Supabase Realtime Channel</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-xs text-emerald-200 font-medium">
+                🔒 Every escrow override requires Guardian MPIN verification (<code className="font-mono font-bold text-white">432100</code>) before ledger balance deduction.
+              </div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <Layers className="w-8 h-8 text-cyan-600" />
-              <h3 className="text-base font-extrabold text-slate-900">Integration Model</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Lightweight client-side mobile SDK drop-in requiring zero backend database schema modifications or complex server migration.
-              </p>
-            </div>
+            {/* Column 2: Evaluator Demo Credentials Panel */}
+            <div className="p-8 rounded-3xl bg-white border-2 border-emerald-500 shadow-xl space-y-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-md border border-emerald-300">
+                    EVALUATOR QUICK-TEST CREDENTIALS
+                  </span>
+                  <span className="text-xs font-mono font-bold text-emerald-700">LIVE DEMO READY</span>
+                </div>
 
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
-              <ShieldCheck className="w-8 h-8 text-purple-600" />
-              <h3 className="text-base font-extrabold text-slate-900">Regulatory Compliance</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Directly aligns with central banking consumer protection mandates for coercive fraud mitigation and vulnerable customer safeguarding.
-              </p>
+                <h3 className="text-xl font-black text-slate-900">Pre-Populated Hackathon Personas</h3>
+
+                <div className="space-y-3">
+                  {/* Senior Persona */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <User className="w-4 h-4 text-emerald-600" />
+                        <span>Senior Ramesh Kumar (Age: 68)</span>
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                        Senior Persona
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs pt-1 font-medium text-slate-600">
+                      <span>Phone: <strong className="text-slate-900 font-mono">+91 98401 92418</strong></span>
+                      <span>Senior MPIN: <code className="font-mono font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">924180</code></span>
+                    </div>
+                  </div>
+
+                  {/* Guardian Persona */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <UserCheck className="w-4 h-4 text-purple-600" />
+                        <span>Guardian Ananya Kumar (Daughter)</span>
+                      </span>
+                      <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                        Guardian Co-Pilot
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs pt-1 font-medium text-slate-600">
+                      <span>Phone: <strong className="text-slate-900 font-mono">+91 98765 43210</strong></span>
+                      <span>Guardian MPIN: <code className="font-mono font-black text-purple-700 bg-purple-100 px-2 py-0.5 rounded border border-purple-300">432100</code></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Direct Quick Launch Buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSeniorClick}
+                  className="py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Smartphone className="w-4 h-4" />
+                  <span>Launch Senior Portal</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGuardianClick}
+                  className="py-3.5 px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Open Guardian Deck</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 7: FAQ ACCORDION                                                  */}
+        {/* 5. FAQ ACCORDION                                                          */}
         {/* ========================================================================= */}
         <section className="space-y-8 max-w-4xl mx-auto">
           <div className="text-center space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200">
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3.5 py-1 rounded-full border border-emerald-300">
               FREQUENTLY ASKED QUESTIONS
             </span>
-            <h2 className="text-3xl font-extrabold text-slate-900">Product & Security FAQ</h2>
+            <h2 className="text-3xl font-black text-slate-900">Product & Security FAQ</h2>
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden">
+            <div className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
               <button
                 onClick={() => toggleFaq(0)}
-                className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-900 hover:bg-slate-50 transition cursor-pointer"
+                className="w-full p-5 text-left flex items-center justify-between gap-4 font-black text-sm text-slate-900 hover:bg-slate-50 transition cursor-pointer"
               >
-                <span>1. Does BankShield introduce friction for regular daily payments?</span>
+                <span>1. How does the 5% Safe Pocket Cap rule work for seniors?</span>
                 {openFaqIndex === 0 ? <ChevronUp className="w-5 h-5 text-emerald-600 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />}
               </button>
               {openFaqIndex === 0 && (
-                <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
-                  No. Transactions scoring below 45 (e.g. routine groceries under ₹1,200) execute instantly with zero friction. Friction is dynamically introduced only when abnormal surge multipliers or duress sensors are triggered.
+                <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3 font-medium">
+                  The Safe Cap dynamically calculates 5% of Ramesh's cleared savings balance (₹1,42,800 * 5% = ₹7,140). Any transfer within ₹7,140 to verified recipients executes instantly upon entering Senior MPIN (924180). Transfers exceeding ₹7,140 automatically route to Guardian Ananya for 1-tap authorization using her independent MPIN (432100).
                 </div>
               )}
             </div>
 
-            <div className="rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden">
+            <div className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
               <button
                 onClick={() => toggleFaq(1)}
-                className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-900 hover:bg-slate-50 transition cursor-pointer"
+                className="w-full p-5 text-left flex items-center justify-between gap-4 font-black text-sm text-slate-900 hover:bg-slate-50 transition cursor-pointer"
               >
-                <span>2. How does the guardian override work if the payment is legitimate?</span>
+                <span>2. How does Guardian co-signing protect against Digital Arrest scams?</span>
                 {openFaqIndex === 1 ? <ChevronUp className="w-5 h-5 text-emerald-600 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />}
               </button>
               {openFaqIndex === 1 && (
-                <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
-                  Designated guardians receive real-time push alerts with transaction context. A single tap on "I Verified — Authorize Transfer" releases the escrow hold instantly before the 15-minute countdown expires.
+                <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3 font-medium">
+                  When a scammer coercively dictates an emergency transfer over an active phone call, BankShield's background call telemetry detects the call and intercepts the payment into escrow—even if Ramesh enters his correct Senior MPIN. The money cannot leave the bank account until Guardian Ananya verifies and co-signs using her MPIN (432100).
                 </div>
               )}
             </div>
 
-            <div className="rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden">
+            <div className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
               <button
                 onClick={() => toggleFaq(2)}
-                className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-900 hover:bg-slate-50 transition cursor-pointer"
+                className="w-full p-5 text-left flex items-center justify-between gap-4 font-black text-sm text-slate-900 hover:bg-slate-50 transition cursor-pointer"
               >
-                <span>3. Can BankShield run entirely offline or on-device?</span>
+                <span>3. What are the evaluator quick-test MPIN credentials?</span>
                 {openFaqIndex === 2 ? <ChevronUp className="w-5 h-5 text-emerald-600 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />}
               </button>
               {openFaqIndex === 2 && (
-                <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
-                  Yes. The heuristic risk calculation operates on the client device at sub-50ms speeds with zero external backend roundtrips required for the risk score evaluation.
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden">
-              <button
-                onClick={() => toggleFaq(3)}
-                className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-900 hover:bg-slate-50 transition cursor-pointer"
-              >
-                <span>4. Is sensitive transaction data shared externally?</span>
-                {openFaqIndex === 3 ? <ChevronUp className="w-5 h-5 text-emerald-600 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />}
-              </button>
-              {openFaqIndex === 3 && (
-                <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
-                  No. Only encrypted and masked transaction telemetry (amount, VPA domain, calculated risk score) is dispatched to pre-registered family guardians via secure webhooks.
+                <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3 font-medium">
+                  Senior Ramesh's MPIN is <code className="font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">924180</code>. Guardian Ananya's MPIN is <code className="font-mono font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">432100</code>. Demo auto-fill shortcuts are provided on all PIN modals for smooth evaluation.
                 </div>
               )}
             </div>
