@@ -45,7 +45,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   guardianInfo,
   setGuardianInfo,
 }) => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showMpin, setShowMpin] = useState<boolean>(false);
   const [useBiometrics, setUseBiometrics] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,12 +62,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const selectPersona = (role: UserRole) => {
     setUserRole(role);
     if (role === 'senior' || role === 'customer') {
-      setLoginId('ACC-9241805');
-      setLoginPin('••••••');
+      setLoginId('+91 98401 92418');
+      setLoginPin('924180');
       setPortalSubTab('pay');
     } else {
-      setLoginId('GUARD-43210');
-      setLoginPin('••••••');
+      setLoginId(guardianInfo.phone || '+91 98765 43210');
+      setLoginPin('432100');
       setPortalSubTab('guardian');
     }
   };
@@ -142,7 +142,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 </div>
                 <div>
                   <span className="block text-xs font-bold text-white">Guardian Sync Tunnel Status</span>
-                  <span className="text-[11px] text-slate-300">Encrypted webhook active ({guardianInfo.name} registered)</span>
+                  <span className="text-[11px] text-slate-300">Encrypted channel active ({guardianInfo.name} registered)</span>
                 </div>
               </div>
 
@@ -207,7 +207,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 font-medium">
-                      Opens Senior UPI Payment Portal with active voice duress protection.
+                      Senior Customer Access • Verified Ward
+                    </p>
+                    <p className="text-[11px] font-mono text-emerald-700 font-bold pt-0.5">
+                      Demo Phone: +91 98401 92418 | Default MPIN: 924180
                     </p>
                   </div>
                   {(userRole === 'senior' || userRole === 'customer') && (
@@ -233,7 +236,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 font-medium">
-                      {guardianInfo.relation} • Mobile {guardianInfo.phone} • Linked to Ramesh
+                      Nominated Guardian Access • Dual Oversight Enabled
+                    </p>
+                    <p className="text-[11px] font-mono text-rose-700 font-bold pt-0.5">
+                      Demo Phone: {guardianInfo.phone || '+91 98765 43210'} | Default MPIN: 432100
                     </p>
                   </div>
                   {userRole === 'guardian' && (
@@ -255,6 +261,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     value={loginId}
                     onChange={e => setLoginId(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-medium text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                    placeholder="Enter User ID or Mobile"
                   />
                 </div>
               </div>
@@ -269,18 +276,31 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 <div className="relative">
                   <Key className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showMpin ? 'text' : 'password'}
+                    maxLength={6}
                     required
                     value={loginPin}
                     onChange={e => setLoginPin(e.target.value)}
-                    className="w-full pl-10 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition tracking-widest"
+                    className="w-full pl-10 pr-28 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono font-bold text-sm tracking-widest focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                    placeholder="Enter 6-digit MPIN"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
+                    onClick={() => setShowMpin(!showMpin)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-900 text-[11px] font-bold px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 transition cursor-pointer flex items-center gap-1"
+                    title={showMpin ? 'Hide MPIN' : 'Show MPIN'}
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showMpin ? (
+                      <>
+                        <EyeOff className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Hide</span>
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Show MPIN</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -326,17 +346,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </form>
           </div>
 
-          {/* Footer Links */}
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-semibold text-slate-500">
+          {/* Clean Footer Links */}
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500">
             <button
               onClick={onReturnHome}
               className="hover:text-slate-900 transition flex items-center gap-1 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
-              <span>Return to Public Landing Page</span>
+              <span>Return to Public Overview</span>
             </button>
             
-            {/* Interactive Register New Guardian Button */}
+            {/* Simple Register New Guardian Text Link */}
             <button
               type="button"
               onClick={() => setIsRegisterModalOpen(true)}

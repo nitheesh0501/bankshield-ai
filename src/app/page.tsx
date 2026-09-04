@@ -46,8 +46,8 @@ export default function BankShieldApp() {
   });
 
   // Login Form State
-  const [loginId, setLoginId] = useState('ACC-9241805');
-  const [loginPin, setLoginPin] = useState('••••••');
+  const [loginId, setLoginId] = useState('+91 98401 92418');
+  const [loginPin, setLoginPin] = useState('924180');
 
   // Senior Phone Input State
   const [recipientName, setRecipientName] = useState('DCP Cyber Cell Official Escrow');
