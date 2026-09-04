@@ -205,12 +205,12 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           <span>Ramesh's Assisted UPI Wallet</span>
         </h3>
         <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-          PROTECTED BY ANANYA
+          Senior Privilege Savings A/C
         </span>
       </div>
 
-      {/* Main Mobile App Frame - Modern Light Surface */}
-      <div className="bg-white text-slate-900 border border-slate-200 rounded-[36px] p-5 sm:p-6 shadow-xl space-y-5 overflow-hidden">
+      {/* Main Mobile App Frame - Smartphone Mockup Frame */}
+      <div className="rounded-[2.5rem] p-5 sm:p-6 shadow-2xl bg-slate-900 border-4 border-slate-800 text-white space-y-5 overflow-hidden">
         
         {/* User Account Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -549,8 +549,8 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             type="submit"
             className="w-full py-4 min-h-[52px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-black text-base transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
-            <Send className="w-5 h-5 text-white" />
-            <span>Send ₹{amount ? Number(amount).toLocaleString('en-IN') : '0'} Now</span>
+            <ShieldCheck className="w-5 h-5 text-emerald-200" />
+            <span>Verify & Execute Payment (BankShield Monitored)</span>
           </button>
         </form>
 

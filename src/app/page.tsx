@@ -377,12 +377,12 @@ export default function BankShieldApp() {
         {/* STAGE 3: UNIFIED FULL-WIDTH AUTHENTICATED PORTAL */}
         {pageStage === 'portal' && (
           <div className="w-full px-4 sm:px-6 lg:px-8 py-4 pb-24 md:pb-6">
-            {/* SUB-TAB 1: UNIFIED CO-PILOT DASHBOARD (DEFAULTS TO FULL-WIDTH 2-COLUMN) */}
+            {/* SUB-TAB 1: UNIFIED CO-PILOT DASHBOARD (CLASSIC SIDE-BY-SIDE DUAL PORTAL) */}
             {portalSubTab === 'dual' && (
               <main className="w-full space-y-6 animate-in fade-in duration-300">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-stretch">
-                  {/* Left Column (40% width): Assisted UPI Terminal */}
-                  <div className="lg:col-span-5 w-full flex flex-col">
+                <div className="w-full min-h-[calc(100vh-64px)] bg-slate-50 flex flex-col lg:flex-row gap-6 items-start">
+                  {/* Left Side (Senior UPI Phone Portal - ~40% width / lg:w-[420px] shrink-0) */}
+                  <div className="w-full lg:w-[420px] shrink-0 flex flex-col">
                     <SeniorPhone
                       recipientName={recipientName}
                       setRecipientName={setRecipientName}
@@ -404,8 +404,8 @@ export default function BankShieldApp() {
                     />
                   </div>
 
-                  {/* Right Column (60% width): Guardian Supervisory & Co-Sign Engine */}
-                  <div className="lg:col-span-7 w-full flex flex-col">
+                  {/* Right Side (Guardian Safety & Co-Pilot Deck - ~60% width / flex-1) */}
+                  <div className="flex-1 w-full flex flex-col">
                     <GuardianDeck
                       activeEscrow={activeEscrow}
                       countdown={countdown}

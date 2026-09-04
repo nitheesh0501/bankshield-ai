@@ -132,38 +132,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <section className="space-y-8">
           <div className="text-center space-y-2">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3.5 py-1 rounded-full border border-emerald-300">
-              CORE INNOVATIONS
+              CORE CAPABILITIES
             </span>
-            <h2 className="text-3xl font-black text-slate-900">Built Specifically for Elderly & First-Time Bankers</h2>
+            <h2 className="text-3xl font-black text-slate-900">Core Capabilities</h2>
             <p className="text-sm text-slate-600 max-w-2xl mx-auto font-medium">
-              Eliminating financial anxiety with proactive safeguards before money leaves the bank account.
+              Eliminating financial anxiety for elderly & first-time bankers with proactive safeguards before money leaves the account.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Capability 1 */}
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
+            {/* Capability 1: BHIM-Grade Simplicity */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-md space-y-4 flex flex-col justify-between hover:border-emerald-400 hover:shadow-lg transition">
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-extrabold border border-emerald-300">
                   <SmartphoneNfc className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900">Clean Visual UPI</h3>
+                <h3 className="text-lg font-black text-slate-900">BHIM-Grade Simplicity</h3>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   High-contrast layout, oversized 48px+ touch targets, visual trusted contact cards, voice assistant guidance, and zero ads or clutter.
                 </p>
               </div>
               <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200 inline-block w-fit">
-                BHIM-Inspired Accessible UX
+                Clean Visual UPI
               </span>
             </div>
 
-            {/* Capability 2 */}
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
+            {/* Capability 2: Dynamic Safe Caps */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-md space-y-4 flex flex-col justify-between hover:border-emerald-400 hover:shadow-lg transition">
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-extrabold border border-cyan-300">
                   <TrendingUp className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900">Dynamic Algorithmic Cap</h3>
+                <h3 className="text-lg font-black text-slate-900">Dynamic Safe Caps</h3>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   Daily safe allowances dynamically calculated at 5% of cleared savings (bounded between ₹1,000 and ₹10,000), halving automatically for unverified VPAs.
                 </p>
@@ -173,55 +173,55 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </span>
             </div>
 
-            {/* Capability 3 */}
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
+            {/* Capability 3: Real-Time Escrow */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-md space-y-4 flex flex-col justify-between hover:border-emerald-400 hover:shadow-lg transition">
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center font-extrabold border border-purple-300">
                   <Lock className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900">Dual-Custody Co-Sign</h3>
+                <h3 className="text-lg font-black text-slate-900">Real-Time Escrow</h3>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   Coercion threats and high-value transfers route to Supabase escrow, unlocking only when the guardian validates via independent MPIN (<code className="font-mono bg-purple-100 text-purple-900 px-1 py-0.5 rounded">432100</code>).
                 </p>
               </div>
               <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-xl border border-purple-200 inline-block w-fit">
-                Pre-Settlement Guardian Escrow
+                Dual-Custody Co-Sign
               </span>
             </div>
 
-            {/* Capability 4 */}
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-lg space-y-4 flex flex-col justify-between hover:border-emerald-400 transition">
+            {/* Capability 4: Active Duress Shield */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-md space-y-4 flex flex-col justify-between hover:border-emerald-400 hover:shadow-lg transition">
               <div className="space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center font-extrabold border border-rose-300">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900">Duress Circuit Breaker</h3>
+                <h3 className="text-lg font-black text-slate-900">Active Duress Shield</h3>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   Sub-50ms engine intercepts active phone calls, digital arrest threats, and coercive social engineering before funds leave the bank account.
                 </p>
               </div>
               <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200 inline-block w-fit">
-                Sub-50ms Active Call Sensor
+                Sub-50ms Circuit Breaker
               </span>
             </div>
           </div>
         </section>
 
         {/* ========================================================================= */}
-        {/* 3. PLATFORM COMPARISON MATRIX                                            */}
+        {/* 3. PLATFORM COMPARISON SECTION                                            */}
         {/* ========================================================================= */}
         <section className="space-y-8">
           <div className="text-center space-y-2">
             <span className="text-xs font-black uppercase tracking-wider text-slate-700 bg-slate-200 px-3.5 py-1 rounded-full border border-slate-300">
-              PLATFORM COMPARISON MATRIX
+              PLATFORM COMPARISON
             </span>
-            <h2 className="text-3xl font-black text-slate-900">Why Legacy & Youth Wallets Fail Seniors</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto font-medium">
-              Comparing standard consumer UPI apps, youth allowance wallets, and BankShield AI's senior defense engine.
+            <h2 className="text-3xl font-black text-slate-900">Platform Comparison</h2>
+            <p className="text-sm font-semibold text-slate-600 max-w-2xl mx-auto">
+              BankShield AI vs Standard UPI vs Youth Wallets
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-3xl border-2 border-slate-200 bg-white shadow-xl">
+          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-lg">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-900 text-white uppercase font-black tracking-wider text-[11px] border-b border-slate-800">
                 <tr>
@@ -285,16 +285,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </section>
 
         {/* ========================================================================= */}
-        {/* 4. ARCHITECTURE & LIVE EVALUATOR CREDENTIALS                              */}
+        {/* 4. DEMO & EVALUATION PANEL                                                */}
         {/* ========================================================================= */}
         <section className="space-y-8">
           <div className="text-center space-y-2">
             <span className="text-xs font-black uppercase tracking-wider text-purple-800 bg-purple-100 px-3.5 py-1 rounded-full border border-purple-300">
-              EVALUATOR QUICK-TEST PANEL
+              EVALUATION SANDBOX
             </span>
-            <h2 className="text-3xl font-black text-slate-900">Architecture & Test Credentials</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto font-medium">
-              Powered by Supabase PostgreSQL audit ledger with real-time state synchronization.
+            <h2 className="text-3xl font-black text-slate-900">Evaluation Sandbox & MPIN Credentials</h2>
+            <p className="text-sm font-bold text-slate-700 max-w-2xl mx-auto">
+              Senior MPIN: <code className="font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">924180</code> | Guardian MPIN: <code className="font-mono bg-purple-100 text-purple-800 px-2 py-0.5 rounded border border-purple-300">432100</code>
             </p>
           </div>
 
@@ -342,7 +342,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                   <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-md border border-emerald-300">
-                    EVALUATOR QUICK-TEST CREDENTIALS
+                    EVALUATION SANDBOX & MPIN CREDENTIALS
                   </span>
                   <span className="text-xs font-mono font-bold text-emerald-700">LIVE DEMO READY</span>
                 </div>
