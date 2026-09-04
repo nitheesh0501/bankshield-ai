@@ -380,9 +380,9 @@ export default function BankShieldApp() {
             {/* SUB-TAB 1: UNIFIED CO-PILOT DASHBOARD (DEFAULTS TO FULL-WIDTH 2-COLUMN) */}
             {portalSubTab === 'dual' && (
               <main className="w-full space-y-6 animate-in fade-in duration-300">
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full items-stretch">
-                  {/* Left Column: Assisted UPI Terminal */}
-                  <div className="xl:col-span-5 w-full flex flex-col">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-stretch">
+                  {/* Left Column (40% width): Assisted UPI Terminal */}
+                  <div className="lg:col-span-5 w-full flex flex-col">
                     <SeniorPhone
                       recipientName={recipientName}
                       setRecipientName={setRecipientName}
@@ -404,8 +404,8 @@ export default function BankShieldApp() {
                     />
                   </div>
 
-                  {/* Right Column: Guardian Supervisory & Co-Sign Engine */}
-                  <div className="xl:col-span-7 w-full flex flex-col">
+                  {/* Right Column (60% width): Guardian Supervisory & Co-Sign Engine */}
+                  <div className="lg:col-span-7 w-full flex flex-col">
                     <GuardianDeck
                       activeEscrow={activeEscrow}
                       countdown={countdown}
