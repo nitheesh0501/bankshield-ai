@@ -23,7 +23,8 @@ import {
   ShoppingBag,
   HeartPulse,
   Receipt,
-  RotateCcw
+  RotateCcw,
+  Wallet
 } from 'lucide-react';
 import { PRESET_SCENARIOS, computeDynamicCap } from '../backend/riskEngine';
 import { AuditItem, GuardianInfo } from '../types';
@@ -42,6 +43,7 @@ interface SeniorPhoneProps {
   currentMultiplier: string;
   handleAuthorizeTransfer: (e: React.FormEvent) => void;
   balance?: number;
+  pocketBalance?: number;
   activeEscrow?: AuditItem | null;
   guardianInfo?: GuardianInfo;
   lastGuardianTopUp?: { amount: number; time: string } | null;
@@ -61,6 +63,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
   currentMultiplier,
   handleAuthorizeTransfer,
   balance = 142800,
+  pocketBalance = 3000,
   activeEscrow = null,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
   lastGuardianTopUp = null,
@@ -167,14 +170,14 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
     setPinError('');
 
     const numAmount = Number(amount);
-    if (numAmount <= capInfo.effectiveCap && !isActiveCall) {
-      // Instant execution receipt
+    if (numAmount <= pocketBalance && !isActiveCall) {
+      // Instant execution receipt from Safe Pocket Balance
       setLastCompletedTxn({
         payee: recipientName,
         amount: numAmount,
         time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       });
-      triggerSpeech(`Payment of ${numAmount} rupees to ${recipientName} successful!`);
+      triggerSpeech(`Payment of ${numAmount} rupees to ${recipientName} successful from your Safe Pocket!`);
     }
 
     handleAuthorizeTransfer({ preventDefault: () => {} } as React.FormEvent);
@@ -189,6 +192,9 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
     setIsQrModalOpen(false);
     setLastCompletedTxn(null);
   };
+
+  const numAmt = Number(amount) || 0;
+  const exceedsPocket = numAmt > pocketBalance;
 
   return (
     <div className="space-y-4 relative">
@@ -237,50 +243,49 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           <div className="p-4 rounded-3xl bg-emerald-950/90 border-2 border-emerald-400 text-center space-y-1.5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-center gap-1.5 text-emerald-400 font-black text-xs uppercase tracking-wider">
               <Sparkles className="w-4 h-4 text-emerald-300" />
-              <span>Allowance Top-Up Received</span>
+              <span>Pocket Allowance Received!</span>
             </div>
             <p className="text-xs font-extrabold text-white leading-relaxed">
-              Daughter Ananya added <strong className="text-emerald-400 font-black text-sm">₹{lastGuardianTopUp.amount.toLocaleString('en-IN')}.00</strong> to your safe spending balance!
+              Daughter Ananya added <strong className="text-emerald-400 font-black text-sm">₹{lastGuardianTopUp.amount.toLocaleString('en-IN')}.00</strong> to your safe pocket balance!
             </p>
           </div>
         )}
 
-        {/* 1. SAFE POCKET BALANCE CARD */}
-        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-950/80 via-slate-900 to-emerald-900/60 border border-emerald-500/30 space-y-3 relative shadow-lg">
+        {/* 1. HERO SAFE POCKET BALANCE CARD (UPI Lite Style) */}
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-emerald-900/70 border-2 border-emerald-500/40 space-y-3 relative shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Safe Pocket Limit</span>
+            <span className="text-xs font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldCheck className="w-4.5 h-4.5 text-emerald-400" />
+              <span>Safe Pocket Balance</span>
             </span>
 
-            <button
-              type="button"
-              onClick={() => setShowFullBalance(!showFullBalance)}
-              className="text-[11px] font-bold text-slate-300 hover:text-white bg-slate-800/80 px-2.5 py-1 rounded-xl border border-slate-700 flex items-center gap-1 transition cursor-pointer"
-            >
-              {showFullBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              <span>{showFullBalance ? 'Hide Savings' : 'Show Full Balance'}</span>
-            </button>
+            <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/30 font-mono">
+              UPI LITE MODE
+            </span>
           </div>
 
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
-                ₹ {capInfo.effectiveCap.toLocaleString('en-IN')}.00
+                ₹ {pocketBalance.toLocaleString('en-IN')}.00
               </span>
-              <span className="text-xs font-bold text-emerald-200/80">/ transfer</span>
+              <span className="text-xs font-extrabold text-emerald-200">Available for Quick Spend</span>
             </div>
-            <p className="text-[11px] text-slate-300 mt-1 leading-snug">
-              Instant 1-tap clearance for routine expenses up to ₹{capInfo.effectiveCap.toLocaleString('en-IN')}.
+            <p className="text-[11px] text-slate-300 mt-1 leading-snug font-medium">
+              Instant 1-tap spend up to ₹{pocketBalance.toLocaleString('en-IN')} with zero guardian friction.
             </p>
           </div>
 
-          {showFullBalance && (
-            <div className="pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs animate-in fade-in duration-200">
-              <span className="text-slate-400 font-medium">Total Linked Savings Balance:</span>
-              <strong className="text-white font-extrabold text-sm">₹ {balance.toLocaleString('en-IN')}.00</strong>
+          {/* Secondary Badge: Protected Main Savings Account */}
+          <div className="pt-3 border-t border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+            <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+              <Wallet className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Main Savings Account: <strong className="text-white font-extrabold">₹ {balance.toLocaleString('en-IN')}.00</strong></span>
             </div>
-          )}
+            <span className="text-[10px] text-cyan-300 font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 w-fit">
+              Protected by Guardian Ananya
+            </span>
+          </div>
         </div>
 
         {/* 2. CORE ACCESSIBLE UPI NAVIGATION TILES */}
@@ -431,7 +436,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 ✓ Payment Successful
               </span>
               <h4 className="text-2xl font-black text-white">₹{lastCompletedTxn.amount.toLocaleString('en-IN')}.00</h4>
-              <p className="text-xs text-slate-300 font-semibold">Sent to {lastCompletedTxn.payee}</p>
+              <p className="text-xs text-slate-300 font-semibold">Sent from Safe Pocket to {lastCompletedTxn.payee}</p>
             </div>
             <button
               type="button"
@@ -458,7 +463,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-slate-900/90 border border-rose-900/50 text-xs text-slate-200 leading-relaxed font-medium">
-              "Amount exceeds your <strong>₹{capInfo.effectiveCap.toLocaleString('en-IN')}</strong> safe limit. We sent a 1-tap confirmation request to Ananya ({guardianInfo.phone})."
+              "Exceeds Safe Pocket Balance (₹{pocketBalance.toLocaleString('en-IN')}). Requesting Guardian Ananya to co-sign from Main Savings."
             </div>
 
             <div className="flex items-center justify-center gap-2 py-1 text-xs font-extrabold text-amber-400 bg-amber-500/10 rounded-xl border border-amber-500/30">
@@ -498,8 +503,10 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           <div className="space-y-1">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold text-slate-300">Amount (₹ INR)</label>
-              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                Safe Limit: ₹{capInfo.effectiveCap.toLocaleString('en-IN')}
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                exceedsPocket ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+              }`}>
+                {exceedsPocket ? 'Exceeds Pocket Balance' : `Pocket: ₹${pocketBalance.toLocaleString('en-IN')}`}
               </span>
             </div>
             <input

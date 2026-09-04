@@ -18,7 +18,8 @@ import {
   PlusCircle,
   IndianRupee,
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  Wallet
 } from 'lucide-react';
 import { AuditItem, GuardianInfo } from '../types';
 
@@ -33,6 +34,9 @@ interface GuardianDeckProps {
   handleSimulateIncident: () => void;
   guardianInfo?: GuardianInfo;
   handleGuardianTopUp?: (amount: number) => void;
+  handleTransferToPocket?: (amount: number) => void;
+  balance?: number;
+  pocketBalance?: number;
 }
 
 export const GuardianDeck: React.FC<GuardianDeckProps> = ({
@@ -46,10 +50,13 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
   handleSimulateIncident,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
   handleGuardianTopUp,
+  handleTransferToPocket,
+  balance = 142800,
+  pocketBalance = 3000,
 }) => {
   // Guardian MPIN Modal State (432100)
   const [isGuardianPinModalOpen, setIsGuardianPinModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'override' | 'topup'>('override');
+  const [modalMode, setModalMode] = useState<'override' | 'topup' | 'pocket'>('override');
   const [guardianPin, setGuardianPin] = useState('');
   const [pinError, setPinError] = useState('');
   const [isShaking, setIsShaking] = useState(false);
@@ -79,6 +86,22 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
     setIsGuardianPinModalOpen(true);
   };
 
+  const handleOpenPocketTransferModal = () => {
+    const num = Number(topUpAmountInput);
+    if (!num || num <= 0) {
+      alert('Please enter a valid transfer amount for Safe Pocket.');
+      return;
+    }
+    if (num > balance) {
+      alert(`Insufficient Main Savings balance (Available: ₹${balance.toLocaleString('en-IN')}).`);
+      return;
+    }
+    setModalMode('pocket');
+    setGuardianPin('');
+    setPinError('');
+    setIsGuardianPinModalOpen(true);
+  };
+
   const handleKeypadPress = (num: string) => {
     if (guardianPin.length < 6) {
       setGuardianPin(prev => prev + num);
@@ -103,16 +126,21 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
     setGuardianPin('');
     setPinError('');
 
+    const amt = Number(topUpAmountInput);
+
     if (modalMode === 'override') {
       handleGuardianOverride();
     } else if (modalMode === 'topup') {
-      const amt = Number(topUpAmountInput);
       if (handleGuardianTopUp && amt > 0) {
         handleGuardianTopUp(amt);
-        setTopUpToast(`₹${amt.toLocaleString('en-IN')} added to Ramesh's balance successfully.`);
-        setTimeout(() => {
-          setTopUpToast(null);
-        }, 5000);
+        setTopUpToast(`₹${amt.toLocaleString('en-IN')} credited to Ramesh successfully.`);
+        setTimeout(() => setTopUpToast(null), 5000);
+      }
+    } else if (modalMode === 'pocket') {
+      if (handleTransferToPocket && amt > 0) {
+        handleTransferToPocket(amt);
+        setTopUpToast(`₹${amt.toLocaleString('en-IN')} transferred to Ramesh's Safe Pocket Balance.`);
+        setTimeout(() => setTopUpToast(null), 5000);
       }
     }
   };
@@ -193,27 +221,46 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
         </span>
       </div>
 
-      {/* 2. GUARDIAN ALLOWANCE / POCKET TOP-UP CARD */}
+      {/* 2. POCKET BALANCE MANAGER WIDGET (UPI Lite Style) */}
       <div className="p-5 rounded-3xl bg-slate-900 text-white border border-slate-800 space-y-4 shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
-              <PlusCircle className="w-5 h-5" />
+              <Wallet className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-black text-white leading-tight">Top-Up Senior Pocket / Add Allowance</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Directly credits Ramesh's balance & recalculates 5% safe cap in real time</p>
+              <h3 className="text-sm font-black text-white leading-tight">Pocket Balance Manager (UPI Lite)</h3>
+              <p className="text-[11px] text-slate-400 font-medium">Manage Ramesh's Safe Pocket Balance vs Protected Main Savings</p>
             </div>
           </div>
           <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded border border-emerald-500/30">
-            SUPABASE AUDIT LEDGER
+            DUAL BALANCE CONTROL
           </span>
         </div>
 
-        {/* Quick Add Chips & Custom Input */}
-        <div className="space-y-3">
+        {/* Live Side-by-Side Balance Indicator */}
+        <div className="grid grid-cols-2 gap-3 text-xs">
+          <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/30 space-y-1">
+            <span className="block text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">
+              Safe Pocket Balance
+            </span>
+            <span className="text-xl font-black text-emerald-400">₹{pocketBalance.toLocaleString('en-IN')}.00</span>
+            <p className="text-[10px] text-slate-400 font-medium">1-tap instant spend pool</p>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <span className="block text-[10px] font-extrabold text-cyan-400 uppercase tracking-wider">
+              Main Savings Account
+            </span>
+            <span className="text-xl font-black text-white">₹{balance.toLocaleString('en-IN')}.00</span>
+            <p className="text-[10px] text-slate-400 font-medium">Co-signed escrow vault</p>
+          </div>
+        </div>
+
+        {/* Quick Add Chips & Actions */}
+        <div className="space-y-3 pt-1">
           <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-            Quick Add Allowance Chips:
+            Transfer Amount to Safe Pocket:
           </span>
           <div className="grid grid-cols-4 gap-2">
             {[500, 1000, 2000, 5000].map(amt => (
@@ -246,11 +293,11 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
 
             <button
               type="button"
-              onClick={handleOpenTopUpModal}
-              className="py-2.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 cursor-pointer shrink-0"
+              onClick={handleOpenPocketTransferModal}
+              className="py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 cursor-pointer shrink-0"
             >
-              <Sparkles className="w-4 h-4 text-emerald-200" />
-              <span>Send Allowance</span>
+              <Wallet className="w-4 h-4 text-emerald-200" />
+              <span>Transfer to Pocket</span>
             </button>
           </div>
         </div>
@@ -303,13 +350,13 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
                 <span className="block font-extrabold text-slate-500 text-[10px] uppercase">Cleared Account Balance</span>
-                <span className="text-base font-black text-emerald-600">₹1,42,800.00</span>
+                <span className="text-base font-black text-emerald-600">₹{balance.toLocaleString('en-IN')}.00</span>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
-                <span className="block font-extrabold text-slate-500 text-[10px] uppercase">Computed Safe Cap</span>
+                <span className="block font-extrabold text-slate-500 text-[10px] uppercase">Safe Pocket Pool</span>
                 <span className="text-base font-black text-slate-900">
-                  ₹7,140.00 <span className="text-[10px] text-slate-500 font-normal">(5% rule)</span>
+                  ₹{pocketBalance.toLocaleString('en-IN')}.00 <span className="text-[10px] text-slate-500 font-normal">(Lite)</span>
                 </span>
               </div>
 
@@ -393,19 +440,23 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
                 Guardian Co-Pilot Authorization
               </h3>
               <p className="text-xs text-slate-400 font-medium">
-                {modalMode === 'topup' ? 'Authorize Allowance Top-Up Funding' : 'Authorize Escrow Transfer'}
+                {modalMode === 'pocket'
+                  ? 'Authorize Transfer to Ramesh Safe Pocket'
+                  : modalMode === 'topup'
+                  ? 'Authorize Allowance Top-Up Funding'
+                  : 'Authorize Escrow Transfer'}
               </p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-1">
               <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                {modalMode === 'topup' ? 'Top-Up Amount to Ramesh:' : 'Authorizing Transfer For Ramesh:'}
+                {modalMode === 'pocket' ? 'Transferring to Safe Pocket:' : modalMode === 'topup' ? 'Top-Up Amount to Ramesh:' : 'Authorizing Transfer For Ramesh:'}
               </span>
               <div className="text-xl font-black text-emerald-400">
-                ₹ {modalMode === 'topup' ? Number(topUpAmountInput || 0).toLocaleString('en-IN') : (activeEscrow ? activeEscrow.amount.toLocaleString('en-IN') : '0')}.00
+                ₹ {modalMode === 'pocket' || modalMode === 'topup' ? Number(topUpAmountInput || 0).toLocaleString('en-IN') : (activeEscrow ? activeEscrow.amount.toLocaleString('en-IN') : '0')}.00
               </div>
               <div className="text-xs text-white font-bold truncate">
-                {modalMode === 'topup' ? 'Credit to Ramesh Savings A/C' : (activeEscrow ? activeEscrow.payee : 'Beneficiary')}
+                {modalMode === 'pocket' ? 'Credit to Safe Pocket (UPI Lite Pool)' : modalMode === 'topup' ? 'Credit to Ramesh Savings A/C' : (activeEscrow ? activeEscrow.payee : 'Beneficiary')}
               </div>
             </div>
 

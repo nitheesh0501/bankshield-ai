@@ -34,8 +34,9 @@ export default function BankShieldApp() {
   const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>('pay');
   const [userRole, setUserRole] = useState<UserRole>('senior');
 
-  // Account Balance State
+  // Account Balance State: Main Savings & Safe Pocket Balance (UPI Lite Style)
   const [balance, setBalance] = useState<number>(142800);
+  const [pocketBalance, setPocketBalance] = useState<number>(3000);
 
   // Guardian Info State (Single Source of Truth)
   const [guardianInfo, setGuardianInfo] = useState<GuardianInfo>({
@@ -115,8 +116,8 @@ export default function BankShieldApp() {
     if (!amount || parseFloat(amount) <= 0) return;
 
     const numAmount = parseFloat(amount);
-    if (numAmount > balance) {
-      alert(`Insufficient account balance (Available: ₹${balance.toLocaleString('en-IN')}).`);
+    if (numAmount > balance + pocketBalance) {
+      alert(`Insufficient total balance (Savings: ₹${balance.toLocaleString('en-IN')} + Pocket: ₹${pocketBalance.toLocaleString('en-IN')}).`);
       return;
     }
 
@@ -129,7 +130,8 @@ export default function BankShieldApp() {
     });
 
     const capInfo = computeDynamicCap(balance, upiId, category, isActiveCall);
-    const requiresAssistedEscrow = numAmount > capInfo.effectiveCap || isActiveCall || evalResult.tier === 'High';
+    const exceedsPocket = numAmount > pocketBalance;
+    const requiresAssistedEscrow = exceedsPocket || numAmount > capInfo.effectiveCap || isActiveCall || evalResult.tier === 'High';
 
     const newTxnId = `TXN-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -142,8 +144,8 @@ export default function BankShieldApp() {
       riskScore: evalResult.score,
       status: requiresAssistedEscrow ? 'Escrow Hold' : 'Completed',
       notes: requiresAssistedEscrow
-        ? `Exceeded Safe Cap ₹${capInfo.effectiveCap.toLocaleString('en-IN')}, ${evalResult.deviationSurge}, ${capInfo.reason}`
-        : 'Safe Transfer Within Dynamic Limit',
+        ? `${exceedsPocket ? 'Exceeds Safe Pocket Balance (₹' + pocketBalance.toLocaleString('en-IN') + '), ' : ''}${evalResult.deviationSurge}, ${capInfo.reason}`
+        : 'Frictionless Safe Pocket Transfer',
     };
 
     setAuditLogs(prev => appendAuditRecord(prev, newAuditItem));
@@ -153,8 +155,8 @@ export default function BankShieldApp() {
       setCountdown(847);
       triggerSpeech();
     } else {
-      // Safe transfer -> deduct balance immediately
-      setBalance(prev => Math.max(0, prev - numAmount));
+      // Safe transfer within pocket balance -> deduct directly from pocket balance
+      setPocketBalance(prev => Math.max(0, prev - numAmount));
       setActiveEscrow(null);
     }
   };
@@ -233,6 +235,39 @@ export default function BankShieldApp() {
     setAuditLogs(prev => appendAuditRecord(prev, creditItem));
     setLastGuardianTopUp({
       amount: topUpAmt,
+      time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    });
+
+    setTimeout(() => {
+      setLastGuardianTopUp(null);
+    }, 6000);
+  };
+
+  // Transfer from Main Savings to Safe Pocket Balance (Guardian Action)
+  const handleTransferToPocket = (transferAmt: number) => {
+    if (transferAmt <= 0) return;
+    if (balance < transferAmt) {
+      alert(`Insufficient Main Savings balance (Available: ₹${balance.toLocaleString('en-IN')}).`);
+      return;
+    }
+
+    setBalance(prev => Math.max(0, prev - transferAmt));
+    setPocketBalance(prev => prev + transferAmt);
+
+    const creditItem: AuditItem = {
+      id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+      timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      payee: 'Safe Pocket Top-Up (Guardian Ananya)',
+      vpa: 'ananya.kumar@okaxis',
+      amount: transferAmt,
+      riskScore: 0,
+      status: 'Credit Cleared',
+      notes: 'Transferred from Main Savings to Safe Pocket Balance',
+    };
+
+    setAuditLogs(prev => appendAuditRecord(prev, creditItem));
+    setLastGuardianTopUp({
+      amount: transferAmt,
       time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
     });
 
@@ -359,6 +394,7 @@ export default function BankShieldApp() {
                   currentMultiplier={currentMultiplier}
                   handleAuthorizeTransfer={handleAuthorizeTransfer}
                   balance={balance}
+                  pocketBalance={pocketBalance}
                   activeEscrow={activeEscrow}
                   guardianInfo={guardianInfo}
                   lastGuardianTopUp={lastGuardianTopUp}
@@ -375,6 +411,9 @@ export default function BankShieldApp() {
                   handleSimulateIncident={handleSimulateIncident}
                   guardianInfo={guardianInfo}
                   handleGuardianTopUp={handleGuardianTopUp}
+                  handleTransferToPocket={handleTransferToPocket}
+                  balance={balance}
+                  pocketBalance={pocketBalance}
                 />
               </div>
             </main>
@@ -398,6 +437,7 @@ export default function BankShieldApp() {
                 handleAuthorizeTransfer={handleAuthorizeTransfer}
                 guardianInfo={guardianInfo}
                 balance={balance}
+                pocketBalance={pocketBalance}
               />
             </main>
           )}
@@ -416,6 +456,9 @@ export default function BankShieldApp() {
                 handleSimulateIncident={handleSimulateIncident}
                 guardianInfo={guardianInfo}
                 handleGuardianTopUp={handleGuardianTopUp}
+                handleTransferToPocket={handleTransferToPocket}
+                balance={balance}
+                pocketBalance={pocketBalance}
               />
             </main>
           )}

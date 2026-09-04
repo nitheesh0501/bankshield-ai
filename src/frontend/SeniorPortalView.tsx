@@ -24,7 +24,8 @@ import {
   QrCode,
   Mic,
   Eye,
-  EyeOff
+  EyeOff,
+  Wallet
 } from 'lucide-react';
 import { evaluateDuressRisk, computeDynamicCap } from '../backend/riskEngine';
 import { GuardianInfo } from '../types';
@@ -44,6 +45,7 @@ interface SeniorPortalViewProps {
   handleAuthorizeTransfer: (e: React.FormEvent) => void;
   guardianInfo?: GuardianInfo;
   balance?: number;
+  pocketBalance?: number;
 }
 
 export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
@@ -61,6 +63,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   handleAuthorizeTransfer,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
   balance = 142800,
+  pocketBalance = 3000,
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isNewBeneficiary, setIsNewBeneficiary] = useState(true);
@@ -177,22 +180,24 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Ramesh Kumar (Age: 68)</h1>
             </div>
 
-            <div className="flex items-center gap-4 pt-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
               <div>
-                <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Safe Pocket Balance</span>
+                <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Safe Pocket Balance (UPI Lite Pool)</span>
                 <span className="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">
-                  ₹ {capInfo.effectiveCap.toLocaleString('en-IN')}.00
+                  ₹ {pocketBalance.toLocaleString('en-IN')}.00
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setShowFullBalance(!showFullBalance)}
-                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 border border-slate-300 cursor-pointer"
-              >
-                {showFullBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                <span>{showFullBalance ? 'Hide Full' : 'Show Savings (₹1,42,800)'}</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFullBalance(!showFullBalance)}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-1.5 border border-slate-300 cursor-pointer"
+                >
+                  {showFullBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 text-cyan-600" />}
+                  <span>{showFullBalance ? 'Hide Savings' : `Main Savings: ₹${balance.toLocaleString('en-IN')}`}</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -213,7 +218,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
 
             <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium pt-1 border-t border-slate-200">
               <ShieldCheck className="w-4 h-4 text-cyan-600 shrink-0" />
-              <span>Safety Rule: <strong>5% Safe Cap (₹7,140)</strong> | Co-Pilot Protection Armed</span>
+              <span>Safety Rule: <strong>Pocket Balance ≤ ₹{pocketBalance.toLocaleString('en-IN')}</strong> | Co-Pilot Vault Armed</span>
             </div>
           </div>
         </div>
@@ -222,7 +227,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
       {/* 2. TWO-COLUMN DASHBOARD LAYOUT */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* LEFT COLUMN: TRANSFER FORM (60% Width / lg:col-span-7) */}
+        {/* LEFT COLUMN: TRANSFER FORM */}
         <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
           <div className="border-b border-slate-100 pb-4">
             <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
@@ -230,7 +235,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               <span>Send Money via Assisted UPI</span>
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Transactions within your ₹{capInfo.effectiveCap.toLocaleString('en-IN')} Safe Cap clear instantly. Larger transfers route to Ananya for 1-tap co-signing.
+              Transactions within your ₹{pocketBalance.toLocaleString('en-IN')} Safe Pocket clear instantly. Larger transfers route to Ananya for 1-tap co-signing.
             </p>
           </div>
 
@@ -255,7 +260,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left text-xs transition cursor-pointer"
               >
                 <span className="block font-bold text-slate-900 text-[11px]">Safe Groceries</span>
-                <span className="block text-[10px] text-emerald-700 font-bold">₹450 (Instant)</span>
+                <span className="block text-[10px] text-emerald-700 font-bold">₹450 (Pocket)</span>
               </button>
 
               <button
@@ -336,7 +341,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-bold text-slate-700">Transfer Amount (₹ INR)</label>
                 <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
-                  Safe Cap: ₹{capInfo.effectiveCap.toLocaleString('en-IN')}
+                  Pocket Pool: ₹{pocketBalance.toLocaleString('en-IN')}
                 </span>
               </div>
               <input
@@ -394,7 +399,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
           </form>
         </div>
 
-        {/* RIGHT COLUMN: VOICE ASSIST & SAFETY METER (40% Width) */}
+        {/* RIGHT COLUMN: VOICE ASSIST & SAFETY METER */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-slate-900 text-white border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
