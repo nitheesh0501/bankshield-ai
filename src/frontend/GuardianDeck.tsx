@@ -19,7 +19,14 @@ import {
   IndianRupee,
   Sparkles,
   ArrowUpRight,
-  Wallet
+  Wallet,
+  Battery,
+  Wifi,
+  EyeOff,
+  Activity,
+  Cpu,
+  Radio,
+  FileText
 } from 'lucide-react';
 import { AuditItem, GuardianInfo } from '../types';
 
@@ -150,9 +157,9 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
   };
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl overflow-hidden relative">
+    <div className="w-full bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl overflow-hidden relative h-full flex flex-col justify-between">
       
-      {/* Success Toast Banner for Top-Up */}
+      {/* Success Toast Banner */}
       {topUpToast && (
         <div className="p-4 rounded-2xl bg-emerald-600 text-white font-extrabold text-sm shadow-xl flex items-center justify-between animate-in zoom-in-95 duration-200">
           <div className="flex items-center gap-2">
@@ -162,264 +169,279 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
           <button
             type="button"
             onClick={() => setTopUpToast(null)}
-            className="text-emerald-200 hover:text-white p-1"
+            className="text-emerald-200 hover:text-white p-1 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* 1. Header Layout */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-slate-100">
-        <div className="space-y-1.5 max-w-md">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            GUARDIAN CO-PILOT ACTIVE
-          </span>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-snug">
-            Senior Safety & Assisted-Pay Deck
-          </h2>
-          <p className="text-xs text-slate-500 font-medium leading-relaxed">
-            Co-Pilot: <strong className="text-slate-800">{guardianInfo.name} ({guardianInfo.relation})</strong> protecting <strong className="text-slate-800">Ramesh Kumar (Father)</strong>
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={handleCallRamesh}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-800 flex items-center gap-1.5 transition shadow-sm cursor-pointer"
-          >
-            <PhoneCall className="w-4 h-4 text-emerald-600" />
-            <span>Call Ramesh</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleSimulateIncident}
-            className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-black text-white flex items-center gap-1.5 transition shadow-sm cursor-pointer"
-          >
-            <Zap className="w-4 h-4 text-white fill-white" />
-            <span>Simulate Incident</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Webhook Status Banner */}
-      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-700 shrink-0">
-            <Webhook className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="block font-extrabold text-slate-900 leading-tight">Native Browser Push & n8n Sync Active</span>
-            <span className="text-slate-500 font-medium leading-normal">Real-time alerts synced to {guardianInfo.name} ({guardianInfo.phone}).</span>
-          </div>
-        </div>
-        <span className="text-[11px] font-mono font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">
-          n8n STATUS: 200 OK CONNECTED
-        </span>
-      </div>
-
-      {/* 2. POCKET BALANCE MANAGER WIDGET (UPI Lite Style) */}
-      <div className="p-5 rounded-3xl bg-slate-900 text-white border border-slate-800 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
-              <Wallet className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-white leading-tight">Pocket Balance Manager (UPI Lite)</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Manage Ramesh's Safe Pocket Balance vs Protected Main Savings</p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded border border-emerald-500/30">
-            DUAL BALANCE CONTROL
-          </span>
-        </div>
-
-        {/* Live Side-by-Side Balance Indicator */}
-        <div className="grid grid-cols-2 gap-3 text-xs">
-          <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/30 space-y-1">
-            <span className="block text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">
-              Safe Pocket Balance
+      <div className="space-y-6">
+        {/* 1. Header Layout */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-slate-800">
+          <div className="space-y-1.5 max-w-md">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              GUARDIAN CO-PILOT ACTIVE
             </span>
-            <span className="text-xl font-black text-emerald-400">₹{pocketBalance.toLocaleString('en-IN')}.00</span>
-            <p className="text-[10px] text-slate-400 font-medium">1-tap instant spend pool</p>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-            <span className="block text-[10px] font-extrabold text-cyan-400 uppercase tracking-wider">
-              Main Savings Account
-            </span>
-            <span className="text-xl font-black text-white">₹{balance.toLocaleString('en-IN')}.00</span>
-            <p className="text-[10px] text-slate-400 font-medium">Co-signed escrow vault</p>
-          </div>
-        </div>
-
-        {/* Quick Add Chips & Actions */}
-        <div className="space-y-3 pt-1">
-          <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-            Transfer Amount to Safe Pocket:
-          </span>
-          <div className="grid grid-cols-4 gap-2">
-            {[500, 1000, 2000, 5000].map(amt => (
-              <button
-                key={amt}
-                type="button"
-                onClick={() => setTopUpAmountInput(amt.toString())}
-                className={`py-2 rounded-xl text-xs font-black transition cursor-pointer border ${
-                  topUpAmountInput === amt.toString()
-                    ? 'bg-emerald-600 border-emerald-400 text-white shadow-md'
-                    : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
-                }`}
-              >
-                + ₹{amt.toLocaleString('en-IN')}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3 pt-1">
-            <div className="relative flex-1">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
-              <input
-                type="number"
-                value={topUpAmountInput}
-                onChange={e => setTopUpAmountInput(e.target.value)}
-                placeholder="Enter custom amount"
-                className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-extrabold text-sm focus:border-emerald-500 focus:outline-none transition"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={handleOpenPocketTransferModal}
-              className="py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 cursor-pointer shrink-0"
-            >
-              <Wallet className="w-4 h-4 text-emerald-200" />
-              <span>Transfer to Pocket</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. INCOMING ASSISTED PAY CARD (FamPay Parent View) */}
-      {activeEscrow && activeEscrow.status === 'Escrow Hold' ? (
-        <div className="bg-rose-50/80 border-2 border-rose-500 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in zoom-in-95 duration-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-rose-200">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-rose-500/20 text-rose-600 flex items-center justify-center shrink-0 border border-rose-300">
-                <ShieldAlert className="w-6 h-6 animate-pulse" />
-              </div>
-              <div>
-                <span className="px-2.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 uppercase tracking-wider">
-                  ASSISTED-PAY APPROVAL REQUESTED
-                </span>
-                <h3 className="text-lg font-black text-slate-900 mt-0.5 leading-snug">
-                  Ramesh is paying ₹{activeEscrow.amount.toLocaleString('en-IN')} to {activeEscrow.payee}
-                </h3>
-              </div>
-            </div>
-            <div className="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-mono text-xs font-black shrink-0 shadow-sm">
-              AUTO-ABORT IN: {formatCountdown(countdown)}
-            </div>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-white border border-rose-200 space-y-3 shadow-sm">
-            <span className="text-[11px] font-bold tracking-wider text-slate-500 uppercase block">
-              Attempted Outflow Transfer Details:
-            </span>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <span className="text-3xl font-black text-rose-600 tracking-tight">
-                  ₹{activeEscrow.amount.toLocaleString('en-IN')}.00
-                </span>
-                <span className="text-sm font-extrabold text-slate-900 ml-2">to {activeEscrow.payee}</span>
-              </div>
-              <span className="text-xs font-mono bg-slate-100 px-3 py-1 rounded-xl border border-slate-300 text-slate-800 font-bold">
-                VPA: {activeEscrow.vpa}
-              </span>
-            </div>
-          </div>
-
-          {/* Forensic Calculation Breakdown */}
-          <div className="space-y-3">
-            <span className="block font-extrabold text-rose-900 uppercase tracking-wider text-[11px]">
-              Forensic Cap Calculation Breakdown:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
-                <span className="block font-extrabold text-slate-500 text-[10px] uppercase">Cleared Account Balance</span>
-                <span className="text-base font-black text-emerald-600">₹{balance.toLocaleString('en-IN')}.00</span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
-                <span className="block font-extrabold text-slate-500 text-[10px] uppercase">Safe Pocket Pool</span>
-                <span className="text-base font-black text-slate-900">
-                  ₹{pocketBalance.toLocaleString('en-IN')}.00 <span className="text-[10px] text-slate-500 font-normal">(Lite)</span>
-                </span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
-                <span className="block font-extrabold text-rose-700 text-[10px] uppercase">Telemetry Surge</span>
-                <span className="text-base font-black text-rose-600">{currentMultiplier}x Baseline</span>
-              </div>
-            </div>
+            <h2 className="text-2xl font-black text-white tracking-tight leading-snug">
+              Senior Safety & Co-Pilot Command Deck
+            </h2>
+            <p className="text-xs text-slate-400 font-medium leading-relaxed">
+              Co-Pilot: <strong className="text-slate-200">{guardianInfo.name} ({guardianInfo.relation})</strong> protecting <strong className="text-slate-200">Ramesh Kumar (Father)</strong>
+            </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-rose-200">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={triggerSpeech}
-              className="py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-extrabold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              onClick={handleCallRamesh}
+              className="px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-extrabold text-white flex items-center gap-1.5 transition shadow-sm cursor-pointer"
             >
-              <Volume2 className="w-4 h-4 text-emerald-600" />
-              <span>Remote Intercom Challenge</span>
+              <PhoneCall className="w-4 h-4 text-emerald-400" />
+              <span>Call Ramesh</span>
             </button>
-
             <button
               type="button"
-              onClick={handleOpenApproveModal}
-              className="py-3.5 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer"
+              onClick={handleSimulateIncident}
+              className="px-3.5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-black text-white flex items-center gap-1.5 transition shadow-lg shadow-rose-600/30 cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4 text-white" />
-              <span>Approve Payment (Enter PIN)</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleFreezeAndAbort}
-              className="flex-1 py-3.5 px-5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Ban className="w-4 h-4" />
-              <span>Decline Payment & Freeze</span>
+              <Zap className="w-4 h-4 text-white fill-white" />
+              <span>Simulate Incident</span>
             </button>
           </div>
         </div>
-      ) : (
-        <div className="p-12 rounded-3xl bg-emerald-50/60 border border-emerald-200 text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto shadow-sm">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
-          <div className="space-y-1 max-w-md mx-auto">
-            <h4 className="text-xl font-black text-slate-900 tracking-tight leading-tight">All Senior Payments Protected</h4>
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              No pending assisted-pay requests requiring intervention. Click below to simulate a digital arrest scam vector.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleSimulateIncident}
-            className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-md inline-flex items-center gap-2 cursor-pointer"
-          >
-            <Zap className="w-4 h-4 text-white fill-white" />
-            <span>Simulate High-Risk Attack</span>
-          </button>
-        </div>
-      )}
 
-      {/* GUARDIAN MPIN AUTHORIZATION MODAL (432100) */}
+        {/* 2. MODULAR TELEMETRY & LIVE DEVICE STATUS PANEL */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] font-extrabold uppercase">Device Battery</span>
+              <Battery className="w-4 h-4 text-emerald-400" />
+            </div>
+            <span className="text-lg font-black text-white">84%</span>
+            <span className="block text-[10px] text-emerald-400 font-medium">Healthy • Charging</span>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] font-extrabold uppercase">5G Telemetry</span>
+              <Wifi className="w-4 h-4 text-cyan-400" />
+            </div>
+            <span className="text-lg font-black text-white">Active</span>
+            <span className="block text-[10px] text-slate-400 font-mono">12ms Edge Latency</span>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] font-extrabold uppercase">Screen Sharing</span>
+              <EyeOff className="w-4 h-4 text-emerald-400" />
+            </div>
+            <span className="text-lg font-black text-emerald-400">Clean</span>
+            <span className="block text-[10px] text-slate-400 font-medium">No AnyDesk Detected</span>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] font-extrabold uppercase">n8n Sync</span>
+              <Webhook className="w-4 h-4 text-purple-400" />
+            </div>
+            <span className="text-lg font-black text-purple-300">200 OK</span>
+            <span className="block text-[10px] text-purple-400 font-mono">Push Active</span>
+          </div>
+        </div>
+
+        {/* 3. POCKET BALANCE MANAGER WIDGET */}
+        <div className="p-5 rounded-3xl bg-slate-950 border border-slate-800 space-y-4 shadow-xl">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
+                <Wallet className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-white leading-tight">Pocket Balance Manager (UPI Lite)</h3>
+                <p className="text-[11px] text-slate-400 font-medium">Manage Ramesh's Safe Pocket Balance vs Protected Main Savings</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded border border-emerald-500/30">
+              DUAL BALANCE CONTROL
+            </span>
+          </div>
+
+          {/* Live Side-by-Side Balance Indicator */}
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-1">
+              <span className="block text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">
+                Safe Pocket Balance
+              </span>
+              <span className="text-xl font-black text-emerald-400">₹{pocketBalance.toLocaleString('en-IN')}.00</span>
+              <p className="text-[10px] text-slate-400 font-medium">1-tap instant spend pool</p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+              <span className="block text-[10px] font-extrabold text-cyan-400 uppercase tracking-wider">
+                Main Savings Account
+              </span>
+              <span className="text-xl font-black text-white">₹{balance.toLocaleString('en-IN')}.00</span>
+              <p className="text-[10px] text-slate-400 font-medium">Co-signed escrow vault</p>
+            </div>
+          </div>
+
+          {/* Quick Add Chips & Actions */}
+          <div className="space-y-3 pt-1">
+            <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              Transfer Amount to Safe Pocket:
+            </span>
+            <div className="grid grid-cols-4 gap-2">
+              {[500, 1000, 2000, 5000].map(amt => (
+                <button
+                  key={amt}
+                  type="button"
+                  onClick={() => setTopUpAmountInput(amt.toString())}
+                  className={`py-2 rounded-xl text-xs font-black transition cursor-pointer border ${
+                    topUpAmountInput === amt.toString()
+                      ? 'bg-emerald-600 border-emerald-400 text-white shadow-md'
+                      : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                  }`}
+                >
+                  + ₹{amt.toLocaleString('en-IN')}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3 pt-1">
+              <div className="relative flex-1">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                <input
+                  type="number"
+                  value={topUpAmountInput}
+                  onChange={e => setTopUpAmountInput(e.target.value)}
+                  placeholder="Enter custom amount"
+                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white font-extrabold text-sm focus:border-emerald-500 focus:outline-none transition"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleOpenPocketTransferModal}
+                className="py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <Wallet className="w-4 h-4 text-emerald-200" />
+                <span>Transfer to Pocket</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. INCOMING ASSISTED PAY REQUEST (FamPay Parent View) */}
+        {activeEscrow && activeEscrow.status === 'Escrow Hold' ? (
+          <div className="bg-rose-950/90 border-2 border-rose-500 rounded-3xl p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-rose-900/60">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/40">
+                  <ShieldAlert className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <span className="px-2.5 py-0.5 rounded text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-wider">
+                    ASSISTED-PAY APPROVAL REQUESTED
+                  </span>
+                  <h3 className="text-base font-black text-white mt-0.5 leading-snug">
+                    Ramesh is paying ₹{activeEscrow.amount.toLocaleString('en-IN')} to {activeEscrow.payee}
+                  </h3>
+                </div>
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-mono text-xs font-black shrink-0 shadow-sm">
+                AUTO-ABORT IN: {formatCountdown(countdown)}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900 border border-rose-900/50 space-y-2 text-xs">
+              <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase block">
+                Attempted Outflow Transfer Details:
+              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-black text-rose-400">₹{activeEscrow.amount.toLocaleString('en-IN')}.00</span>
+                <span className="font-mono bg-slate-950 px-3 py-1 rounded-xl border border-slate-800 text-slate-300">VPA: {activeEscrow.vpa}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                type="button"
+                onClick={triggerSpeech}
+                className="py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 font-extrabold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Volume2 className="w-4 h-4 text-emerald-400" />
+                <span>Remote Intercom Challenge</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleOpenApproveModal}
+                className="py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <CheckCircle2 className="w-4 h-4 text-white" />
+                <span>Approve Payment (Enter PIN)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleFreezeAndAbort}
+                className="flex-1 py-3 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Ban className="w-4 h-4" />
+                <span>Decline Payment & Freeze</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-8 rounded-3xl bg-slate-950 border border-slate-800 text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40">
+              <CheckCircle2 className="w-7 h-7" />
+            </div>
+            <h4 className="text-base font-extrabold text-white">All Senior Payments Protected</h4>
+            <p className="text-xs text-slate-400 font-medium">No active duress incidents requiring co-signing.</p>
+          </div>
+        )}
+
+        {/* 5. RECENT 5 INTERCEPTIONS & THREAT AUDIT STREAM */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Activity className="w-4 h-4 text-cyan-400" />
+              <span>Recent Threat Interception Stream</span>
+            </span>
+            <span className="text-[10px] font-mono text-emerald-400 font-bold">LIVE TELEMETRY</span>
+          </div>
+
+          <div className="space-y-2 text-xs">
+            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+                <div>
+                  <span className="block font-bold text-white leading-tight">Digital Arrest Scam Intercepted</span>
+                  <span className="text-[10px] text-slate-500 font-mono">DCP Cyber Cell Official Escrow (₹85,000)</span>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-rose-500/20 text-rose-300 border border-rose-500/30">SCORE 95</span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                <div>
+                  <span className="block font-bold text-white leading-tight">Utility Cutoff Scam Challenge</span>
+                  <span className="text-[10px] text-slate-500 font-mono">Rajesh Electricals Utility Cell (₹48,500)</span>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">SCORE 82</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* GUARDIAN MPIN MODAL (432100) */}
       {isGuardianPinModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className={`bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative ${isShaking ? 'animate-bounce border-rose-500' : ''}`}>
