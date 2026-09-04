@@ -1,5 +1,21 @@
-import React from 'react';
-import { ShieldAlert, BellRing, Zap, Webhook, Volume2, CheckCircle2, Ban } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  ShieldAlert,
+  BellRing,
+  Zap,
+  Webhook,
+  Volume2,
+  CheckCircle2,
+  Ban,
+  PhoneCall,
+  Lock,
+  X,
+  AlertCircle,
+  Delete,
+  ShieldCheck,
+  Check,
+  Smartphone
+} from 'lucide-react';
 import { AuditItem, GuardianInfo } from '../types';
 
 interface GuardianDeckProps {
@@ -25,20 +41,64 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
   handleSimulateIncident,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
 }) => {
+  // Guardian MPIN Modal State (432100)
+  const [isGuardianPinModalOpen, setIsGuardianPinModalOpen] = useState(false);
+  const [guardianPin, setGuardianPin] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [isShaking, setIsShaking] = useState(false);
+
+  const GUARDIAN_MPIN = '432100'; // Designated Guardian Ananya's MPIN
+
+  const handleOpenApproveModal = () => {
+    setGuardianPin('');
+    setPinError('');
+    setIsGuardianPinModalOpen(true);
+  };
+
+  const handleKeypadPress = (num: string) => {
+    if (guardianPin.length < 6) {
+      setGuardianPin(prev => prev + num);
+      setPinError('');
+    }
+  };
+
+  const handleBackspace = () => {
+    setGuardianPin(prev => prev.slice(0, -1));
+    setPinError('');
+  };
+
+  const handleConfirmGuardianPin = () => {
+    if (guardianPin !== GUARDIAN_MPIN) {
+      setPinError('Invalid Guardian MPIN. Try again.');
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      return;
+    }
+
+    setIsGuardianPinModalOpen(false);
+    setGuardianPin('');
+    setPinError('');
+    handleGuardianOverride();
+  };
+
+  const handleCallRamesh = () => {
+    alert('📞 Calling Ramesh Kumar (+91 98401 92418)... Priority Guardian Line Connected.');
+  };
+
   return (
     <div className="w-full bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl overflow-hidden">
-      {/* 1. Header Layout Refactoring */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-zinc-100">
-        <div className="space-y-2 max-w-md">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+      {/* 1. Header Layout */}
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-slate-100">
+        <div className="space-y-1.5 max-w-md">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            GUARDIAN OVERSIGHT ACTIVE
+            GUARDIAN CO-PILOT ACTIVE
           </span>
-          <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight leading-snug">
-            Senior Safety Escrow Command Deck
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-snug">
+            Senior Safety & Assisted-Pay Deck
           </h2>
-          <p className="text-xs text-zinc-500 leading-relaxed">
-            Designated Guardian: <strong className="text-zinc-700">{guardianInfo.name} ({guardianInfo.relation})</strong> protecting <strong className="text-zinc-700">Ramesh Kumar (Father)</strong>
+          <p className="text-xs text-slate-500 font-medium leading-relaxed">
+            Co-Pilot: <strong className="text-slate-800">{guardianInfo.name} ({guardianInfo.relation})</strong> protecting <strong className="text-slate-800">Ramesh Kumar (Father)</strong>
           </p>
         </div>
 
@@ -46,17 +106,18 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
-            className="px-3 py-2 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-medium text-zinc-700 flex items-center gap-1.5 transition shadow-sm cursor-pointer"
+            onClick={handleCallRamesh}
+            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-800 flex items-center gap-1.5 transition shadow-sm cursor-pointer"
           >
-            <BellRing className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Enable Push Alerts</span>
+            <PhoneCall className="w-4 h-4 text-emerald-600" />
+            <span>Call Ramesh</span>
           </button>
           <button
             type="button"
             onClick={handleSimulateIncident}
-            className="px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white flex items-center gap-1.5 transition shadow-sm cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-black text-white flex items-center gap-1.5 transition shadow-sm cursor-pointer"
           >
-            <Zap className="w-3.5 h-3.5 text-white fill-white" />
+            <Zap className="w-4 h-4 text-white fill-white" />
             <span>Simulate Incident</span>
           </button>
         </div>
@@ -69,81 +130,87 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
             <Webhook className="w-4 h-4" />
           </div>
           <div>
-            <span className="block font-bold text-zinc-900 leading-tight">Native Browser Push & n8n Webhook Active</span>
-            <span className="text-zinc-500 leading-normal">Real-time desktop and mobile push alerts synchronized to {guardianInfo.name} ({guardianInfo.phone}).</span>
+            <span className="block font-extrabold text-slate-900 leading-tight">Native Browser Push & n8n Sync Active</span>
+            <span className="text-slate-500 font-medium leading-normal">Real-time alerts synced to {guardianInfo.name} ({guardianInfo.phone}).</span>
           </div>
         </div>
-        <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">
+        <span className="text-[11px] font-mono font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">
           n8n STATUS: 200 OK CONNECTED
         </span>
       </div>
 
-      {/* 2. Active Interception Header Row Alignment */}
+      {/* 2. INCOMING ASSISTED PAY CARD (FamPay Parent View) */}
       {activeEscrow && activeEscrow.status === 'Escrow Hold' ? (
-        <div className="bg-rose-50/70 border-2 border-rose-500 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in zoom-in-95 duration-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-rose-200/80">
+        <div className="bg-rose-50/80 border-2 border-rose-500 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in zoom-in-95 duration-200">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-rose-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-100 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
-                <ShieldAlert className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-2xl bg-rose-500/20 text-rose-600 flex items-center justify-center shrink-0 border border-rose-300">
+                <ShieldAlert className="w-6 h-6 animate-pulse" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
-                    HIGH DURESS SCAM SUSPECTED
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-zinc-900 mt-1 leading-snug">
-                  In-Flight Intervention Required
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 uppercase tracking-wider">
+                  ASSISTED-PAY APPROVAL REQUESTED
+                </span>
+                <h3 className="text-lg font-black text-slate-900 mt-0.5 leading-snug">
+                  Ramesh is paying ₹{activeEscrow.amount.toLocaleString('en-IN')} to {activeEscrow.payee}
                 </h3>
               </div>
             </div>
-            <div className="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-mono text-xs font-bold shrink-0 self-start sm:self-auto shadow-sm">
+            <div className="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-mono text-xs font-black shrink-0 shadow-sm">
               AUTO-ABORT IN: {formatCountdown(countdown)}
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white border border-rose-200 space-y-2 shadow-xs">
-            <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase block">
+          {/* Transaction Summary Card */}
+          <div className="p-5 rounded-2xl bg-white border border-rose-200 space-y-3 shadow-sm">
+            <span className="text-[11px] font-bold tracking-wider text-slate-500 uppercase block">
               Attempted Outflow Transfer Details:
             </span>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <span className="text-3xl font-black text-rose-600 tracking-tight">
-                  ₹{activeEscrow.amount.toLocaleString('en-IN')}
+                  ₹{activeEscrow.amount.toLocaleString('en-IN')}.00
                 </span>
-                <span className="text-sm font-bold text-zinc-900 ml-2">to {activeEscrow.payee}</span>
+                <span className="text-sm font-extrabold text-slate-900 ml-2">to {activeEscrow.payee}</span>
               </div>
-              <span className="text-xs font-mono bg-slate-100 px-3 py-1 rounded-lg border border-slate-300 text-zinc-700">
+              <span className="text-xs font-mono bg-slate-100 px-3 py-1 rounded-xl border border-slate-300 text-slate-800 font-bold">
                 VPA: {activeEscrow.vpa}
               </span>
             </div>
           </div>
 
-          <div className="space-y-3 pt-1">
-            <span className="block font-bold text-rose-900 uppercase tracking-wider text-[11px]">
-              Itemized Risk Factors Telemetry:
+          {/* Forensic Calculation Breakdown */}
+          <div className="space-y-3">
+            <span className="block font-extrabold text-rose-900 uppercase tracking-wider text-[11px]">
+              Forensic Cap Calculation Breakdown:
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-white border border-rose-200 space-y-1 font-medium text-rose-950 shadow-xs">
-                <span className="block font-bold text-rose-700 leading-tight">{currentMultiplier}x Baseline Surge</span>
-                <p className="text-[11px] text-zinc-600 leading-normal">Typical monthly spend is &lt;₹1,200.</p>
+              <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
+                <span className="block font-extrabold text-slate-500 text-[10px] uppercase">Cleared Account Balance</span>
+                <span className="text-base font-black text-emerald-600">₹1,42,800.00</span>
               </div>
-              <div className="p-3.5 rounded-xl bg-white border border-rose-200 space-y-1 font-medium text-rose-950 shadow-xs">
-                <span className="block font-bold text-rose-700 leading-tight">Active Phone Call Sensor</span>
-                <p className="text-[11px] text-zinc-600 leading-normal">Coercer is actively on the line dictating actions.</p>
+
+              <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
+                <span className="block font-extrabold text-slate-500 text-[10px] uppercase">Computed Safe Cap</span>
+                <span className="text-base font-black text-slate-900">
+                  ₹7,140.00 <span className="text-[10px] text-slate-500 font-normal">(5% rule)</span>
+                </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-white border border-rose-200 space-y-1 font-medium text-rose-950 shadow-xs">
-                <span className="block font-bold text-rose-700 leading-tight">Coercion Keywords</span>
-                <p className="text-[11px] text-zinc-600 leading-normal">'dcp', 'cyber', 'escrow' pattern detected.</p>
+
+              <div className="p-3.5 rounded-2xl bg-white border border-rose-200 space-y-1 font-medium text-slate-900 shadow-xs">
+                <span className="block font-extrabold text-rose-700 text-[10px] uppercase">Telemetry Surge</span>
+                <span className="text-base font-black text-rose-600">{currentMultiplier}x Baseline</span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-rose-200/80">
+          {/* Action Buttons: Approve, Decline, Remote Intercom */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-rose-200">
             <button
               type="button"
               onClick={triggerSpeech}
-              className="py-3 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-extrabold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <Volume2 className="w-4 h-4 text-emerald-600" />
               <span>Remote Intercom Challenge</span>
@@ -151,42 +218,156 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
 
             <button
               type="button"
-              onClick={handleGuardianOverride}
-              className="py-3 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              onClick={handleOpenApproveModal}
+              className="py-3.5 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>I Verified — Authorize Transfer</span>
+              <CheckCircle2 className="w-4 h-4 text-white" />
+              <span>Approve Payment (Enter PIN)</span>
             </button>
 
             <button
               type="button"
               onClick={handleFreezeAndAbort}
-              className="flex-1 py-3 px-5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 py-3.5 px-5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Ban className="w-4 h-4" />
-              <span>Freeze & Abort Transfer</span>
+              <span>Decline Payment & Freeze</span>
             </button>
           </div>
         </div>
       ) : (
         <div className="p-12 rounded-3xl bg-emerald-50/60 border border-emerald-200 text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto shadow-xs">
+          <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto shadow-sm">
             <CheckCircle2 className="w-10 h-10" />
           </div>
           <div className="space-y-1 max-w-md mx-auto">
-            <h4 className="text-xl font-bold text-zinc-900 tracking-tight leading-tight">All Systems Secure & Protected</h4>
-            <p className="text-xs text-zinc-600 leading-relaxed">
-              No active duress incidents requiring intervention. Click below to simulate a digital arrest scam vector.
+            <h4 className="text-xl font-black text-slate-900 tracking-tight leading-tight">All Senior Payments Protected</h4>
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              No pending assisted-pay requests requiring intervention. Click below to simulate a digital arrest scam vector.
             </p>
           </div>
           <button
             type="button"
             onClick={handleSimulateIncident}
-            className="px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-md inline-flex items-center gap-2 cursor-pointer"
+            className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition shadow-md inline-flex items-center gap-2 cursor-pointer"
           >
             <Zap className="w-4 h-4 text-white fill-white" />
-            <span>Simulate High-Risk Incident</span>
+            <span>Simulate High-Risk Attack</span>
           </button>
+        </div>
+      )}
+
+      {/* GUARDIAN MPIN AUTHORIZATION MODAL (432100) */}
+      {isGuardianPinModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className={`bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative ${isShaking ? 'animate-bounce border-rose-500' : ''}`}>
+            
+            <button
+              type="button"
+              onClick={() => setIsGuardianPinModalOpen(false)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center space-y-1">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-inner">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-white tracking-tight mt-2">
+                Guardian Co-Pilot Authorization
+              </h3>
+              <p className="text-xs text-slate-400 font-medium">
+                Enter Ananya's 6-Digit Guardian MPIN
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-1">
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                Authorizing Transfer For Ramesh:
+              </span>
+              <div className="text-xl font-black text-emerald-400">
+                ₹ {activeEscrow ? activeEscrow.amount.toLocaleString('en-IN') : '0'}.00
+              </div>
+              <div className="text-xs text-white font-bold truncate">
+                {activeEscrow ? activeEscrow.payee : 'Beneficiary'}
+              </div>
+            </div>
+
+            {/* 6-Digit Indicator Display */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2 py-1">
+                {[0, 1, 2, 3, 4, 5].map(idx => (
+                  <div
+                    key={idx}
+                    className={`w-10 h-12 rounded-xl border-2 flex items-center justify-center text-xl font-bold transition-all ${
+                      guardianPin.length > idx
+                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                        : 'border-slate-700 bg-slate-950 text-slate-600'
+                    }`}
+                  >
+                    {guardianPin.length > idx ? '•' : ''}
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGuardianPin(GUARDIAN_MPIN);
+                    setPinError('');
+                  }}
+                  className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold underline transition cursor-pointer"
+                >
+                  [Auto-fill Guardian PIN: 432100]
+                </button>
+              </div>
+            </div>
+
+            {pinError && (
+              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-1.5 animate-pulse">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{pinError}</span>
+              </div>
+            )}
+
+            {/* Touch Keypad */}
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => handleKeypadPress(num)}
+                  className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                >
+                  {num}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={handleBackspace}
+                className="py-3 rounded-xl bg-slate-800 hover:bg-rose-900 text-rose-300 font-bold text-sm transition flex items-center justify-center cursor-pointer"
+              >
+                <Delete className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleKeypadPress('0')}
+                className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+              >
+                0
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmGuardianPin}
+                disabled={guardianPin.length !== 6}
+                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
+              >
+                OK
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

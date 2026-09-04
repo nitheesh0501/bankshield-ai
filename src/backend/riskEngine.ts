@@ -1,4 +1,49 @@
-import { RiskEvaluationInput, RiskEvaluationResult, PresetScenario } from '../types';
+import { RiskEvaluationInput, RiskEvaluationResult, PresetScenario, DynamicCapResult } from '../types';
+
+export function computeDynamicCap(
+  balance: number,
+  payeeVpa: string = '',
+  category: string = '',
+  isCallActive: boolean = false
+): DynamicCapResult {
+  // Safe Cap Formula: min(10000, max(1000, balance * 0.05))
+  const baseCap = Math.min(10000, Math.max(1000, balance * 0.05));
+
+  const textPayload = (payeeVpa + ' ' + category).toLowerCase();
+  const suspiciousKeywords = ['dcp', 'cyber', 'police', 'escrow', 'court', 'disconnection', 'warrant', 'official-escrow'];
+  const hasSuspiciousKeyword = suspiciousKeywords.some(kw => textPayload.includes(kw));
+
+  let trustMultiplier = 1.0;
+  let reason = 'Verified Merchant / Essential Category';
+
+  if (isCallActive || hasSuspiciousKeyword) {
+    trustMultiplier = 0.0;
+    reason = isCallActive
+      ? 'Active Call Detected (0.0x Trust Multiplier)'
+      : 'Authority Coercion Keywords Detected (0.0x Trust Multiplier)';
+  } else {
+    const whitelistedVPAs = ['apollo.pharmacy@upi', 'nilgiris.groceries@upi', 'tneb.billing@gov', 'ananya.daughter@upi'];
+    const whitelistedCategories = ['essentials', 'regular household expense', 'healthcare', 'medical emergency', 'utility recurring'];
+
+    const isWhitelisted =
+      whitelistedVPAs.some(vpa => payeeVpa.toLowerCase().includes(vpa)) ||
+      whitelistedCategories.some(cat => category.toLowerCase().includes(cat.toLowerCase()));
+
+    if (!isWhitelisted && payeeVpa) {
+      trustMultiplier = 0.5;
+      reason = 'Unverified / First-Time Recipient (0.5x Trust Multiplier)';
+    }
+  }
+
+  const effectiveCap = Math.floor(baseCap * trustMultiplier);
+
+  return {
+    baseCap,
+    trustMultiplier,
+    effectiveCap,
+    reason,
+  };
+}
 
 export function evaluateDuressRisk(input: RiskEvaluationInput): RiskEvaluationResult {
   const { amount, category, isCallActive, payeeVpa, historicalAvg } = input;

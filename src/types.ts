@@ -16,8 +16,15 @@ export interface AuditItem {
   vpa: string;
   amount: number;
   riskScore: number;
-  status: 'Escrow Hold' | 'Aborted & Frozen' | 'Advised & Paid' | 'Completed' | 'Guardian Cleared';
+  status: 'Escrow Hold' | 'Aborted & Frozen' | 'Advised & Paid' | 'Completed' | 'Guardian Cleared' | 'Guardian Authorized';
   notes: string;
+}
+
+export interface DynamicCapResult {
+  baseCap: number;
+  trustMultiplier: number;
+  effectiveCap: number;
+  reason: string;
 }
 
 export interface RiskEvaluationInput {

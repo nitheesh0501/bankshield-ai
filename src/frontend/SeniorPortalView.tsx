@@ -20,9 +20,13 @@ import {
   ArrowUpRight,
   Delete,
   X,
-  AlertCircle
+  AlertCircle,
+  QrCode,
+  Mic,
+  Eye,
+  EyeOff
 } from 'lucide-react';
-import { evaluateDuressRisk } from '../backend/riskEngine';
+import { evaluateDuressRisk, computeDynamicCap } from '../backend/riskEngine';
 import { GuardianInfo } from '../types';
 
 interface SeniorPortalViewProps {
@@ -61,12 +65,16 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isNewBeneficiary, setIsNewBeneficiary] = useState(true);
   const [emergencyAlertSent, setEmergencyAlertSent] = useState(false);
+  const [showFullBalance, setShowFullBalance] = useState(false);
 
   // UPI PIN Verification State
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [enteredPin, setEnteredPin] = useState('');
   const [pinError, setPinError] = useState('');
   const CORRECT_PIN = '924180';
+
+  // Dynamic Safe Cap Calculation
+  const capInfo = computeDynamicCap(balance, upiId, category, isActiveCall);
 
   const handleInitiatePayment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,14 +99,9 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
     setPinError('');
   };
 
-  const handleAutofillPin = () => {
-    setEnteredPin(CORRECT_PIN);
-    setPinError('');
-  };
-
   const handleConfirmPin = () => {
     if (enteredPin !== CORRECT_PIN) {
-      setPinError('Incorrect 6-digit UPI PIN. Please try again.');
+      setPinError('Incorrect 6-digit MPIN. Try again.');
       return;
     }
     setIsPinModalOpen(false);
@@ -106,7 +109,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
     handleAuthorizeTransfer({ preventDefault: () => {} } as React.FormEvent);
   };
 
-  // Live evaluated risk score preview
+  // Risk Score Preview
   const numAmount = parseFloat(amount) || 0;
   const evalResult = evaluateDuressRisk({
     amount: numAmount,
@@ -123,9 +126,9 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
     try {
       window.speechSynthesis.cancel();
       const warningText =
-        'Police and utility companies never ask for UPI transfers to personal or escrow accounts to avoid arrest. Disconnect the call now.';
+        'Police and utility companies never ask for UPI transfers over phone calls. Disconnect the call now.';
       const utterance = new SpeechSynthesisUtterance(warningText);
-      utterance.rate = 0.92;
+      utterance.rate = 0.9;
       utterance.lang = 'en-US';
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
@@ -141,7 +144,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
     setEmergencyAlertSent(true);
     triggerSpeech();
     setTimeout(() => {
-      alert(`🚨 Emergency Escalation Triggered! ${guardianInfo.name} has been notified via priority push alert and WhatsApp webhook call link.`);
+      alert(`🚨 Emergency Alert Sent! ${guardianInfo.name} has been notified.`);
     }, 200);
   };
 
@@ -157,14 +160,14 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       
-      {/* 1. HEADER ACCOUNT & SAFETY SUMMARY BANNER */}
+      {/* 1. HEADER ACCOUNT & SAFE POCKET BANNER */}
       <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Account Info */}
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                Senior Citizen Privilege Savings A/C
+                Senior Privilege Savings A/C
               </span>
               <span className="text-xs text-slate-500 font-mono">No: 501009849241</span>
             </div>
@@ -174,11 +177,22 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Ramesh Kumar (Age: 68)</h1>
             </div>
 
-            <div>
-              <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Available Clear Balance</span>
-              <span className="text-3xl sm:text-4xl font-extrabold text-emerald-600 tracking-tight">
-                ₹ {balance.toLocaleString('en-IN')}.00
-              </span>
+            <div className="flex items-center gap-4 pt-1">
+              <div>
+                <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Safe Pocket Balance</span>
+                <span className="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">
+                  ₹ {capInfo.effectiveCap.toLocaleString('en-IN')}.00
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowFullBalance(!showFullBalance)}
+                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 border border-slate-300 cursor-pointer"
+              >
+                {showFullBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <span>{showFullBalance ? 'Hide Full' : 'Show Savings (₹1,42,800)'}</span>
+              </button>
             </div>
           </div>
 
@@ -187,19 +201,19 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
             <div className="flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                BankShield Cognitive Safety Active
+                Assisted Safety Active
               </span>
               <span className="text-[10px] font-mono font-bold text-slate-500">v2.4 EDGE</span>
             </div>
 
             <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold pt-1">
               <UserCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Nominated Guardian: <strong>{guardianInfo.name} ({guardianInfo.relation})</strong> • Instant Escalation Ready</span>
+              <span>Nominated Guardian: <strong>{guardianInfo.name} ({guardianInfo.relation})</strong></span>
             </div>
 
             <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium pt-1 border-t border-slate-200">
               <ShieldCheck className="w-4 h-4 text-cyan-600 shrink-0" />
-              <span>Safety Baseline: <strong>Normal Daily Spend ₹1,200</strong> | Duress Circuit-Breaker Armed</span>
+              <span>Safety Rule: <strong>5% Safe Cap (₹7,140)</strong> | Co-Pilot Protection Armed</span>
             </div>
           </div>
         </div>
@@ -208,27 +222,26 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
       {/* 2. TWO-COLUMN DASHBOARD LAYOUT */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* LEFT COLUMN: TRANSFER FORM & COERCION SIMULATOR (60% Width / lg:col-span-7) */}
+        {/* LEFT COLUMN: TRANSFER FORM (60% Width / lg:col-span-7) */}
         <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
           <div className="border-b border-slate-100 pb-4">
             <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
               <Send className="w-5 h-5 text-emerald-600" />
-              <span>Send Money via Monitored UPI</span>
+              <span>Send Money via Assisted UPI</span>
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Every payment is analyzed sub-50ms against authority coercion vectors before funds move.
+              Transactions within your ₹{capInfo.effectiveCap.toLocaleString('en-IN')} Safe Cap clear instantly. Larger transfers route to Ananya for 1-tap co-signing.
             </p>
           </div>
 
-          {/* Pitch Deck Attack Vector Test Presets */}
+          {/* Quick Attack Vector Test Presets */}
           <div className="space-y-2.5">
             <span className="block text-[11px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1">
               <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-600" />
-              <span>Pitch Deck Attack Vector Test Presets (Slides 02 & 06):</span>
+              <span>Quick Test Scam Presets:</span>
             </span>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {/* Preset 1 */}
               <button
                 type="button"
                 onClick={() => selectScenarioPreset({
@@ -239,13 +252,12 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: false,
                   newBen: false,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left text-xs transition cursor-pointer"
               >
                 <span className="block font-bold text-slate-900 text-[11px]">Safe Groceries</span>
-                <span className="block text-[10px] text-emerald-700 font-bold">₹450 (Normal)</span>
+                <span className="block text-[10px] text-emerald-700 font-bold">₹450 (Instant)</span>
               </button>
 
-              {/* Preset 2 */}
               <button
                 type="button"
                 onClick={() => selectScenarioPreset({
@@ -256,13 +268,12 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: true,
                   newBen: true,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-200 text-left text-xs transition cursor-pointer"
               >
                 <span className="block font-bold text-slate-900 text-[11px]">Utility Cutoff Scam</span>
-                <span className="block text-[10px] text-amber-700 font-bold">₹48,500 (12x surge)</span>
+                <span className="block text-[10px] text-amber-700 font-bold">₹48,500 (Assisted)</span>
               </button>
 
-              {/* Preset 3 */}
               <button
                 type="button"
                 onClick={() => selectScenarioPreset({
@@ -273,13 +284,12 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: true,
                   newBen: true,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-left text-xs transition cursor-pointer"
               >
                 <span className="block font-bold text-slate-900 text-[11px]">Digital Arrest</span>
-                <span className="block text-[10px] text-rose-700 font-bold">₹85,000 (Scam)</span>
+                <span className="block text-[10px] text-rose-700 font-bold">₹85,000 (Blocked)</span>
               </button>
 
-              {/* Preset 4 */}
               <button
                 type="button"
                 onClick={() => selectScenarioPreset({
@@ -290,43 +300,43 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: false,
                   newBen: false,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-cyan-50 border border-slate-200 hover:border-cyan-300 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-cyan-50 border border-slate-200 text-left text-xs transition cursor-pointer"
               >
                 <span className="block font-bold text-slate-900 text-[11px]">Hospital Emergency</span>
-                <span className="block text-[10px] text-cyan-700 font-bold">₹60,000 (Urgent)</span>
+                <span className="block text-[10px] text-cyan-700 font-bold">₹60,000 (Assisted)</span>
               </button>
             </div>
           </div>
 
-          {/* UPI Transfer Form */}
+          {/* Form */}
           <form onSubmit={handleInitiatePayment} className="space-y-4 pt-2">
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">Beneficiary Name</label>
+              <label className="block text-xs font-bold text-slate-700">Recipient Name</label>
               <input
                 type="text"
                 required
                 value={recipientName}
                 onChange={e => setRecipientName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:border-emerald-600 focus:outline-none transition"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">Beneficiary UPI VPA</label>
+              <label className="block text-xs font-bold text-slate-700">Recipient UPI Address</label>
               <input
                 type="text"
                 required
                 value={upiId}
                 onChange={e => setUpiId(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-xs focus:border-emerald-600 focus:outline-none transition"
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-bold text-slate-700">Transfer Amount (₹ INR)</label>
-                <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded border border-rose-200">
-                  Deviation: {currentMultiplier}x above 30-day baseline
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+                  Safe Cap: ₹{capInfo.effectiveCap.toLocaleString('en-IN')}
                 </span>
               </div>
               <input
@@ -334,77 +344,46 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 required
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-extrabold text-xl focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                className="w-full px-4 py-3.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-extrabold text-xl focus:border-emerald-600 focus:outline-none transition"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">Payment Reason / Purpose Dropdown</label>
+              <label className="block text-xs font-bold text-slate-700">Category / Purpose</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-xs focus:border-emerald-600 focus:outline-none transition"
               >
                 <option value="Regular Household Expense">Regular Household Expense</option>
                 <option value="Law Enforcement / Police Clearance">Law Enforcement / Police Clearance</option>
                 <option value="Utility Disconnection Threat">Utility Disconnection Threat</option>
                 <option value="Medical Emergency">Medical Emergency</option>
-                <option value="Investment / Crypto Deposit">Investment / Crypto Deposit</option>
               </select>
             </div>
 
-            {/* Duress & Threat Simulation Sensors */}
-            <div className="space-y-2.5 pt-2">
-              <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                Telemetry & Threat Simulation Sensors:
-              </span>
-
-              {/* Sensor Toggle 1 */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-100 text-rose-700 animate-pulse' : 'bg-slate-200 text-slate-500'}`}>
-                    <PhoneCall className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="block text-xs font-bold text-slate-900">Simulate Active Background Call (Duress Sensor)</span>
-                    <span className="text-[11px] text-slate-500">Adds authority coercion penalty (+15 Risk Score)</span>
-                  </div>
+            {/* Sensor Switch */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-100 text-rose-700 animate-pulse' : 'bg-slate-200 text-slate-500'}`}>
+                  <PhoneCall className="w-4 h-4" />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsActiveCall(!isActiveCall)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                    isActiveCall ? 'bg-rose-600' : 'bg-slate-300'
-                  }`}
-                >
-                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </div>
-
-              {/* Sensor Toggle 2 */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-xl ${isNewBeneficiary ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-500'}`}>
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="block text-xs font-bold text-slate-900">New Beneficiary Created &lt;10 Mins Ago</span>
-                    <span className="text-[11px] text-slate-500">Triggers immediate velocity flag (+25 Risk Score)</span>
-                  </div>
+                <div>
+                  <span className="block text-xs font-bold text-slate-900">Simulate Background Phone Call</span>
+                  <span className="text-[11px] text-slate-500">Auto-routes transaction to Ananya</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsNewBeneficiary(!isNewBeneficiary)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                    isNewBeneficiary ? 'bg-amber-600' : 'bg-slate-300'
-                  }`}
-                >
-                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isNewBeneficiary ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
               </div>
+              <button
+                type="button"
+                onClick={() => setIsActiveCall(!isActiveCall)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                  isActiveCall ? 'bg-rose-600' : 'bg-slate-300'
+                }`}
+              >
+                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
             </div>
 
-            {/* Execution Button */}
             <button
               type="submit"
               className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-4"
@@ -415,65 +394,21 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
           </form>
         </div>
 
-        {/* RIGHT COLUMN: FRONT-OF-GLASS SAFETY ASSISTANT (40% Width / lg:col-span-5) */}
+        {/* RIGHT COLUMN: VOICE ASSIST & SAFETY METER (40% Width) */}
         <div className="lg:col-span-5 space-y-6">
-          
-          {/* Live Duress Telemetry Meter */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-emerald-600" />
-                <span>Live Duress Telemetry Meter</span>
-              </span>
-              <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                12ms Client Edge
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Calculated Risk Score:</span>
-                <span className={`text-xl font-black ${
-                  previewScore >= 75 ? 'text-rose-600' : previewScore >= 45 ? 'text-amber-600' : 'text-emerald-600'
-                }`}>
-                  {previewScore} / 100
-                </span>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="w-full h-3.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
-                <div
-                  className={`h-full transition-all duration-300 ${
-                    previewScore >= 75 ? 'bg-rose-600' : previewScore >= 45 ? 'bg-amber-500' : 'bg-emerald-500'
-                  }`}
-                  style={{ width: `${previewScore}%` }}
-                />
-              </div>
-
-              <span className="block text-[11px] text-slate-600 font-semibold pt-1">
-                {previewScore >= 75
-                  ? '🚨 High Duress Alert: Triggers 15-min Guardian Escrow Hold'
-                  : previewScore >= 45
-                  ? '⚠️ Amber Caution: Requires voice warning acknowledgement'
-                  : '✅ Low Risk: Instant frictionless execution'}
-              </span>
-            </div>
-          </div>
-
-          {/* Vernacular Audio Assistance Card (Web Speech API) */}
           <div className="bg-slate-900 text-white border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <span className="text-xs font-extrabold text-rose-400 uppercase tracking-wide flex items-center gap-1.5">
                 <Volume2 className="w-4 h-4" />
-                <span>Vernacular Voice Guidance Assistant</span>
+                <span>Voice Guidance Assistant</span>
               </span>
               <span className="text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded">
-                Speech API Active
+                Active
               </span>
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed font-normal">
-              "Police and utility companies never ask for UPI transfers to personal or escrow accounts to avoid arrest."
+              "Police and utility companies never ask for money over phone calls. Disconnect the call now."
             </p>
 
             <button
@@ -486,41 +421,32 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
             </button>
           </div>
 
-          {/* Guardian Sync Telemetry */}
+          {/* Guardian Info */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-3 text-xs">
             <span className="block font-extrabold text-slate-900 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">
-              Guardian Sync Telemetry:
+              Guardian Co-Pilot Telemetry:
             </span>
 
             <div className="space-y-2 text-slate-600">
               <div className="flex items-center justify-between">
-                <span>Linked Guardian:</span>
+                <span>Designated Guardian:</span>
                 <strong className="text-slate-900">{guardianInfo.name} ({guardianInfo.phone})</strong>
               </div>
               <div className="flex items-center justify-between">
-                <span>Automated Webhook Channel:</span>
-                <strong className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono text-[10px]">n8n active</strong>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Auto-Abort Timeout:</span>
-                <strong className="text-slate-900">15 minutes reversible escrow hold</strong>
+                <span>Real-Time Sync:</span>
+                <strong className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono text-[10px]">n8n Push Active</strong>
               </div>
             </div>
           </div>
 
-          {/* Senior Quick Emergency Button */}
+          {/* Emergency Alert Button */}
           <div className="p-4 bg-rose-50 border-2 border-rose-300 rounded-3xl space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-rose-900">
-              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>Feel pressurized or suspicious?</span>
-            </div>
-
             <button
               type="button"
               onClick={handleEmergencyButton}
               className="w-full py-3.5 rounded-2xl bg-white hover:bg-rose-100 border-2 border-rose-600 text-rose-700 font-extrabold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>🚨 I Feel Pressured / Call My Guardian {guardianInfo.name} Now</span>
+              <span>🚨 Pressured? Call Guardian {guardianInfo.name} Now</span>
             </button>
 
             {emergencyAlertSent && (
@@ -529,181 +455,56 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               </span>
             )}
           </div>
-
         </div>
 
       </div>
 
-      {/* 3. RECENT TRUSTED BENEFICIARIES SECTION */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div>
-            <h3 className="text-lg font-extrabold text-slate-900">Recent Trusted Beneficiaries</h3>
-            <p className="text-xs text-slate-500">1-tap instant payment to pre-verified trusted contacts.</p>
-          </div>
-          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            3 Contacts Verified
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Card 1: Apollo Pharmacy & Clinic */}
-          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                  <HeartPulse className="w-5 h-5" />
-                </div>
-                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
-                  Routine Healthcare
-                </span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-slate-900">Apollo Pharmacy & Clinic</h4>
-                <p className="text-[11px] text-slate-500 font-mono">apollo.pharmacy@upi</p>
-                <p className="text-[11px] text-slate-500 mt-1">Last Paid: <strong>Yesterday (₹2,450)</strong></p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => selectScenarioPreset({
-                payee: 'Apollo Pharmacy & Clinic',
-                vpa: 'apollo.pharmacy@upi',
-                amt: 1000,
-                cat: 'Medical Emergency',
-                call: false,
-                newBen: false,
-              })}
-              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <span>Quick Pay ₹1,000</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Card 2: Nilgiris Daily Groceries */}
-          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                  <ShoppingBag className="w-5 h-5" />
-                </div>
-                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
-                  Verified Merchant
-                </span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-slate-900">Nilgiris Daily Groceries</h4>
-                <p className="text-[11px] text-slate-500 font-mono">nilgiris.groceries@upi</p>
-                <p className="text-[11px] text-slate-500 mt-1">Last Paid: <strong>30 Aug (₹350)</strong></p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => selectScenarioPreset({
-                payee: 'Nilgiris Daily Groceries',
-                vpa: 'nilgiris.groceries@upi',
-                amt: 450,
-                cat: 'Regular Household Expense',
-                call: false,
-                newBen: false,
-              })}
-              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <span>Quick Pay ₹450</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Card 3: TNEB Electricity Bill */}
-          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold">
-                  <ZapOff className="w-5 h-5" />
-                </div>
-                <span className="text-[10px] font-bold text-cyan-800 bg-cyan-100 border border-cyan-300 px-2 py-0.5 rounded">
-                  Utility Recurring
-                </span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-slate-900">TNEB Electricity Bill</h4>
-                <p className="text-[11px] text-slate-500 font-mono">tneb.billing@gov</p>
-                <p className="text-[11px] text-slate-500 mt-1">Monthly Bill Due: <strong>₹1,850</strong></p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => selectScenarioPreset({
-                payee: 'TNEB Electricity Billing',
-                vpa: 'tneb.billing@gov',
-                amt: 1850,
-                cat: 'Regular Household Expense',
-                call: false,
-                newBen: false,
-              })}
-              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <span>Pay Bill ₹1,850</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* SENIOR-FRIENDLY UPI SECURITY PIN MODAL */}
+      {/* SENIOR MPIN MODAL (924180) */}
       {isPinModalOpen && (
-        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-zinc-900 border-2 border-zinc-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative">
-            
-            {/* Close button */}
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white relative">
             <button
               type="button"
               onClick={() => setIsPinModalOpen(false)}
-              className="absolute right-4 top-4 text-zinc-400 hover:text-white p-1 rounded-full hover:bg-zinc-800 transition cursor-pointer"
+              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            {/* Header */}
             <div className="text-center space-y-1">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-inner">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-inner">
                 <Lock className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-extrabold text-white tracking-tight mt-2">
-                BankShield Secure UPI PIN Verification
+                Enter Your 6-Digit MPIN
               </h3>
-              <p className="text-xs text-zinc-400">
-                Enter your 6-digit UPI MPIN for A/C ...9241
+              <p className="text-xs text-slate-400">
+                A/C ...9241 • Ramesh Kumar
               </p>
             </div>
 
-            {/* Payee Summary Box */}
-            <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 text-center space-y-1">
-              <span className="block text-[10px] uppercase font-bold tracking-wider text-zinc-500">
-                Transferring Funds To:
+            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-1">
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                Paying Amount:
               </span>
-              <div className="text-base font-black text-white">
+              <div className="text-xl font-black text-emerald-400">
                 ₹ {Number(amount || 0).toLocaleString('en-IN')}.00
               </div>
-              <div className="text-xs text-emerald-400 font-bold truncate">
+              <div className="text-xs text-white font-bold truncate">
                 {recipientName || 'Beneficiary'}
               </div>
             </div>
 
-            {/* 6-Digit PIN Indicator Display */}
+            {/* 6-Digit Indicator Display */}
             <div className="space-y-2">
-              <div className="flex items-center justify-center gap-2 py-2">
+              <div className="flex items-center justify-center gap-2 py-1">
                 {[0, 1, 2, 3, 4, 5].map(idx => (
                   <div
                     key={idx}
                     className={`w-10 h-12 rounded-xl border-2 flex items-center justify-center text-xl font-bold transition-all ${
                       enteredPin.length > idx
                         ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
-                        : 'border-zinc-700 bg-zinc-950 text-zinc-600'
+                        : 'border-slate-700 bg-slate-950 text-slate-600'
                     }`}
                   >
                     {enteredPin.length > idx ? '•' : ''}
@@ -711,11 +512,13 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 ))}
               </div>
 
-              {/* Demo Auto-fill shortcut */}
               <div className="text-center">
                 <button
                   type="button"
-                  onClick={handleAutofillPin}
+                  onClick={() => {
+                    setEnteredPin(CORRECT_PIN);
+                    setPinError('');
+                  }}
                   className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold underline transition cursor-pointer"
                 >
                   [Auto-fill Demo PIN: 924180]
@@ -723,22 +526,21 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               </div>
             </div>
 
-            {/* Error Feedback */}
             {pinError && (
-              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-1.5 animate-in zoom-in-95">
+              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-1.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{pinError}</span>
               </div>
             )}
 
-            {/* Senior-Friendly Touch Keypad */}
+            {/* Keypad */}
             <div className="grid grid-cols-3 gap-2 pt-1">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => handleKeypadPress(num)}
-                  className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                  className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
                 >
                   {num}
                 </button>
@@ -746,15 +548,14 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               <button
                 type="button"
                 onClick={handleBackspace}
-                className="py-3 rounded-xl bg-zinc-800 hover:bg-rose-900 text-rose-300 font-bold text-sm transition flex items-center justify-center cursor-pointer"
-                title="Backspace"
+                className="py-3 rounded-xl bg-slate-800 hover:bg-rose-900 text-rose-300 font-bold text-sm transition flex items-center justify-center cursor-pointer"
               >
                 <Delete className="w-5 h-5" />
               </button>
               <button
                 type="button"
                 onClick={() => handleKeypadPress('0')}
-                className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
               >
                 0
               </button>
@@ -762,39 +563,14 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 type="button"
                 onClick={handleConfirmPin}
                 disabled={enteredPin.length !== 6}
-                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-zinc-800 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
+                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
               >
                 OK
               </button>
             </div>
-
-            {/* Pitch Deck Alignment Note */}
-            <div className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800 text-[10px] text-zinc-400 text-center leading-relaxed">
-              🔒 <strong className="text-zinc-300">2FA PIN Validated.</strong> BankShield Cognitive Engine running in-flight duress evaluation (&lt;50ms)...
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-zinc-800">
-              <button
-                type="button"
-                onClick={() => setIsPinModalOpen(false)}
-                className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs transition cursor-pointer"
-              >
-                Cancel Transfer
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmPin}
-                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-lg shadow-emerald-600/20 cursor-pointer"
-              >
-                Authorize Payment
-              </button>
-            </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 };

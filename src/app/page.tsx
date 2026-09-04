@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 import { PageStage, PortalSubTab, UserRole, AuditItem, GuardianInfo } from '../types';
-import { evaluateDuressRisk } from '../backend/riskEngine';
+import { evaluateDuressRisk, computeDynamicCap } from '../backend/riskEngine';
 import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV, exportAuditODS, downloadAuditPDF } from '../backend/auditService';
 
 import { Navigation } from '../frontend/Navigation';
@@ -109,7 +109,7 @@ export default function BankShieldApp() {
     }
   };
 
-  // Authorize Transfer Handled via backend riskEngine
+  // Authorize Transfer Handled via backend riskEngine & Dynamic Cap Engine
   const handleAuthorizeTransfer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || parseFloat(amount) <= 0) return;
@@ -128,8 +128,10 @@ export default function BankShieldApp() {
       historicalAvg: 1200,
     });
 
+    const capInfo = computeDynamicCap(balance, upiId, category, isActiveCall);
+    const requiresAssistedEscrow = numAmount > capInfo.effectiveCap || isActiveCall || evalResult.tier === 'High';
+
     const newTxnId = `TXN-${Math.floor(1000 + Math.random() * 9000)}`;
-    const isHighRisk = evalResult.tier === 'High';
 
     const newAuditItem: AuditItem = {
       id: newTxnId,
@@ -138,37 +140,45 @@ export default function BankShieldApp() {
       vpa: upiId,
       amount: numAmount,
       riskScore: evalResult.score,
-      status: isHighRisk ? 'Escrow Hold' : 'Completed',
-      notes: isHighRisk ? `${evalResult.deviationSurge}, Coercion Keywords, Active Call Telemetry` : 'Low Risk Frictionless Transfer',
+      status: requiresAssistedEscrow ? 'Escrow Hold' : 'Completed',
+      notes: requiresAssistedEscrow
+        ? `Exceeded Safe Cap ₹${capInfo.effectiveCap.toLocaleString('en-IN')}, ${evalResult.deviationSurge}, ${capInfo.reason}`
+        : 'Safe Transfer Within Dynamic Limit',
     };
 
     setAuditLogs(prev => appendAuditRecord(prev, newAuditItem));
 
-    if (isHighRisk) {
+    if (requiresAssistedEscrow) {
       setActiveEscrow(newAuditItem);
       setCountdown(847);
       triggerSpeech();
-      // Funds placed under escrow hold — balance remains untouched in Ramesh's account until authorized
     } else {
-      // Safe transfer (Score < 75) — deduct balance immediately
+      // Safe transfer -> deduct balance immediately
       setBalance(prev => Math.max(0, prev - numAmount));
       setActiveEscrow(null);
     }
   };
 
-  // Guardian Freeze & Abort Action (Aborted -> Funds remain untouched in Ramesh's account)
+  // Guardian Freeze & Abort Action
   const handleFreezeAndAbort = () => {
     stopSpeech();
     if (activeEscrow) {
       const updatedId = activeEscrow.id;
+      const abortedItem: AuditItem = {
+        ...activeEscrow,
+        status: 'Aborted & Frozen',
+        notes: `Aborted by Guardian ${guardianInfo.name}. Funds secured in savings A/C.`,
+      };
+
       setAuditLogs(prev =>
-        prev.map(item =>
-          item.id === updatedId
-            ? { ...item, status: 'Aborted & Frozen', notes: `Aborted by Guardian ${guardianInfo.name}. Funds secured in savings A/C.` }
-            : item
-        )
+        prev.map(item => (item.id === updatedId ? abortedItem : item))
       );
-      setActiveEscrow(null);
+      setActiveEscrow(abortedItem);
+
+      // Clear after giving real-time feedback
+      setTimeout(() => {
+        setActiveEscrow(null);
+      }, 5000);
     }
   };
 
@@ -182,15 +192,23 @@ export default function BankShieldApp() {
         alert(`Insufficient account balance (Available: ₹${balance.toLocaleString('en-IN')}) to settle this escrow transfer.`);
         return;
       }
+
+      const authorizedItem: AuditItem = {
+        ...activeEscrow,
+        status: 'Guardian Authorized',
+        notes: `Manually authorized by Guardian ${guardianInfo.name} via MPIN 432100.`,
+      };
+
       setBalance(prev => Math.max(0, prev - escrowAmt));
       setAuditLogs(prev =>
-        prev.map(item =>
-          item.id === updatedId
-            ? { ...item, status: 'Guardian Cleared', notes: `Manually authorized by Guardian ${guardianInfo.name}.` }
-            : item
-        )
+        prev.map(item => (item.id === updatedId ? authorizedItem : item))
       );
-      setActiveEscrow(null);
+      setActiveEscrow(authorizedItem);
+
+      // Clear after showing real-time feedback
+      setTimeout(() => {
+        setActiveEscrow(null);
+      }, 4000);
     }
   };
 
@@ -297,6 +315,8 @@ export default function BankShieldApp() {
                   currentMultiplier={currentMultiplier}
                   handleAuthorizeTransfer={handleAuthorizeTransfer}
                   balance={balance}
+                  activeEscrow={activeEscrow}
+                  guardianInfo={guardianInfo}
                 />
 
                 <GuardianDeck

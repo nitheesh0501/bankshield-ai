@@ -1,6 +1,32 @@
-import React, { useState } from 'react';
-import { Smartphone, Send, PhoneCall, Volume2, Lock, Delete, X, AlertCircle, ShieldCheck } from 'lucide-react';
-import { PRESET_SCENARIOS } from '../backend/riskEngine';
+import React, { useState, useEffect } from 'react';
+import {
+  Smartphone,
+  Send,
+  PhoneCall,
+  Volume2,
+  Lock,
+  Delete,
+  X,
+  AlertCircle,
+  ShieldCheck,
+  QrCode,
+  Mic,
+  UserCheck,
+  Sparkles,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  Clock,
+  ChevronRight,
+  ArrowUpRight,
+  Zap,
+  ShoppingBag,
+  HeartPulse,
+  Receipt,
+  RotateCcw
+} from 'lucide-react';
+import { PRESET_SCENARIOS, computeDynamicCap } from '../backend/riskEngine';
+import { AuditItem, GuardianInfo } from '../types';
 
 interface SeniorPhoneProps {
   recipientName: string;
@@ -16,6 +42,8 @@ interface SeniorPhoneProps {
   currentMultiplier: string;
   handleAuthorizeTransfer: (e: React.FormEvent) => void;
   balance?: number;
+  activeEscrow?: AuditItem | null;
+  guardianInfo?: GuardianInfo;
 }
 
 export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
@@ -32,24 +60,49 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
   currentMultiplier,
   handleAuthorizeTransfer,
   balance = 142800,
+  activeEscrow = null,
+  guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
 }) => {
+  // UI Toggles & States
+  const [showFullBalance, setShowFullBalance] = useState(false);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isPhonePayModalOpen, setIsPhonePayModalOpen] = useState(false);
+  const [phoneLookup, setPhoneLookup] = useState('');
+  const [isVoiceListening, setIsVoiceListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // UPI PIN Verification State
+  // UPI PIN Modal & Verification
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [enteredPin, setEnteredPin] = useState('');
   const [pinError, setPinError] = useState('');
-  const CORRECT_PIN = '924180'; // Matches Ramesh's NetBanking credential
+  const CORRECT_PIN = '924180'; // Ramesh's Senior PIN
 
-  const triggerSpeech = () => {
+  // Local Success Receipt State
+  const [lastCompletedTxn, setLastCompletedTxn] = useState<{ payee: string; amount: number; time: string } | null>(null);
+
+  // Dynamic Safe Cap Calculation
+  const capInfo = computeDynamicCap(balance, upiId, category, isActiveCall);
+
+  // Watch for real-time status transitions on activeEscrow
+  useEffect(() => {
+    if (activeEscrow && (activeEscrow.status === 'Guardian Authorized' || activeEscrow.status === 'Guardian Cleared')) {
+      setLastCompletedTxn({
+        payee: activeEscrow.payee,
+        amount: activeEscrow.amount,
+        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      });
+    }
+  }, [activeEscrow]);
+
+  // Voice Assistant TTS
+  const triggerSpeech = (customText?: string) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     try {
       window.speechSynthesis.cancel();
-      const text =
-        'Warning: Official police, court, or utility authorities will never demand money transfers over the phone to avoid arrest or disconnection. Disconnect the call now.';
+      const text = customText || 'Tap the microphone or select a trusted contact to send money safely.';
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.92;
-      utterance.lang = 'en-US';
+      utterance.rate = 0.9;
+      utterance.lang = 'en-IN';
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
       setIsSpeaking(true);
@@ -60,6 +113,14 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
     }
   };
 
+  const handleMicClick = () => {
+    setIsVoiceListening(true);
+    triggerSpeech('Listening! Tell me who you want to pay. For example, Apollo Pharmacy or Ananya.');
+    setTimeout(() => {
+      setIsVoiceListening(false);
+    }, 4000);
+  };
+
   const selectPreset = (presetId: string) => {
     const preset = PRESET_SCENARIOS.find(p => p.id === presetId);
     if (!preset) return;
@@ -68,11 +129,11 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
     setAmount(preset.amount.toString());
     setCategory(preset.category);
     setIsActiveCall(preset.isCallActive);
+    setLastCompletedTxn(null);
   };
 
-  // Payment Execution & PIN Flow Handlers
-  const handleInitiatePayment = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleInitiatePayment = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!amount || Number(amount) <= 0) {
       alert('Please enter a valid transfer amount.');
       return;
@@ -94,65 +155,245 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
     setPinError('');
   };
 
-  const handleAutofillPin = () => {
-    setEnteredPin(CORRECT_PIN);
-    setPinError('');
-  };
-
   const handleConfirmPin = () => {
     if (enteredPin !== CORRECT_PIN) {
-      setPinError('Incorrect 6-digit UPI PIN. Please try again.');
+      setPinError('Incorrect 6-digit MPIN. Try again.');
       return;
     }
 
     setIsPinModalOpen(false);
     setPinError('');
+
+    const numAmount = Number(amount);
+    if (numAmount <= capInfo.effectiveCap && !isActiveCall) {
+      // Instant execution receipt
+      setLastCompletedTxn({
+        payee: recipientName,
+        amount: numAmount,
+        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      });
+      triggerSpeech(`Payment of ${numAmount} rupees to ${recipientName} successful!`);
+    }
+
     handleAuthorizeTransfer({ preventDefault: () => {} } as React.FormEvent);
+  };
+
+  const handleSimulateScan = (name: string, vpa: string, amt: number) => {
+    setRecipientName(name);
+    setUpiId(vpa);
+    setAmount(amt.toString());
+    setCategory('QR Scanner Payment');
+    setIsActiveCall(false);
+    setIsQrModalOpen(false);
+    setLastCompletedTxn(null);
   };
 
   return (
     <div className="space-y-4 relative">
       {/* Container Header */}
       <div className="flex items-center justify-between px-2">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5 leading-tight">
+        <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 leading-tight">
           <Smartphone className="w-4 h-4 text-emerald-600" />
-          <span>[ DEVICE 1 ] Ramesh's Senior UPI Phone Client (/pay)</span>
+          <span>Ramesh's Assisted UPI Wallet</span>
         </h3>
-        <span className="text-xs font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-          LIVE SENSOR
+        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
+          PROTECTED BY ANANYA
         </span>
       </div>
 
-      {/* Mobile Mockup Container */}
-      <div className="bg-zinc-950 text-zinc-100 border-4 border-zinc-800 rounded-[36px] p-6 shadow-2xl space-y-5 overflow-hidden">
-        {/* Account Header */}
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+      {/* Main Mobile App Frame */}
+      <div className="bg-slate-900 text-slate-100 border-4 border-slate-800 rounded-[36px] p-5 sm:p-6 shadow-2xl space-y-5 overflow-hidden">
+        
+        {/* User Account Header */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center border border-emerald-500/30">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 font-extrabold flex items-center justify-center text-base border border-emerald-500/40 shadow-inner">
               RK
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white leading-tight">Ramesh Kumar (Age: 68)</h4>
-              <p className="text-[11px] text-zinc-400 font-mono leading-normal mt-0.5">Savings A/C ...9241 • Bal: ₹{balance.toLocaleString('en-IN')}</p>
+              <h4 className="text-base font-extrabold text-white leading-tight">Ramesh Kumar</h4>
+              <p className="text-xs text-slate-400 font-medium">Senior Privilege Account</p>
             </div>
           </div>
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+
+          <button
+            type="button"
+            onClick={handleMicClick}
+            className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+              isVoiceListening
+                ? 'bg-rose-600 border-rose-400 text-white animate-pulse shadow-lg shadow-rose-600/30'
+                : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-400 hover:bg-emerald-600/30'
+            }`}
+            title="Tap for Voice Assistant"
+          >
+            <Mic className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Dynamic Available Clear Balance Display */}
-        <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col">
-          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-            Available Clear Balance
+        {/* 1. SAFE POCKET BALANCE CARD */}
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-950/80 via-slate-900 to-emerald-900/60 border border-emerald-500/30 space-y-3 relative shadow-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Safe Pocket Limit</span>
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setShowFullBalance(!showFullBalance)}
+              className="text-[11px] font-bold text-slate-300 hover:text-white bg-slate-800/80 px-2.5 py-1 rounded-xl border border-slate-700 flex items-center gap-1 transition cursor-pointer"
+            >
+              {showFullBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              <span>{showFullBalance ? 'Hide Savings' : 'Show Full Balance'}</span>
+            </button>
+          </div>
+
+          <div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
+                ₹ {capInfo.effectiveCap.toLocaleString('en-IN')}.00
+              </span>
+              <span className="text-xs font-bold text-emerald-200/80">/ transfer</span>
+            </div>
+            <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+              Instant 1-tap clearance for routine expenses up to ₹{capInfo.effectiveCap.toLocaleString('en-IN')}.
+            </p>
+          </div>
+
+          {showFullBalance && (
+            <div className="pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs animate-in fade-in duration-200">
+              <span className="text-slate-400 font-medium">Total Linked Savings Balance:</span>
+              <strong className="text-white font-extrabold text-sm">₹ {balance.toLocaleString('en-IN')}.00</strong>
+            </div>
+          )}
+        </div>
+
+        {/* 2. CORE ACCESSIBLE UPI NAVIGATION TILES (Oversized Touch Targets) */}
+        <div className="grid grid-cols-3 gap-2.5">
+          {/* Tile 1: Scan QR */}
+          <button
+            type="button"
+            onClick={() => setIsQrModalOpen(true)}
+            className="p-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-md cursor-pointer border border-emerald-400/30 min-h-[80px]"
+          >
+            <QrCode className="w-6 h-6 text-white" />
+            <span className="text-xs font-extrabold leading-tight">Scan Any QR</span>
+          </button>
+
+          {/* Tile 2: Pay Phone Number */}
+          <button
+            type="button"
+            onClick={() => setIsPhonePayModalOpen(true)}
+            className="p-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-100 flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-md cursor-pointer border border-slate-700 min-h-[80px]"
+          >
+            <Send className="w-6 h-6 text-emerald-400" />
+            <span className="text-xs font-extrabold leading-tight">Pay Contact</span>
+          </button>
+
+          {/* Tile 3: Voice Assist */}
+          <button
+            type="button"
+            onClick={handleMicClick}
+            className="p-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-100 flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-md cursor-pointer border border-slate-700 min-h-[80px]"
+          >
+            <Volume2 className="w-6 h-6 text-cyan-400" />
+            <span className="text-xs font-extrabold leading-tight">Voice Assist</span>
+          </button>
+        </div>
+
+        {/* 3. FREQUENT & TRUSTED PAYEES (Avatar Grid) */}
+        <div className="space-y-2.5">
+          <span className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider">
+            Frequent & Trusted Payees:
           </span>
-          <p className="text-2xl font-black text-emerald-400 tracking-tight mt-0.5">
-            ₹ {balance.toLocaleString('en-IN')}.00
-          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {/* Contact 1: Ananya */}
+            <button
+              type="button"
+              onClick={() => {
+                setRecipientName('Ananya Kumar (Daughter)');
+                setUpiId('ananya.daughter@upi');
+                setAmount('1000');
+                setCategory('Family Support');
+                setIsActiveCall(false);
+                setLastCompletedTxn(null);
+              }}
+              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+            >
+              <div className="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-emerald-500/40">
+                AK
+              </div>
+              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Ananya</span>
+              <span className="text-[9px] text-emerald-400 font-semibold">Daughter</span>
+            </button>
+
+            {/* Contact 2: Apollo Pharmacy */}
+            <button
+              type="button"
+              onClick={() => {
+                setRecipientName('Apollo Pharmacy');
+                setUpiId('apollo.pharmacy@upi');
+                setAmount('1200');
+                setCategory('Healthcare & Medicine');
+                setIsActiveCall(false);
+                setLastCompletedTxn(null);
+              }}
+              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+            >
+              <div className="w-9 h-9 rounded-full bg-rose-500/20 text-rose-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-rose-500/40">
+                <HeartPulse className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Pharmacy</span>
+              <span className="text-[9px] text-slate-400 font-semibold">Medicine</span>
+            </button>
+
+            {/* Contact 3: Local Milkman */}
+            <button
+              type="button"
+              onClick={() => {
+                setRecipientName('Nilgiris Daily Groceries');
+                setUpiId('nilgiris.groceries@upi');
+                setAmount('450');
+                setCategory('Regular Household Expense');
+                setIsActiveCall(false);
+                setLastCompletedTxn(null);
+              }}
+              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+            >
+              <div className="w-9 h-9 rounded-full bg-amber-500/20 text-amber-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-amber-500/40">
+                <ShoppingBag className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Groceries</span>
+              <span className="text-[9px] text-slate-400 font-semibold">Daily</span>
+            </button>
+
+            {/* Contact 4: Electricity Bill */}
+            <button
+              type="button"
+              onClick={() => {
+                setRecipientName('TNEB Electricity Bill');
+                setUpiId('tneb.billing@gov');
+                setAmount('1850');
+                setCategory('Utility Recurring');
+                setIsActiveCall(false);
+                setLastCompletedTxn(null);
+              }}
+              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+            >
+              <div className="w-9 h-9 rounded-full bg-cyan-500/20 text-cyan-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-cyan-500/40">
+                <Zap className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Electricity</span>
+              <span className="text-[9px] text-slate-400 font-semibold">Utility</span>
+            </button>
+          </div>
         </div>
 
-        {/* Quick Test Scam Scenarios Selector */}
-        <div className="space-y-2">
-          <span className="block text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-            Quick Test Scam Scenarios:
+        {/* QUICK TEST SCAM PRESETS SELECTOR */}
+        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+          <span className="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Test Scam Vectors:</span>
+            <span className="text-[9px] text-slate-500 font-normal">Simulate attacks</span>
           </span>
           <div className="grid grid-cols-3 gap-1.5">
             {PRESET_SCENARIOS.map(preset => (
@@ -160,9 +401,9 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 key={preset.id}
                 type="button"
                 onClick={() => selectPreset(preset.id)}
-                className="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left text-[11px] font-bold text-white transition cursor-pointer"
+                className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-left text-[11px] font-bold text-white transition cursor-pointer"
               >
-                <span className={`block text-[9px] ${preset.expectedScore >= 75 ? 'text-rose-400' : preset.expectedScore >= 45 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                <span className={`block text-[9px] truncate ${preset.expectedScore >= 75 ? 'text-rose-400 font-black' : 'text-emerald-400'}`}>
                   {preset.name}
                 </span>
                 <span>₹{preset.amount.toLocaleString('en-IN')}</span>
@@ -171,24 +412,86 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           </div>
         </div>
 
-        {/* Form Fields */}
-        <form onSubmit={handleInitiatePayment} className="space-y-4">
+        {/* 4. REAL-TIME ASSISTED ESCROW / COMPLETED RECEIPT BANNER */}
+        {lastCompletedTxn ? (
+          <div className="p-5 rounded-3xl bg-emerald-950/90 border-2 border-emerald-500 text-center space-y-3 animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 block">
+                ✓ Payment Successful
+              </span>
+              <h4 className="text-2xl font-black text-white">₹{lastCompletedTxn.amount.toLocaleString('en-IN')}.00</h4>
+              <p className="text-xs text-slate-300 font-semibold">Sent to {lastCompletedTxn.payee}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLastCompletedTxn(null)}
+              className="text-xs px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-md cursor-pointer"
+            >
+              Send Another Payment
+            </button>
+          </div>
+        ) : activeEscrow && activeEscrow.status === 'Escrow Hold' ? (
+          <div className="p-5 rounded-3xl bg-rose-950/90 border-2 border-rose-500 space-y-3 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/40 shrink-0">
+                <Clock className="w-5 h-5 animate-spin" />
+              </div>
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-400 block">
+                  Needs Guardian Approval
+                </span>
+                <h4 className="text-sm font-extrabold text-white leading-tight">
+                  Transfer of ₹{activeEscrow.amount.toLocaleString('en-IN')} to {activeEscrow.payee}
+                </h4>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-900/90 border border-rose-900/50 text-xs text-slate-200 leading-relaxed font-medium">
+              "Amount exceeds your <strong>₹{capInfo.effectiveCap.toLocaleString('en-IN')}</strong> safe limit. We sent a 1-tap confirmation request to Ananya ({guardianInfo.phone})."
+            </div>
+
+            <div className="flex items-center justify-center gap-2 py-1 text-xs font-extrabold text-amber-400 bg-amber-500/10 rounded-xl border border-amber-500/30">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              <span>Waiting for Ananya to enter her PIN...</span>
+            </div>
+          </div>
+        ) : activeEscrow && activeEscrow.status === 'Aborted & Frozen' ? (
+          <div className="p-5 rounded-3xl bg-rose-950/90 border-2 border-rose-500 space-y-3 animate-in zoom-in-95 duration-200 text-center">
+            <div className="w-10 h-10 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/40">
+              <X className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-400 block">
+                Payment Stopped & Secured
+              </span>
+              <h4 className="text-base font-extrabold text-white">Transfer of ₹{activeEscrow.amount.toLocaleString('en-IN')} Cancelled</h4>
+              <p className="text-xs text-slate-300">Your guardian Ananya stopped this transaction. Your money is 100% safe in your account.</p>
+            </div>
+          </div>
+        ) : null}
+
+        {/* 5. ACCESSIBLE SEND MONEY FORM */}
+        <form onSubmit={handleInitiatePayment} className="space-y-4 pt-1">
           <div className="space-y-1">
-            <label className="block text-xs font-bold text-zinc-300">Beneficiary Name / VPA</label>
+            <label className="block text-xs font-bold text-slate-300">Recipient Name / Contact</label>
             <input
               type="text"
               required
               value={recipientName}
               onChange={e => setRecipientName(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-medium text-xs focus:border-emerald-500 focus:outline-none transition"
+              className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-white font-bold text-sm focus:border-emerald-500 focus:outline-none transition"
+              placeholder="e.g. Apollo Pharmacy"
             />
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-zinc-300">Transfer Amount (₹ INR)</label>
-              <span className="text-[10px] text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
-                {currentMultiplier}x Historical Surge
+              <label className="block text-xs font-bold text-slate-300">Amount (₹ INR)</label>
+              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                Safe Limit: ₹{capInfo.effectiveCap.toLocaleString('en-IN')}
               </span>
             </div>
             <input
@@ -196,31 +499,21 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               required
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-base focus:border-emerald-500 focus:outline-none transition"
+              className="w-full px-4 py-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-emerald-400 font-black text-xl focus:border-emerald-500 focus:outline-none transition"
+              placeholder="Enter amount"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="block text-xs font-bold text-zinc-300">Payment Reason</label>
-            <input
-              type="text"
-              required
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-medium text-xs focus:border-emerald-500 focus:outline-none transition"
-            />
-          </div>
-
-          {/* Background Phone Call Duress Sensor Switch */}
-          <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between gap-3">
+          {/* Background Phone Call Sensor Toggle */}
+          <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className={`p-2 rounded-lg ${isActiveCall ? 'bg-rose-500/20 text-rose-400 animate-pulse' : 'bg-zinc-800 text-zinc-500'}`}>
+              <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-500/20 text-rose-400 animate-pulse' : 'bg-slate-800 text-slate-500'}`}>
                 <PhoneCall className="w-4 h-4" />
               </div>
               <div>
-                <span className="block text-xs font-bold text-white leading-tight">Simulate Background Phone Call (Duress Sensor)</span>
-                <span className="text-[10px] text-zinc-400 leading-normal">
-                  {isActiveCall ? 'Active caller claiming official authority (+15 pts)' : 'No active phone call detected'}
+                <span className="block text-xs font-bold text-white leading-tight">Active Call Sensor</span>
+                <span className="text-[10px] text-slate-400 leading-normal">
+                  {isActiveCall ? 'Phone call in progress (Auto-routes to Ananya)' : 'No active phone call'}
                 </span>
               </div>
             </div>
@@ -228,92 +521,162 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             <button
               type="button"
               onClick={() => setIsActiveCall(!isActiveCall)}
-              className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                isActiveCall ? 'bg-rose-600' : 'bg-zinc-700'
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                isActiveCall ? 'bg-rose-600' : 'bg-slate-700'
               }`}
             >
-              <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
+              <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
           </div>
 
-          {/* Contextual Voice Assist Card */}
-          <div className="p-3.5 bg-zinc-900/90 border border-rose-900/50 rounded-xl space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-rose-400 uppercase tracking-wide">Contextual Voice Assist</span>
-              <button
-                type="button"
-                onClick={triggerSpeech}
-                className="text-xs px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-medium flex items-center gap-1.5 cursor-pointer transition"
-              >
-                <Volume2 className={`w-3.5 h-3.5 ${isSpeaking ? 'animate-bounce' : ''}`} />
-                <span>Read Warning Aloud</span>
-              </button>
-            </div>
-            <p className="text-xs text-zinc-300 leading-relaxed font-normal">
-              "Authority coercion pattern detected. Transfers to official escrow VPAs over phone calls are intercepted."
-            </p>
-          </div>
-
+          {/* Big Oversized Pay Button (Min 48px target) */}
           <button
             type="submit"
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-black text-sm transition shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-4 min-h-[52px] rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-black text-base transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer"
           >
-            <Send className="w-4 h-4" />
-            <span>Authorize Transfer of ₹{amount ? parseFloat(amount).toLocaleString('en-IN') : '0'}</span>
+            <Send className="w-5 h-5 text-white" />
+            <span>Send ₹{amount ? Number(amount).toLocaleString('en-IN') : '0'} Now</span>
           </button>
         </form>
+
       </div>
 
-      {/* SENIOR-FRIENDLY UPI SECURITY PIN MODAL */}
-      {isPinModalOpen && (
-        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-zinc-900 border-2 border-zinc-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative">
-            
-            {/* Close button */}
+      {/* QR SCANNER SIMULATION MODAL */}
+      {isQrModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-white relative">
             <button
               type="button"
-              onClick={() => setIsPinModalOpen(false)}
-              className="absolute right-4 top-4 text-zinc-400 hover:text-white p-1 rounded-full hover:bg-zinc-800 transition cursor-pointer"
+              onClick={() => setIsQrModalOpen(false)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            {/* Header */}
             <div className="text-center space-y-1">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-inner">
+              <QrCode className="w-8 h-8 text-emerald-400 mx-auto" />
+              <h3 className="text-base font-extrabold">Scan Any Merchant UPI QR</h3>
+              <p className="text-xs text-slate-400">Point your phone camera at shop QR code</p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-slate-950 border-2 border-dashed border-emerald-500/50 flex items-center justify-center text-center space-y-2 flex-col min-h-[160px]">
+              <span className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center animate-pulse">
+                <QrCode className="w-8 h-8" />
+              </span>
+              <span className="text-xs font-bold text-emerald-300">Simulate Quick QR Scans:</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => handleSimulateScan('Nilgiris Daily Groceries', 'nilgiris.groceries@upi', 450)}
+                className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-left text-xs font-bold transition cursor-pointer"
+              >
+                <span className="block text-emerald-400 text-[10px]">Merchant</span>
+                <span>Nilgiris ₹450</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSimulateScan('Apollo Pharmacy', 'apollo.pharmacy@upi', 1200)}
+                className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-left text-xs font-bold transition cursor-pointer"
+              >
+                <span className="block text-rose-400 text-[10px]">Pharmacy</span>
+                <span>Apollo ₹1,200</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PHONE LOOKUP PAY MODAL */}
+      {isPhonePayModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-white relative">
+            <button
+              type="button"
+              onClick={() => setIsPhonePayModalOpen(false)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center space-y-1">
+              <Send className="w-7 h-7 text-emerald-400 mx-auto" />
+              <h3 className="text-base font-extrabold">Pay to Phone / Contact</h3>
+              <p className="text-xs text-slate-400">Enter 10-digit mobile number</p>
+            </div>
+
+            <div className="space-y-2">
+              <input
+                type="tel"
+                value={phoneLookup}
+                onChange={e => setPhoneLookup(e.target.value)}
+                placeholder="+91 98765 43210"
+                className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-white font-mono text-sm focus:border-emerald-500 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setRecipientName('Ananya Kumar');
+                  setUpiId('ananya.daughter@upi');
+                  setIsPhonePayModalOpen(false);
+                }}
+                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition cursor-pointer"
+              >
+                Proceed to Pay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SENIOR MPIN VERIFICATION MODAL (924180) */}
+      {isPinModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative">
+            
+            <button
+              type="button"
+              onClick={() => setIsPinModalOpen(false)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center space-y-1">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-inner">
                 <Lock className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-extrabold text-white tracking-tight mt-2">
-                BankShield Secure UPI PIN Verification
+                Enter Your 6-Digit MPIN
               </h3>
-              <p className="text-xs text-zinc-400">
-                Enter your 6-digit UPI MPIN for A/C ...9241
+              <p className="text-xs text-slate-400">
+                A/C ...9241 • Ramesh Kumar
               </p>
             </div>
 
-            {/* Payee Summary Box */}
-            <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 text-center space-y-1">
-              <span className="block text-[10px] uppercase font-bold tracking-wider text-zinc-500">
-                Transferring Funds To:
+            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-1">
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                Paying Amount:
               </span>
-              <div className="text-base font-black text-white">
+              <div className="text-xl font-black text-emerald-400">
                 ₹ {Number(amount || 0).toLocaleString('en-IN')}.00
               </div>
-              <div className="text-xs text-emerald-400 font-bold truncate">
+              <div className="text-xs text-white font-bold truncate">
                 {recipientName || 'Beneficiary'}
               </div>
             </div>
 
-            {/* 6-Digit PIN Indicator Display */}
+            {/* 6-Digit Indicator Display */}
             <div className="space-y-2">
-              <div className="flex items-center justify-center gap-2 py-2">
+              <div className="flex items-center justify-center gap-2 py-1">
                 {[0, 1, 2, 3, 4, 5].map(idx => (
                   <div
                     key={idx}
                     className={`w-10 h-12 rounded-xl border-2 flex items-center justify-center text-xl font-bold transition-all ${
                       enteredPin.length > idx
                         ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
-                        : 'border-zinc-700 bg-zinc-950 text-zinc-600'
+                        : 'border-slate-700 bg-slate-950 text-slate-600'
                     }`}
                   >
                     {enteredPin.length > idx ? '•' : ''}
@@ -321,11 +684,13 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 ))}
               </div>
 
-              {/* Demo Auto-fill shortcut */}
               <div className="text-center">
                 <button
                   type="button"
-                  onClick={handleAutofillPin}
+                  onClick={() => {
+                    setEnteredPin(CORRECT_PIN);
+                    setPinError('');
+                  }}
                   className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold underline transition cursor-pointer"
                 >
                   [Auto-fill Demo PIN: 924180]
@@ -333,22 +698,21 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               </div>
             </div>
 
-            {/* Error Feedback */}
             {pinError && (
-              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-1.5 animate-in zoom-in-95">
+              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-1.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{pinError}</span>
               </div>
             )}
 
-            {/* Senior-Friendly Touch Keypad */}
+            {/* Touch Keypad */}
             <div className="grid grid-cols-3 gap-2 pt-1">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => handleKeypadPress(num)}
-                  className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                  className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
                 >
                   {num}
                 </button>
@@ -356,15 +720,14 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               <button
                 type="button"
                 onClick={handleBackspace}
-                className="py-3 rounded-xl bg-zinc-800 hover:bg-rose-900 text-rose-300 font-bold text-sm transition flex items-center justify-center cursor-pointer"
-                title="Backspace"
+                className="py-3 rounded-xl bg-slate-800 hover:bg-rose-900 text-rose-300 font-bold text-sm transition flex items-center justify-center cursor-pointer"
               >
                 <Delete className="w-5 h-5" />
               </button>
               <button
                 type="button"
                 onClick={() => handleKeypadPress('0')}
-                className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
               >
                 0
               </button>
@@ -372,39 +735,14 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 type="button"
                 onClick={handleConfirmPin}
                 disabled={enteredPin.length !== 6}
-                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-zinc-800 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
+                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
               >
                 OK
               </button>
             </div>
-
-            {/* Pitch Deck Alignment Note */}
-            <div className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800 text-[10px] text-zinc-400 text-center leading-relaxed">
-              🔒 <strong className="text-zinc-300">2FA PIN Validated.</strong> BankShield Cognitive Engine running in-flight duress evaluation (&lt;50ms)...
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-zinc-800">
-              <button
-                type="button"
-                onClick={() => setIsPinModalOpen(false)}
-                className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs transition cursor-pointer"
-              >
-                Cancel Transfer
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmPin}
-                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-lg shadow-emerald-600/20 cursor-pointer"
-              >
-                Authorize Payment
-              </button>
-            </div>
-
           </div>
         </div>
       )}
     </div>
   );
 };
-
