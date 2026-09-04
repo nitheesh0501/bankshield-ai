@@ -200,27 +200,27 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
     <div className="space-y-4 relative">
       {/* Container Header */}
       <div className="flex items-center justify-between px-2">
-        <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 leading-tight">
+        <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5 leading-tight">
           <Smartphone className="w-4 h-4 text-emerald-600" />
           <span>Ramesh's Assisted UPI Wallet</span>
         </h3>
-        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
+        <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
           PROTECTED BY ANANYA
         </span>
       </div>
 
-      {/* Main Mobile App Frame */}
-      <div className="bg-slate-900 text-slate-100 border-4 border-slate-800 rounded-[36px] p-5 sm:p-6 shadow-2xl space-y-5 overflow-hidden">
+      {/* Main Mobile App Frame - Modern Light Surface */}
+      <div className="bg-white text-slate-900 border border-slate-200 rounded-[36px] p-5 sm:p-6 shadow-xl space-y-5 overflow-hidden">
         
         {/* User Account Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 font-extrabold flex items-center justify-center text-base border border-emerald-500/40 shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white font-black flex items-center justify-center text-base shadow-xs">
               RK
             </div>
             <div>
-              <h4 className="text-base font-extrabold text-white leading-tight">Ramesh Kumar</h4>
-              <p className="text-xs text-slate-400 font-medium">Senior Privilege Account</p>
+              <h4 className="text-base font-black text-slate-900 leading-tight">Ramesh Kumar</h4>
+              <p className="text-xs text-slate-500 font-medium">Senior Privilege Account</p>
             </div>
           </div>
 
@@ -229,8 +229,8 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             onClick={handleMicClick}
             className={`p-3 rounded-2xl border transition-all cursor-pointer ${
               isVoiceListening
-                ? 'bg-rose-600 border-rose-400 text-white animate-pulse shadow-lg shadow-rose-600/30'
-                : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-400 hover:bg-emerald-600/30'
+                ? 'bg-rose-600 border-rose-500 text-white animate-pulse shadow-md'
+                : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
             }`}
             title="Tap for Voice Assistant"
           >
@@ -240,49 +240,49 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
 
         {/* INCOMING GUARDIAN CREDIT TOP-UP BANNER */}
         {lastGuardianTopUp && (
-          <div className="p-4 rounded-3xl bg-emerald-950/90 border-2 border-emerald-400 text-center space-y-1.5 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-center gap-1.5 text-emerald-400 font-black text-xs uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-emerald-300" />
+          <div className="p-4 rounded-3xl bg-emerald-50 border border-emerald-200 text-center space-y-1.5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-center gap-1.5 text-emerald-800 font-black text-xs uppercase tracking-wider">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
               <span>Pocket Allowance Received!</span>
             </div>
-            <p className="text-xs font-extrabold text-white leading-relaxed">
-              Daughter Ananya added <strong className="text-emerald-400 font-black text-sm">₹{lastGuardianTopUp.amount.toLocaleString('en-IN')}.00</strong> to your safe pocket balance!
+            <p className="text-xs font-extrabold text-slate-800 leading-relaxed">
+              Daughter Ananya added <strong className="text-emerald-700 font-black text-sm">₹{lastGuardianTopUp.amount.toLocaleString('en-IN')}.00</strong> to your safe pocket balance!
             </p>
           </div>
         )}
 
-        {/* 1. HERO SAFE POCKET BALANCE CARD (UPI Lite Style) */}
-        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-emerald-900/70 border-2 border-emerald-500/40 space-y-3 relative shadow-xl">
+        {/* 1. HERO SAFE POCKET BALANCE CARD (Clean Modern Light Theme) */}
+        <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-50/80 via-white to-slate-50 border border-emerald-200 space-y-3 relative shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-              <ShieldCheck className="w-4.5 h-4.5 text-emerald-400" />
+            <span className="text-xs font-black text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldCheck className="w-4.5 h-4.5 text-emerald-600" />
               <span>Safe Pocket Balance</span>
             </span>
 
-            <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/30 font-mono">
+            <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200 font-mono">
               UPI LITE MODE
             </span>
           </div>
 
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
+              <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                 ₹ {pocketBalance.toLocaleString('en-IN')}.00
               </span>
-              <span className="text-xs font-extrabold text-emerald-200">Available for Quick Spend</span>
+              <span className="text-xs font-extrabold text-emerald-700">Available for Quick Spend</span>
             </div>
-            <p className="text-[11px] text-slate-300 mt-1 leading-snug font-medium">
+            <p className="text-[11px] text-slate-600 mt-1 leading-snug font-medium">
               Instant 1-tap spend up to ₹{pocketBalance.toLocaleString('en-IN')} with zero guardian friction.
             </p>
           </div>
 
           {/* Secondary Badge: Protected Main Savings Account */}
-          <div className="pt-3 border-t border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
-            <div className="flex items-center gap-1.5 text-slate-300 font-medium">
-              <Wallet className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Main Savings Account: <strong className="text-white font-extrabold">₹ {balance.toLocaleString('en-IN')}.00</strong></span>
+          <div className="pt-3 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+            <div className="flex items-center gap-1.5 text-slate-700 font-medium">
+              <Wallet className="w-3.5 h-3.5 text-slate-500" />
+              <span>Main Savings Account: <strong className="text-slate-900 font-black">₹ {balance.toLocaleString('en-IN')}.00</strong></span>
             </div>
-            <span className="text-[10px] text-cyan-300 font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 w-fit">
+            <span className="text-[10px] text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-200 w-fit">
               Protected by Guardian Ananya
             </span>
           </div>
@@ -293,34 +293,34 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           <button
             type="button"
             onClick={() => setIsQrModalOpen(true)}
-            className="p-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-md cursor-pointer border border-emerald-400/30 min-h-[80px]"
+            className="p-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-sm cursor-pointer min-h-[80px]"
           >
             <QrCode className="w-6 h-6 text-white" />
-            <span className="text-xs font-extrabold leading-tight">Scan Any QR</span>
+            <span className="text-xs font-black leading-tight">Scan Any QR</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsPhonePayModalOpen(true)}
-            className="p-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-100 flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-md cursor-pointer border border-slate-700 min-h-[80px]"
+            className="p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-sm cursor-pointer min-h-[80px]"
           >
             <Send className="w-6 h-6 text-emerald-400" />
-            <span className="text-xs font-extrabold leading-tight">Pay Contact</span>
+            <span className="text-xs font-black leading-tight">Pay Contact</span>
           </button>
 
           <button
             type="button"
             onClick={handleMicClick}
-            className="p-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-100 flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-md cursor-pointer border border-slate-700 min-h-[80px]"
+            className="p-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-200 active:scale-95 text-slate-900 flex flex-col items-center justify-center text-center space-y-1.5 transition shadow-xs cursor-pointer min-h-[80px]"
           >
-            <Volume2 className="w-6 h-6 text-cyan-400" />
-            <span className="text-xs font-extrabold leading-tight">Voice Assist</span>
+            <Volume2 className="w-6 h-6 text-emerald-600" />
+            <span className="text-xs font-black leading-tight">Voice Assist</span>
           </button>
         </div>
 
         {/* 3. FREQUENT & TRUSTED PAYEES */}
         <div className="space-y-2.5">
-          <span className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider">
+          <span className="block text-xs font-extrabold text-slate-800 uppercase tracking-wider">
             Frequent & Trusted Payees:
           </span>
           <div className="grid grid-cols-4 gap-2">
@@ -334,13 +334,13 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 setIsActiveCall(false);
                 setLastCompletedTxn(null);
               }}
-              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center transition cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-emerald-500/40">
+              <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 font-black flex items-center justify-center text-xs mb-1 border border-emerald-200">
                 AK
               </div>
-              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Ananya</span>
-              <span className="text-[9px] text-emerald-400 font-semibold">Daughter</span>
+              <span className="text-[11px] font-extrabold text-slate-900 leading-tight truncate w-full">Ananya</span>
+              <span className="text-[9px] text-emerald-700 font-bold">Daughter</span>
             </button>
 
             <button
@@ -353,13 +353,13 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 setIsActiveCall(false);
                 setLastCompletedTxn(null);
               }}
-              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center transition cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-full bg-rose-500/20 text-rose-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-rose-500/40">
+              <div className="w-9 h-9 rounded-full bg-rose-100 text-rose-800 font-black flex items-center justify-center text-xs mb-1 border border-rose-200">
                 <HeartPulse className="w-4 h-4" />
               </div>
-              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Pharmacy</span>
-              <span className="text-[9px] text-slate-400 font-semibold">Medicine</span>
+              <span className="text-[11px] font-extrabold text-slate-900 leading-tight truncate w-full">Pharmacy</span>
+              <span className="text-[9px] text-slate-500 font-semibold">Medicine</span>
             </button>
 
             <button
@@ -372,13 +372,13 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 setIsActiveCall(false);
                 setLastCompletedTxn(null);
               }}
-              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center transition cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-full bg-amber-500/20 text-amber-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-amber-500/40">
+              <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-800 font-black flex items-center justify-center text-xs mb-1 border border-amber-200">
                 <ShoppingBag className="w-4 h-4" />
               </div>
-              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Groceries</span>
-              <span className="text-[9px] text-slate-400 font-semibold">Daily</span>
+              <span className="text-[11px] font-extrabold text-slate-900 leading-tight truncate w-full">Groceries</span>
+              <span className="text-[9px] text-slate-500 font-semibold">Daily</span>
             </button>
 
             <button
@@ -391,22 +391,22 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 setIsActiveCall(false);
                 setLastCompletedTxn(null);
               }}
-              className="p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-center flex flex-col items-center justify-center transition cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center transition cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-full bg-cyan-500/20 text-cyan-400 font-extrabold flex items-center justify-center text-xs mb-1 border border-cyan-500/40">
+              <div className="w-9 h-9 rounded-full bg-cyan-100 text-cyan-800 font-black flex items-center justify-center text-xs mb-1 border border-cyan-200">
                 <Zap className="w-4 h-4" />
               </div>
-              <span className="text-[11px] font-bold text-white leading-tight truncate w-full">Electricity</span>
-              <span className="text-[9px] text-slate-400 font-semibold">Utility</span>
+              <span className="text-[11px] font-extrabold text-slate-900 leading-tight truncate w-full">Electricity</span>
+              <span className="text-[9px] text-slate-500 font-semibold">Utility</span>
             </button>
           </div>
         </div>
 
         {/* QUICK TEST SCAM PRESETS SELECTOR */}
-        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-          <span className="block text-[10px] font-extrabold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <span className="block text-[10px] font-extrabold text-amber-800 uppercase tracking-wider flex items-center justify-between">
             <span>Test Scam Vectors:</span>
-            <span className="text-[9px] text-slate-500 font-normal">Simulate attacks</span>
+            <span className="text-[9px] text-slate-500 font-medium">Simulate attacks</span>
           </span>
           <div className="grid grid-cols-3 gap-1.5">
             {PRESET_SCENARIOS.map(preset => (
@@ -414,9 +414,9 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 key={preset.id}
                 type="button"
                 onClick={() => selectPreset(preset.id)}
-                className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-left text-[11px] font-bold text-white transition cursor-pointer"
+                className="p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-left text-[11px] font-bold text-slate-900 transition cursor-pointer shadow-xs"
               >
-                <span className={`block text-[9px] truncate ${preset.expectedScore >= 75 ? 'text-rose-400 font-black' : 'text-emerald-400'}`}>
+                <span className={`block text-[9px] truncate ${preset.expectedScore >= 75 ? 'text-rose-700 font-black' : 'text-emerald-700'}`}>
                   {preset.name}
                 </span>
                 <span>₹{preset.amount.toLocaleString('en-IN')}</span>
@@ -427,61 +427,61 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
 
         {/* 4. REAL-TIME ASSISTED ESCROW / COMPLETED RECEIPT BANNER */}
         {lastCompletedTxn ? (
-          <div className="p-5 rounded-3xl bg-emerald-950/90 border-2 border-emerald-500 text-center space-y-3 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40">
+          <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-200 text-center space-y-3 animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto border border-emerald-300">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 block">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 block">
                 ✓ Payment Successful
               </span>
-              <h4 className="text-2xl font-black text-white">₹{lastCompletedTxn.amount.toLocaleString('en-IN')}.00</h4>
-              <p className="text-xs text-slate-300 font-semibold">Sent from Safe Pocket to {lastCompletedTxn.payee}</p>
+              <h4 className="text-2xl font-black text-slate-900">₹{lastCompletedTxn.amount.toLocaleString('en-IN')}.00</h4>
+              <p className="text-xs text-slate-700 font-semibold">Sent from Safe Pocket to {lastCompletedTxn.payee}</p>
             </div>
             <button
               type="button"
               onClick={() => setLastCompletedTxn(null)}
-              className="text-xs px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-md cursor-pointer"
+              className="text-xs px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition shadow-sm cursor-pointer"
             >
               Send Another Payment
             </button>
           </div>
         ) : activeEscrow && activeEscrow.status === 'Escrow Hold' ? (
-          <div className="p-5 rounded-3xl bg-rose-950/90 border-2 border-rose-500 space-y-3 animate-in zoom-in-95 duration-200">
+          <div className="p-5 rounded-3xl bg-rose-50 border border-rose-200 space-y-3 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/40 shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center border border-rose-300 shrink-0">
                 <Clock className="w-5 h-5 animate-spin" />
               </div>
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-400 block">
+                <span className="text-[10px] font-black uppercase tracking-wider text-rose-800 block">
                   Needs Guardian Approval
                 </span>
-                <h4 className="text-sm font-extrabold text-white leading-tight">
+                <h4 className="text-sm font-extrabold text-slate-900 leading-tight">
                   Transfer of ₹{activeEscrow.amount.toLocaleString('en-IN')} to {activeEscrow.payee}
                 </h4>
               </div>
             </div>
 
-            <div className="p-3 rounded-2xl bg-slate-900/90 border border-rose-900/50 text-xs text-slate-200 leading-relaxed font-medium">
+            <div className="p-3 rounded-2xl bg-white border border-rose-200 text-xs text-slate-700 leading-relaxed font-medium">
               "Exceeds Safe Pocket Balance (₹{pocketBalance.toLocaleString('en-IN')}). Requesting Guardian Ananya to co-sign from Main Savings."
             </div>
 
-            <div className="flex items-center justify-center gap-2 py-1 text-xs font-extrabold text-amber-400 bg-amber-500/10 rounded-xl border border-amber-500/30">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            <div className="flex items-center justify-center gap-2 py-1 text-xs font-extrabold text-amber-800 bg-amber-50 rounded-xl border border-amber-200">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
               <span>Waiting for Ananya to enter her PIN...</span>
             </div>
           </div>
         ) : activeEscrow && activeEscrow.status === 'Aborted & Frozen' ? (
-          <div className="p-5 rounded-3xl bg-rose-950/90 border-2 border-rose-500 space-y-3 animate-in zoom-in-95 duration-200 text-center">
-            <div className="w-10 h-10 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/40">
+          <div className="p-5 rounded-3xl bg-rose-50 border border-rose-200 space-y-3 animate-in zoom-in-95 duration-200 text-center">
+            <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center mx-auto border border-rose-300">
               <X className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-400 block">
+              <span className="text-[10px] font-black uppercase tracking-wider text-rose-800 block">
                 Payment Stopped & Secured
               </span>
-              <h4 className="text-base font-extrabold text-white">Transfer of ₹{activeEscrow.amount.toLocaleString('en-IN')} Cancelled</h4>
-              <p className="text-xs text-slate-300">Your guardian Ananya stopped this transaction. Your money is 100% safe in your account.</p>
+              <h4 className="text-base font-extrabold text-slate-900">Transfer of ₹{activeEscrow.amount.toLocaleString('en-IN')} Cancelled</h4>
+              <p className="text-xs text-slate-600">Your guardian Ananya stopped this transaction. Your money is 100% safe in your account.</p>
             </div>
           </div>
         ) : null}
@@ -489,22 +489,22 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
         {/* 5. ACCESSIBLE SEND MONEY FORM */}
         <form onSubmit={handleInitiatePayment} className="space-y-4 pt-1">
           <div className="space-y-1">
-            <label className="block text-xs font-bold text-slate-300">Recipient Name / Contact</label>
+            <label className="block text-xs font-bold text-slate-700">Recipient Name / Contact</label>
             <input
               type="text"
               required
               value={recipientName}
               onChange={e => setRecipientName(e.target.value)}
-              className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-white font-bold text-sm focus:border-emerald-500 focus:outline-none transition"
+              className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
               placeholder="e.g. Apollo Pharmacy"
             />
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-slate-300">Amount (₹ INR)</label>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                exceedsPocket ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+              <label className="block text-xs font-bold text-slate-700">Amount (₹ INR)</label>
+              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded border ${
+                exceedsPocket ? 'text-rose-800 bg-rose-50 border-rose-200' : 'text-emerald-800 bg-emerald-50 border-emerald-200'
               }`}>
                 {exceedsPocket ? 'Exceeds Pocket Balance' : `Pocket: ₹${pocketBalance.toLocaleString('en-IN')}`}
               </span>
@@ -514,20 +514,20 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               required
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-emerald-400 font-black text-xl focus:border-emerald-500 focus:outline-none transition"
+              className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-300 text-slate-900 font-black text-xl focus:border-emerald-600 focus:bg-white focus:outline-none transition"
               placeholder="Enter amount"
             />
           </div>
 
           {/* Background Phone Call Sensor Toggle */}
-          <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-500/20 text-rose-400 animate-pulse' : 'bg-slate-800 text-slate-500'}`}>
+              <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-100 text-rose-700 border border-rose-300 animate-pulse' : 'bg-slate-200 text-slate-500'}`}>
                 <PhoneCall className="w-4 h-4" />
               </div>
               <div>
-                <span className="block text-xs font-bold text-white leading-tight">Active Call Sensor</span>
-                <span className="text-[10px] text-slate-400 leading-normal">
+                <span className="block text-xs font-extrabold text-slate-900 leading-tight">Active Call Sensor</span>
+                <span className="text-[10px] text-slate-500 leading-normal">
                   {isActiveCall ? 'Phone call in progress (Auto-routes to Ananya)' : 'No active phone call'}
                 </span>
               </div>
@@ -537,17 +537,17 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               type="button"
               onClick={() => setIsActiveCall(!isActiveCall)}
               className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                isActiveCall ? 'bg-rose-600' : 'bg-slate-700'
+                isActiveCall ? 'bg-rose-600' : 'bg-slate-300'
               }`}
             >
               <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
           </div>
 
-          {/* Big Oversized Pay Button */}
+          {/* Big Oversized Pay Button (Min 52px height) */}
           <button
             type="submit"
-            className="w-full py-4 min-h-[52px] rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-black text-base transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-4 min-h-[52px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-black text-base transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             <Send className="w-5 h-5 text-white" />
             <span>Send ₹{amount ? Number(amount).toLocaleString('en-IN') : '0'} Now</span>
@@ -558,44 +558,44 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
 
       {/* QR SCANNER SIMULATION MODAL */}
       {isQrModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-white relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-slate-900 relative">
             <button
               type="button"
               onClick={() => setIsQrModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-700 p-1 rounded-full hover:bg-slate-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="text-center space-y-1">
-              <QrCode className="w-8 h-8 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-extrabold">Scan Any Merchant UPI QR</h3>
-              <p className="text-xs text-slate-400">Point your phone camera at shop QR code</p>
+              <QrCode className="w-8 h-8 text-emerald-600 mx-auto" />
+              <h3 className="text-base font-black">Scan Any Merchant UPI QR</h3>
+              <p className="text-xs text-slate-500">Point your phone camera at shop QR code</p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-950 border-2 border-dashed border-emerald-500/50 flex items-center justify-center text-center space-y-2 flex-col min-h-[160px]">
-              <span className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center animate-pulse">
+            <div className="p-6 rounded-2xl bg-slate-50 border-2 border-dashed border-emerald-300 flex items-center justify-center text-center space-y-2 flex-col min-h-[160px]">
+              <span className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center animate-pulse">
                 <QrCode className="w-8 h-8" />
               </span>
-              <span className="text-xs font-bold text-emerald-300">Simulate Quick QR Scans:</span>
+              <span className="text-xs font-bold text-emerald-800">Simulate Quick QR Scans:</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => handleSimulateScan('Nilgiris Daily Groceries', 'nilgiris.groceries@upi', 450)}
-                className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-left text-xs font-bold transition cursor-pointer"
+                className="p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs font-bold transition cursor-pointer"
               >
-                <span className="block text-emerald-400 text-[10px]">Merchant</span>
+                <span className="block text-emerald-700 text-[10px]">Merchant</span>
                 <span>Nilgiris ₹450</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSimulateScan('Apollo Pharmacy', 'apollo.pharmacy@upi', 1200)}
-                className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-left text-xs font-bold transition cursor-pointer"
+                className="p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs font-bold transition cursor-pointer"
               >
-                <span className="block text-rose-400 text-[10px]">Pharmacy</span>
+                <span className="block text-rose-700 text-[10px]">Pharmacy</span>
                 <span>Apollo ₹1,200</span>
               </button>
             </div>
@@ -605,20 +605,20 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
 
       {/* PHONE LOOKUP PAY MODAL */}
       {isPhonePayModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-white relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-slate-900 relative">
             <button
               type="button"
               onClick={() => setIsPhonePayModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-700 p-1 rounded-full hover:bg-slate-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="text-center space-y-1">
-              <Send className="w-7 h-7 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-extrabold">Pay to Phone / Contact</h3>
-              <p className="text-xs text-slate-400">Enter 10-digit mobile number</p>
+              <Send className="w-7 h-7 text-emerald-600 mx-auto" />
+              <h3 className="text-base font-black">Pay to Phone / Contact</h3>
+              <p className="text-xs text-slate-500">Enter 10-digit mobile number</p>
             </div>
 
             <div className="space-y-2">
@@ -627,7 +627,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 value={phoneLookup}
                 onChange={e => setPhoneLookup(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-white font-mono text-sm focus:border-emerald-500 focus:outline-none"
+                className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-sm focus:border-emerald-600 focus:outline-none"
               />
               <button
                 type="button"
@@ -636,7 +636,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                   setUpiId('ananya.daughter@upi');
                   setIsPhonePayModalOpen(false);
                 }}
-                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition cursor-pointer"
+                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition cursor-pointer"
               >
                 Proceed to Pay
               </button>
@@ -647,36 +647,36 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
 
       {/* SENIOR MPIN VERIFICATION MODAL (924180) */}
       {isPinModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-slate-900 relative">
             <button
               type="button"
               onClick={() => setIsPinModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition cursor-pointer"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-700 p-1 rounded-full hover:bg-slate-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="text-center space-y-1">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-inner">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto text-xl shadow-xs">
                 <Lock className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-extrabold text-white tracking-tight mt-2">
+              <h3 className="text-lg font-black text-slate-900 tracking-tight mt-2">
                 Enter Your 6-Digit MPIN
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 A/C ...9241 • Ramesh Kumar
               </p>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-1">
-              <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-500">
                 Paying Amount:
               </span>
-              <div className="text-xl font-black text-emerald-400">
+              <div className="text-xl font-black text-emerald-700">
                 ₹ {Number(amount || 0).toLocaleString('en-IN')}.00
               </div>
-              <div className="text-xs text-white font-bold truncate">
+              <div className="text-xs text-slate-900 font-extrabold truncate">
                 {recipientName || 'Beneficiary'}
               </div>
             </div>
@@ -689,8 +689,8 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                     key={idx}
                     className={`w-10 h-12 rounded-xl border-2 flex items-center justify-center text-xl font-bold transition-all ${
                       enteredPin.length > idx
-                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
-                        : 'border-slate-700 bg-slate-950 text-slate-600'
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                        : 'border-slate-300 bg-slate-50 text-slate-400'
                     }`}
                   >
                     {enteredPin.length > idx ? '•' : ''}
@@ -705,7 +705,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                     setEnteredPin(CORRECT_PIN);
                     setPinError('');
                   }}
-                  className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold underline transition cursor-pointer"
+                  className="text-[11px] text-emerald-700 hover:text-emerald-800 font-extrabold underline transition cursor-pointer"
                 >
                   [Auto-fill Demo PIN: 924180]
                 </button>
@@ -713,7 +713,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             </div>
 
             {pinError && (
-              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-1.5">
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold text-center flex items-center justify-center gap-1.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{pinError}</span>
               </div>
@@ -726,7 +726,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                   key={num}
                   type="button"
                   onClick={() => handleKeypadPress(num)}
-                  className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                  className="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-emerald-600 active:text-white text-slate-900 font-black text-lg transition shadow-xs cursor-pointer border border-slate-200"
                 >
                   {num}
                 </button>
@@ -734,14 +734,14 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               <button
                 type="button"
                 onClick={handleBackspace}
-                className="py-3 rounded-xl bg-slate-800 hover:bg-rose-900 text-rose-300 font-bold text-sm transition flex items-center justify-center cursor-pointer"
+                className="py-3 rounded-xl bg-slate-100 hover:bg-rose-100 text-rose-700 font-bold text-sm transition flex items-center justify-center cursor-pointer border border-slate-200"
               >
                 <Delete className="w-5 h-5" />
               </button>
               <button
                 type="button"
                 onClick={() => handleKeypadPress('0')}
-                className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                className="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-emerald-600 active:text-white text-slate-900 font-black text-lg transition shadow-xs cursor-pointer border border-slate-200"
               >
                 0
               </button>
@@ -749,7 +749,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
                 type="button"
                 onClick={handleConfirmPin}
                 disabled={enteredPin.length !== 6}
-                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
+                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
               >
                 OK
               </button>
