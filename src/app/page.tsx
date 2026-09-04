@@ -274,7 +274,22 @@ export default function BankShieldApp() {
 
       {/* STAGE 1: PUBLIC LANDING PAGE */}
       {pageStage === 'landing' && (
-        <LandingPage onAccessPortal={() => setPageStage('login')} />
+        <LandingPage
+          onAccessPortal={() => {
+            setPageStage('portal');
+            setPortalSubTab('pay');
+          }}
+          onLaunchSeniorPay={() => {
+            setPageStage('portal');
+            setPortalSubTab('pay');
+            setUserRole('senior');
+          }}
+          onLaunchGuardianDeck={() => {
+            setPageStage('portal');
+            setPortalSubTab('guardian');
+            setUserRole('guardian');
+          }}
+        />
       )}
 
       {/* STAGE 2: ENTERPRISE SPLIT-SCREEN AUTHENTICATION PAGE */}
