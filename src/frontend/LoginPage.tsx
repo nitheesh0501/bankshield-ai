@@ -384,6 +384,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
             ) : (
               <form onSubmit={handleSaveGuardian} className="space-y-4">
+                {/* Input 1: Guardian Full Name */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-700">Guardian Full Name</label>
                   <input
@@ -396,8 +397,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   />
                 </div>
 
+                {/* Input 2: Relationship */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">Relationship to Senior Account Holder</label>
+                  <label className="block text-xs font-bold text-slate-700">Relationship</label>
                   <select
                     value={guardianForm.relation}
                     onChange={e => setGuardianForm({ ...guardianForm, relation: e.target.value })}
@@ -406,12 +408,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     <option value="Daughter">Daughter</option>
                     <option value="Son">Son</option>
                     <option value="Spouse">Spouse</option>
-                    <option value="Legal Caregiver">Legal Caregiver</option>
+                    <option value="Legal Guardian / Caregiver">Legal Guardian / Caregiver</option>
                   </select>
                 </div>
 
+                {/* Input 3: Emergency Mobile / WhatsApp Number */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">Guardian WhatsApp / Mobile Number</label>
+                  <label className="block text-xs font-bold text-slate-700">
+                    Guardian Mobile Number (For Instant Alert & Verification)
+                  </label>
                   <input
                     type="tel"
                     required
@@ -422,16 +427,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">Escrow Webhook Endpoint (Optional)</label>
-                  <input
-                    type="text"
-                    value={guardianForm.webhookUrl}
-                    onChange={e => setGuardianForm({ ...guardianForm, webhookUrl: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-[11px] focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                  />
+                {/* Clean Banking Trust Banner */}
+                <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 leading-relaxed font-medium">
+                  "Once registered, this guardian will receive instant 1-click verification alerts on WhatsApp whenever an unusual or high-value transfer is flagged by BankShield."
                 </div>
 
+                {/* Action Buttons */}
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                   <button
                     type="button"
@@ -444,7 +445,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     type="submit"
                     className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition shadow-md cursor-pointer"
                   >
-                    Save & Bind Guardian
+                    Confirm & Link Guardian
                   </button>
                 </div>
               </form>
