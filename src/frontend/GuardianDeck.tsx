@@ -1,6 +1,6 @@
 import React from 'react';
 import { ShieldAlert, BellRing, Zap, Webhook, Volume2, CheckCircle2, Ban } from 'lucide-react';
-import { AuditItem } from '../types';
+import { AuditItem, GuardianInfo } from '../types';
 
 interface GuardianDeckProps {
   activeEscrow: AuditItem | null;
@@ -11,6 +11,7 @@ interface GuardianDeckProps {
   handleGuardianOverride: () => void;
   handleFreezeAndAbort: () => void;
   handleSimulateIncident: () => void;
+  guardianInfo?: GuardianInfo;
 }
 
 export const GuardianDeck: React.FC<GuardianDeckProps> = ({
@@ -22,6 +23,7 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
   handleGuardianOverride,
   handleFreezeAndAbort,
   handleSimulateIncident,
+  guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
 }) => {
   return (
     <div className="w-full bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl overflow-hidden">
@@ -36,7 +38,7 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
             Senior Safety Escrow Command Deck
           </h2>
           <p className="text-xs text-zinc-500 leading-relaxed">
-            Designated Guardian: <strong className="text-zinc-700">Ananya Kumar</strong> protecting <strong className="text-zinc-700">Ramesh Kumar (Father)</strong>
+            Designated Guardian: <strong className="text-zinc-700">{guardianInfo.name} ({guardianInfo.relation})</strong> protecting <strong className="text-zinc-700">Ramesh Kumar (Father)</strong>
           </p>
         </div>
 
@@ -68,7 +70,7 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
           </div>
           <div>
             <span className="block font-bold text-zinc-900 leading-tight">Native Browser Push & n8n Webhook Active</span>
-            <span className="text-zinc-500 leading-normal">Real-time desktop and mobile push alerts synchronized across tabs.</span>
+            <span className="text-zinc-500 leading-normal">Real-time desktop and mobile push alerts synchronized to {guardianInfo.name} ({guardianInfo.phone}).</span>
           </div>
         </div>
         <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">

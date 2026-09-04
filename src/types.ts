@@ -2,6 +2,13 @@ export type PageStage = 'landing' | 'login' | 'portal';
 export type PortalSubTab = 'dual' | 'pay' | 'guardian' | 'audit';
 export type UserRole = 'senior' | 'guardian' | 'customer';
 
+export interface GuardianInfo {
+  name: string;
+  relation: string;
+  phone: string;
+  webhookUrl: string;
+}
+
 export interface AuditItem {
   id: string;
   timestamp: string;

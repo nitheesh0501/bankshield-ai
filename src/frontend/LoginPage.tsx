@@ -12,9 +12,11 @@ import {
   PhoneCall,
   Webhook,
   Key,
-  ChevronLeft
+  ChevronLeft,
+  X,
+  UserPlus
 } from 'lucide-react';
-import { UserRole, PortalSubTab } from '../types';
+import { UserRole, PortalSubTab, GuardianInfo } from '../types';
 
 interface LoginPageProps {
   userRole: UserRole;
@@ -26,6 +28,8 @@ interface LoginPageProps {
   setPortalSubTab: (tab: PortalSubTab) => void;
   onAuthenticate: () => void;
   onReturnHome: () => void;
+  guardianInfo: GuardianInfo;
+  setGuardianInfo: (info: GuardianInfo) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({
@@ -38,10 +42,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   setPortalSubTab,
   onAuthenticate,
   onReturnHome,
+  guardianInfo,
+  setGuardianInfo,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [useBiometrics, setUseBiometrics] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Register Guardian Modal State
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [guardianForm, setGuardianForm] = useState<GuardianInfo>({
+    name: guardianInfo.name,
+    relation: guardianInfo.relation,
+    phone: guardianInfo.phone,
+    webhookUrl: guardianInfo.webhookUrl || 'https://n8n.bankshield.internal/webhook/escrow-alert',
+  });
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const selectPersona = (role: UserRole) => {
     setUserRole(role);
@@ -65,8 +81,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }, 400);
   };
 
+  const handleSaveGuardian = (e: React.FormEvent) => {
+    e.preventDefault();
+    setGuardianInfo(guardianForm);
+    setRegisterSuccess(true);
+    setTimeout(() => {
+      setRegisterSuccess(false);
+      setIsRegisterModalOpen(false);
+    }, 800);
+  };
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         
         {/* LEFT COLUMN: BANK SECURITY & LIVE TELEMETRY */}
@@ -116,7 +142,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 </div>
                 <div>
                   <span className="block text-xs font-bold text-white">Guardian Sync Tunnel Status</span>
-                  <span className="text-[11px] text-slate-300">Encrypted webhook active (Ananya Kumar registered)</span>
+                  <span className="text-[11px] text-slate-300">Encrypted webhook active ({guardianInfo.name} registered)</span>
                 </div>
               </div>
 
@@ -189,7 +215,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   )}
                 </button>
 
-                {/* Option B: Guardian Ananya Kumar */}
+                {/* Option B: Guardian Dynamic Display */}
                 <button
                   type="button"
                   onClick={() => selectPersona('guardian')}
@@ -201,13 +227,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-slate-900 text-sm">Login as Guardian (Ananya Kumar)</span>
+                      <span className="font-extrabold text-slate-900 text-sm">Login as Guardian ({guardianInfo.name})</span>
                       <span className="text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-300 px-1.5 py-0.5 rounded">
                         Designated Guardian
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 font-medium">
-                      Opens Guardian Escrow Command Deck with remote intervention controls.
+                      {guardianInfo.relation} • Mobile {guardianInfo.phone} • Linked to Ramesh
                     </p>
                   </div>
                   {userRole === 'guardian' && (
@@ -309,13 +335,123 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <ChevronLeft className="w-4 h-4" />
               <span>Return to Public Landing Page</span>
             </button>
-            <button className="hover:text-emerald-600 transition cursor-pointer">
-              Register New Guardian
+            
+            {/* Interactive Register New Guardian Button */}
+            <button
+              type="button"
+              onClick={() => setIsRegisterModalOpen(true)}
+              className="text-xs text-slate-600 hover:text-emerald-600 font-bold transition cursor-pointer flex items-center gap-1"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Register New Guardian</span>
             </button>
           </div>
         </div>
 
       </div>
+
+      {/* GUARDIAN REGISTRATION MODAL DIALOG */}
+      {isRegisterModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 animate-in zoom-in-95 duration-200 relative">
+            <button
+              onClick={() => setIsRegisterModalOpen(false)}
+              className="absolute right-5 top-5 text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Modal Header */}
+            <div className="flex items-start gap-4 border-b border-slate-100 pb-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+                🛡️
+              </div>
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-900">Register Authorized Family Guardian</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Designate a trusted family member with 1-click escrow abort permissions under RBI Senior Protection guidelines.
+                </p>
+              </div>
+            </div>
+
+            {registerSuccess ? (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center space-y-2 animate-in zoom-in-95">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                <p className="text-sm font-extrabold">✅ Guardian Bound to A/C ...9241</p>
+                <p className="text-slate-600 text-xs font-normal">
+                  Updated guardian <strong>{guardianForm.name} ({guardianForm.relation})</strong> is now linked for real-time duress alerts.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSaveGuardian} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700">Guardian Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={guardianForm.name}
+                    onChange={e => setGuardianForm({ ...guardianForm, name: e.target.value })}
+                    placeholder="e.g. Ananya Kumar"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-medium text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700">Relationship to Senior Account Holder</label>
+                  <select
+                    value={guardianForm.relation}
+                    onChange={e => setGuardianForm({ ...guardianForm, relation: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                  >
+                    <option value="Daughter">Daughter</option>
+                    <option value="Son">Son</option>
+                    <option value="Spouse">Spouse</option>
+                    <option value="Legal Caregiver">Legal Caregiver</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700">Guardian WhatsApp / Mobile Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={guardianForm.phone}
+                    onChange={e => setGuardianForm({ ...guardianForm, phone: e.target.value })}
+                    placeholder="e.g. +91 98765 43210"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-medium text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700">Escrow Webhook Endpoint (Optional)</label>
+                  <input
+                    type="text"
+                    value={guardianForm.webhookUrl}
+                    onChange={e => setGuardianForm({ ...guardianForm, webhookUrl: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-[11px] focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setIsRegisterModalOpen(false)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition shadow-md cursor-pointer"
+                  >
+                    Save & Bind Guardian
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

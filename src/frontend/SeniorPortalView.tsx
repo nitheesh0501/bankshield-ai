@@ -20,6 +20,7 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { evaluateDuressRisk } from '../backend/riskEngine';
+import { GuardianInfo } from '../types';
 
 interface SeniorPortalViewProps {
   recipientName: string;
@@ -34,6 +35,7 @@ interface SeniorPortalViewProps {
   setIsActiveCall: (val: boolean) => void;
   currentMultiplier: string;
   handleAuthorizeTransfer: (e: React.FormEvent) => void;
+  guardianInfo?: GuardianInfo;
 }
 
 export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
@@ -49,6 +51,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   setIsActiveCall,
   currentMultiplier,
   handleAuthorizeTransfer,
+  guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isNewBeneficiary, setIsNewBeneficiary] = useState(true);
@@ -89,7 +92,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
     setEmergencyAlertSent(true);
     triggerSpeech();
     setTimeout(() => {
-      alert('🚨 Emergency Escalation Triggered! Ananya Kumar has been notified via priority push alert and WhatsApp webhook call link.');
+      alert(`🚨 Emergency Escalation Triggered! ${guardianInfo.name} has been notified via priority push alert and WhatsApp webhook call link.`);
     }, 200);
   };
 
@@ -142,7 +145,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
 
             <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold pt-1">
               <UserCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Nominated Guardian: <strong>Ananya Kumar (Daughter)</strong> • Instant Escalation Ready</span>
+              <span>Nominated Guardian: <strong>{guardianInfo.name} ({guardianInfo.relation})</strong> • Instant Escalation Ready</span>
             </div>
 
             <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium pt-1 border-t border-slate-200">
@@ -443,7 +446,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
             <div className="space-y-2 text-slate-600">
               <div className="flex items-center justify-between">
                 <span>Linked Guardian:</span>
-                <strong className="text-slate-900">Ananya Kumar (+91 98765 43210)</strong>
+                <strong className="text-slate-900">{guardianInfo.name} ({guardianInfo.phone})</strong>
               </div>
               <div className="flex items-center justify-between">
                 <span>Automated Webhook Channel:</span>
@@ -468,12 +471,12 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               onClick={handleEmergencyButton}
               className="w-full py-3.5 rounded-2xl bg-white hover:bg-rose-100 border-2 border-rose-600 text-rose-700 font-extrabold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>🚨 I Feel Pressured / Call My Guardian Ananya Now</span>
+              <span>🚨 I Feel Pressured / Call My Guardian {guardianInfo.name} Now</span>
             </button>
 
             {emergencyAlertSent && (
               <span className="block text-[11px] font-bold text-rose-800 text-center">
-                ✓ Priority emergency alert dispatched to Ananya Kumar!
+                ✓ Priority emergency alert dispatched to {guardianInfo.name}!
               </span>
             )}
           </div>

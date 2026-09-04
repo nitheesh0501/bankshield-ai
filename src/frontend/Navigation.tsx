@@ -1,6 +1,6 @@
 import React from 'react';
 import { Shield, Monitor, Smartphone, ShieldAlert, Activity, LogOut, LogIn, Radio, ChevronLeft } from 'lucide-react';
-import { PageStage, PortalSubTab, UserRole, AuditItem } from '../types';
+import { PageStage, PortalSubTab, UserRole, AuditItem, GuardianInfo } from '../types';
 
 interface NavigationProps {
   pageStage: PageStage;
@@ -12,6 +12,7 @@ interface NavigationProps {
   countdown: number;
   formatCountdown: (sec: number) => string;
   handleFreezeAndAbort: () => void;
+  guardianInfo?: GuardianInfo;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
@@ -24,8 +25,15 @@ export const Navigation: React.FC<NavigationProps> = ({
   countdown,
   formatCountdown,
   handleFreezeAndAbort,
+  guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
 }) => {
   const isSenior = userRole === 'senior' || userRole === 'customer';
+  const guardianInitials = guardianInfo.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'AK';
 
   return (
     <>
@@ -135,15 +143,15 @@ export const Navigation: React.FC<NavigationProps> = ({
                       ? 'bg-emerald-100 border-emerald-300 text-emerald-800'
                       : 'bg-rose-100 border-rose-300 text-rose-800'
                   }`}>
-                    {isSenior ? 'RK' : 'AK'}
+                    {isSenior ? 'RK' : guardianInitials}
                   </div>
 
                   <div className="hidden sm:block text-left">
                     <span className="block font-extrabold text-slate-900 leading-tight">
-                      {isSenior ? 'RK Ramesh Kumar' : 'AK Ananya Kumar'}
+                      {isSenior ? 'RK Ramesh Kumar' : `${guardianInitials} ${guardianInfo.name}`}
                     </span>
                     <span className="block text-[10px] text-slate-500 font-mono leading-none">
-                      {isSenior ? 'A/C ...9241 • Guardian: Ananya' : 'Protecting: Ramesh (Father)'}
+                      {isSenior ? `A/C ...9241 • Guardian: ${guardianInfo.name.split(' ')[0]}` : 'Protecting: Ramesh (Father)'}
                     </span>
                   </div>
 
@@ -168,7 +176,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             <div className="flex items-center gap-2 truncate">
               <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping shrink-0" />
               <span className="truncate font-bold">
-                🚨 ACTIVE ESCROW HOLD: ₹{activeEscrow.amount.toLocaleString('en-IN')} transfer paused pending Guardian Ananya's review ({formatCountdown(countdown)} remaining).
+                🚨 ACTIVE ESCROW HOLD: ₹{activeEscrow.amount.toLocaleString('en-IN')} transfer paused pending Guardian {guardianInfo.name}'s review ({formatCountdown(countdown)} remaining).
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">

@@ -17,7 +17,7 @@ import {
   Printer
 } from 'lucide-react';
 
-import { PageStage, PortalSubTab, UserRole, AuditItem } from '../types';
+import { PageStage, PortalSubTab, UserRole, AuditItem, GuardianInfo } from '../types';
 import { evaluateDuressRisk } from '../backend/riskEngine';
 import { INITIAL_AUDIT_LOGS, appendAuditRecord, exportAuditCSV, exportAuditODS, downloadAuditPDF } from '../backend/auditService';
 
@@ -33,6 +33,14 @@ export default function BankShieldApp() {
   const [pageStage, setPageStage] = useState<PageStage>('landing');
   const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>('pay');
   const [userRole, setUserRole] = useState<UserRole>('senior');
+
+  // Guardian Info State (Single Source of Truth)
+  const [guardianInfo, setGuardianInfo] = useState<GuardianInfo>({
+    name: 'Ananya Kumar',
+    relation: 'Daughter',
+    phone: '+91 98765 43210',
+    webhookUrl: 'https://n8n.bankshield.internal/webhook/escrow-alert',
+  });
 
   // Login Form State
   const [loginId, setLoginId] = useState('ACC-9241805');
@@ -145,7 +153,7 @@ export default function BankShieldApp() {
       setAuditLogs(prev =>
         prev.map(item =>
           item.id === updatedId
-            ? { ...item, status: 'Aborted & Frozen', notes: 'Aborted by Guardian Ananya. Funds secured in savings A/C.' }
+            ? { ...item, status: 'Aborted & Frozen', notes: `Aborted by Guardian ${guardianInfo.name}. Funds secured in savings A/C.` }
             : item
         )
       );
@@ -161,7 +169,7 @@ export default function BankShieldApp() {
       setAuditLogs(prev =>
         prev.map(item =>
           item.id === updatedId
-            ? { ...item, status: 'Guardian Cleared', notes: 'Manually authorized by Guardian Ananya.' }
+            ? { ...item, status: 'Guardian Cleared', notes: `Manually authorized by Guardian ${guardianInfo.name}.` }
             : item
         )
       );
@@ -226,6 +234,7 @@ export default function BankShieldApp() {
         countdown={countdown}
         formatCountdown={formatCountdown}
         handleFreezeAndAbort={handleFreezeAndAbort}
+        guardianInfo={guardianInfo}
       />
 
       {/* STAGE 1: PUBLIC LANDING PAGE */}
@@ -245,6 +254,8 @@ export default function BankShieldApp() {
           setPortalSubTab={setPortalSubTab}
           onAuthenticate={() => setPageStage('portal')}
           onReturnHome={() => setPageStage('landing')}
+          guardianInfo={guardianInfo}
+          setGuardianInfo={setGuardianInfo}
         />
       )}
 
@@ -279,6 +290,7 @@ export default function BankShieldApp() {
                   handleGuardianOverride={handleGuardianOverride}
                   handleFreezeAndAbort={handleFreezeAndAbort}
                   handleSimulateIncident={handleSimulateIncident}
+                  guardianInfo={guardianInfo}
                 />
               </div>
             </main>
@@ -300,6 +312,7 @@ export default function BankShieldApp() {
                 setIsActiveCall={setIsActiveCall}
                 currentMultiplier={currentMultiplier}
                 handleAuthorizeTransfer={handleAuthorizeTransfer}
+                guardianInfo={guardianInfo}
               />
             </main>
           )}
@@ -316,6 +329,7 @@ export default function BankShieldApp() {
                 handleGuardianOverride={handleGuardianOverride}
                 handleFreezeAndAbort={handleFreezeAndAbort}
                 handleSimulateIncident={handleSimulateIncident}
+                guardianInfo={guardianInfo}
               />
             </main>
           )}
