@@ -17,7 +17,10 @@ import {
   ShoppingBag,
   HeartPulse,
   ZapOff,
-  ArrowUpRight
+  ArrowUpRight,
+  Delete,
+  X,
+  AlertCircle
 } from 'lucide-react';
 import { evaluateDuressRisk } from '../backend/riskEngine';
 import { GuardianInfo } from '../types';
@@ -58,6 +61,50 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isNewBeneficiary, setIsNewBeneficiary] = useState(true);
   const [emergencyAlertSent, setEmergencyAlertSent] = useState(false);
+
+  // UPI PIN Verification State
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState('');
+  const CORRECT_PIN = '924180';
+
+  const handleInitiatePayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!amount || Number(amount) <= 0) {
+      alert('Please enter a valid transfer amount.');
+      return;
+    }
+    setEnteredPin('');
+    setPinError('');
+    setIsPinModalOpen(true);
+  };
+
+  const handleKeypadPress = (num: string) => {
+    if (enteredPin.length < 6) {
+      setEnteredPin(prev => prev + num);
+      setPinError('');
+    }
+  };
+
+  const handleBackspace = () => {
+    setEnteredPin(prev => prev.slice(0, -1));
+    setPinError('');
+  };
+
+  const handleAutofillPin = () => {
+    setEnteredPin(CORRECT_PIN);
+    setPinError('');
+  };
+
+  const handleConfirmPin = () => {
+    if (enteredPin !== CORRECT_PIN) {
+      setPinError('Incorrect 6-digit UPI PIN. Please try again.');
+      return;
+    }
+    setIsPinModalOpen(false);
+    setPinError('');
+    handleAuthorizeTransfer({ preventDefault: () => {} } as React.FormEvent);
+  };
 
   // Live evaluated risk score preview
   const numAmount = parseFloat(amount) || 0;
@@ -252,7 +299,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
           </div>
 
           {/* UPI Transfer Form */}
-          <form onSubmit={handleAuthorizeTransfer} className="space-y-4 pt-2">
+          <form onSubmit={handleInitiatePayment} className="space-y-4 pt-2">
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-700">Beneficiary Name</label>
               <input
@@ -606,6 +653,147 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* SENIOR-FRIENDLY UPI SECURITY PIN MODAL */}
+      {isPinModalOpen && (
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-zinc-900 border-2 border-zinc-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative">
+            
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setIsPinModalOpen(false)}
+              className="absolute right-4 top-4 text-zinc-400 hover:text-white p-1 rounded-full hover:bg-zinc-800 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div className="text-center space-y-1">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-inner">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-white tracking-tight mt-2">
+                BankShield Secure UPI PIN Verification
+              </h3>
+              <p className="text-xs text-zinc-400">
+                Enter your 6-digit UPI MPIN for A/C ...9241
+              </p>
+            </div>
+
+            {/* Payee Summary Box */}
+            <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 text-center space-y-1">
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-zinc-500">
+                Transferring Funds To:
+              </span>
+              <div className="text-base font-black text-white">
+                ₹ {Number(amount || 0).toLocaleString('en-IN')}.00
+              </div>
+              <div className="text-xs text-emerald-400 font-bold truncate">
+                {recipientName || 'Beneficiary'}
+              </div>
+            </div>
+
+            {/* 6-Digit PIN Indicator Display */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2 py-2">
+                {[0, 1, 2, 3, 4, 5].map(idx => (
+                  <div
+                    key={idx}
+                    className={`w-10 h-12 rounded-xl border-2 flex items-center justify-center text-xl font-bold transition-all ${
+                      enteredPin.length > idx
+                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                        : 'border-zinc-700 bg-zinc-950 text-zinc-600'
+                    }`}
+                  >
+                    {enteredPin.length > idx ? '•' : ''}
+                  </div>
+                ))}
+              </div>
+
+              {/* Demo Auto-fill shortcut */}
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={handleAutofillPin}
+                  className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold underline transition cursor-pointer"
+                >
+                  [Auto-fill Demo PIN: 924180]
+                </button>
+              </div>
+            </div>
+
+            {/* Error Feedback */}
+            {pinError && (
+              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-1.5 animate-in zoom-in-95">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{pinError}</span>
+              </div>
+            )}
+
+            {/* Senior-Friendly Touch Keypad */}
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => handleKeypadPress(num)}
+                  className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+                >
+                  {num}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={handleBackspace}
+                className="py-3 rounded-xl bg-zinc-800 hover:bg-rose-900 text-rose-300 font-bold text-sm transition flex items-center justify-center cursor-pointer"
+                title="Backspace"
+              >
+                <Delete className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleKeypadPress('0')}
+                className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-black text-lg transition shadow-md cursor-pointer"
+              >
+                0
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmPin}
+                disabled={enteredPin.length !== 6}
+                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:hover:bg-zinc-800 text-white font-bold text-xs transition flex items-center justify-center cursor-pointer"
+              >
+                OK
+              </button>
+            </div>
+
+            {/* Pitch Deck Alignment Note */}
+            <div className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800 text-[10px] text-zinc-400 text-center leading-relaxed">
+              🔒 <strong className="text-zinc-300">2FA PIN Validated.</strong> BankShield Cognitive Engine running in-flight duress evaluation (&lt;50ms)...
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-zinc-800">
+              <button
+                type="button"
+                onClick={() => setIsPinModalOpen(false)}
+                className="py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs transition cursor-pointer"
+              >
+                Cancel Transfer
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmPin}
+                className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-lg shadow-emerald-600/20 cursor-pointer"
+              >
+                Authorize Payment
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
