@@ -26,6 +26,7 @@ import { LandingPage } from '../frontend/LandingPage';
 import { LoginPage } from '../frontend/LoginPage';
 import { SeniorPhone } from '../frontend/SeniorPhone';
 import { GuardianDeck } from '../frontend/GuardianDeck';
+import { SeniorPortalView } from '../frontend/SeniorPortalView';
 
 export default function BankShieldApp() {
   // Navigation State
@@ -41,7 +42,7 @@ export default function BankShieldApp() {
   const [recipientName, setRecipientName] = useState('DCP Cyber Cell Official Escrow');
   const [upiId, setUpiId] = useState('dcp.cyber.cell@official-escrow');
   const [amount, setAmount] = useState('85000');
-  const [category, setCategory] = useState('Digital Arrest Warrant');
+  const [category, setCategory] = useState('Law Enforcement / Police Clearance');
   const [isActiveCall, setIsActiveCall] = useState(true);
 
   // Active Incident & Escrow State
@@ -173,7 +174,7 @@ export default function BankShieldApp() {
     setRecipientName('DCP Cyber Cell Official Escrow');
     setUpiId('dcp.cyber.cell@official-escrow');
     setAmount('85000');
-    setCategory('Digital Arrest Warrant');
+    setCategory('Law Enforcement / Police Clearance');
     setIsActiveCall(true);
 
     const newAuditItem: AuditItem = {
@@ -283,52 +284,23 @@ export default function BankShieldApp() {
             </main>
           )}
 
-          {/* SUB-TAB 2: SENIOR /pay */}
+          {/* SUB-TAB 2: SENIOR /pay PORTAL VIEW */}
           {portalSubTab === 'pay' && (
-            <main className="max-w-xl mx-auto px-4 py-8 space-y-6 animate-in fade-in duration-300">
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-                  <div>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
-                      Senior Customer Portal
-                    </span>
-                    <h2 className="text-2xl font-extrabold text-slate-900 mt-1">Ramesh Kumar (Father)</h2>
-                    <p className="text-xs text-slate-500 font-mono">Savings Account ...9241 • Bal: ₹1,42,800</p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleAuthorizeTransfer} className="space-y-5">
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Beneficiary Name / VPA</label>
-                    <input
-                      type="text"
-                      required
-                      value={recipientName}
-                      onChange={e => setRecipientName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-medium text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Transfer Amount (₹ INR)</label>
-                    <input
-                      type="number"
-                      required
-                      value={amount}
-                      onChange={e => setAmount(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-lg focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base transition shadow-lg flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Send className="w-5 h-5" />
-                    <span>Verify & Execute Payment</span>
-                  </button>
-                </form>
-              </div>
+            <main className="max-w-7xl mx-auto px-4 py-8 space-y-6 animate-in fade-in duration-300">
+              <SeniorPortalView
+                recipientName={recipientName}
+                setRecipientName={setRecipientName}
+                upiId={upiId}
+                setUpiId={setUpiId}
+                amount={amount}
+                setAmount={setAmount}
+                category={category}
+                setCategory={setCategory}
+                isActiveCall={isActiveCall}
+                setIsActiveCall={setIsActiveCall}
+                currentMultiplier={currentMultiplier}
+                handleAuthorizeTransfer={handleAuthorizeTransfer}
+              />
             </main>
           )}
 
