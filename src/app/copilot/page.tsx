@@ -1,5 +1,5 @@
 import BankShieldApp from '../page';
 
 export default function CopilotPage() {
-  return <BankShieldApp />;
+  return <BankShieldApp initialStage="portal" initialSubTab="dual" />;
 }

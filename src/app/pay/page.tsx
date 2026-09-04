@@ -1,5 +1,5 @@
 import BankShieldApp from '../page';
 
 export default function PayPage() {
-  return <BankShieldApp />;
+  return <BankShieldApp initialStage="portal" initialSubTab="pay" />;
 }

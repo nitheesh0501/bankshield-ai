@@ -75,19 +75,10 @@ export const Navigation: React.FC<NavigationProps> = ({
               {/* Central Unified Console Tabs (Desktop) */}
               <nav className="hidden md:flex items-center gap-1 p-1 bg-slate-100 border border-slate-200 rounded-2xl">
                 <button
-                  onClick={() => setPortalSubTab('dual')}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                    portalSubTab === 'dual'
-                      ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <Monitor className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Co-Pilot Console</span>
-                </button>
-
-                <button
-                  onClick={() => setPortalSubTab('pay')}
+                  onClick={() => {
+                    setPortalSubTab('pay');
+                    if (typeof window !== 'undefined') window.history.pushState({}, '', '/pay');
+                  }}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                     portalSubTab === 'pay'
                       ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
@@ -95,11 +86,14 @@ export const Navigation: React.FC<NavigationProps> = ({
                   }`}
                 >
                   <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Senior /pay</span>
+                  <span>Senior Portal (/pay)</span>
                 </button>
 
                 <button
-                  onClick={() => setPortalSubTab('guardian')}
+                  onClick={() => {
+                    setPortalSubTab('guardian');
+                    if (typeof window !== 'undefined') window.history.pushState({}, '', '/deck');
+                  }}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                     portalSubTab === 'guardian'
                       ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
@@ -107,7 +101,22 @@ export const Navigation: React.FC<NavigationProps> = ({
                   }`}
                 >
                   <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-                  <span>Guardian /deck</span>
+                  <span>Guardian Deck (/deck)</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setPortalSubTab('dual');
+                    if (typeof window !== 'undefined') window.history.pushState({}, '', '/console');
+                  }}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                    portalSubTab === 'dual'
+                      ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Monitor className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Co-Pilot Console (/console)</span>
                 </button>
 
                 <button

@@ -28,10 +28,18 @@ import { SeniorPhone } from '../frontend/SeniorPhone';
 import { GuardianDeck } from '../frontend/GuardianDeck';
 import { SeniorPortalView } from '../frontend/SeniorPortalView';
 
-export default function BankShieldApp() {
+interface BankShieldAppProps {
+  initialStage?: PageStage;
+  initialSubTab?: PortalSubTab;
+}
+
+export default function BankShieldApp({
+  initialStage = 'landing',
+  initialSubTab = 'dual',
+}: BankShieldAppProps = {}) {
   // Navigation State
-  const [pageStage, setPageStage] = useState<PageStage>('landing');
-  const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>('pay');
+  const [pageStage, setPageStage] = useState<PageStage>(initialStage);
+  const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>(initialSubTab);
   const [userRole, setUserRole] = useState<UserRole>('senior');
 
   // Account Balance State: Main Savings & Safe Pocket Balance (UPI Lite Style)
