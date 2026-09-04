@@ -321,66 +321,116 @@ export default function BankShieldApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
-      {/* Top Navigation Component */}
-      <Navigation
-        pageStage={pageStage}
-        setPageStage={setPageStage}
-        portalSubTab={portalSubTab}
-        setPortalSubTab={setPortalSubTab}
-        userRole={userRole}
-        activeEscrow={activeEscrow}
-        countdown={countdown}
-        formatCountdown={formatCountdown}
-        handleFreezeAndAbort={handleFreezeAndAbort}
-        guardianInfo={guardianInfo}
-      />
-
-      {/* STAGE 1: PUBLIC LANDING PAGE */}
-      {pageStage === 'landing' && (
-        <LandingPage
-          onAccessPortal={() => {
-            setPageStage('portal');
-            setPortalSubTab('pay');
-          }}
-          onLaunchSeniorPay={() => {
-            setPageStage('portal');
-            setPortalSubTab('pay');
-            setUserRole('senior');
-          }}
-          onLaunchGuardianDeck={() => {
-            setPageStage('portal');
-            setPortalSubTab('guardian');
-            setUserRole('guardian');
-          }}
-        />
-      )}
-
-      {/* STAGE 2: ENTERPRISE SPLIT-SCREEN AUTHENTICATION PAGE */}
-      {pageStage === 'login' && (
-        <LoginPage
-          userRole={userRole}
-          setUserRole={setUserRole}
-          loginId={loginId}
-          setLoginId={setLoginId}
-          loginPin={loginPin}
-          setLoginPin={setLoginPin}
+    <div className="min-h-screen bg-[#0B0F19] text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
+      <div>
+        {/* Top Navigation Component */}
+        <Navigation
+          pageStage={pageStage}
+          setPageStage={setPageStage}
+          portalSubTab={portalSubTab}
           setPortalSubTab={setPortalSubTab}
-          onAuthenticate={() => setPageStage('portal')}
-          onReturnHome={() => setPageStage('landing')}
+          userRole={userRole}
+          activeEscrow={activeEscrow}
+          countdown={countdown}
+          formatCountdown={formatCountdown}
+          handleFreezeAndAbort={handleFreezeAndAbort}
           guardianInfo={guardianInfo}
-          setGuardianInfo={setGuardianInfo}
         />
-      )}
 
-      {/* STAGE 3: AUTHENTICATED PORTAL */}
-      {pageStage === 'portal' && (
-        <div>
-          {/* SUB-TAB 1: DUAL SCREEN MODE */}
-          {portalSubTab === 'dual' && (
-            <main className="max-w-7xl mx-auto px-4 py-6 space-y-6 animate-in fade-in duration-300">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-                <SeniorPhone
+        {/* STAGE 1: PUBLIC LANDING PAGE */}
+        {pageStage === 'landing' && (
+          <LandingPage
+            onAccessPortal={() => {
+              setPageStage('portal');
+              setPortalSubTab('dual');
+            }}
+            onLaunchSeniorPay={() => {
+              setPageStage('portal');
+              setPortalSubTab('pay');
+              setUserRole('senior');
+            }}
+            onLaunchGuardianDeck={() => {
+              setPageStage('portal');
+              setPortalSubTab('guardian');
+              setUserRole('guardian');
+            }}
+          />
+        )}
+
+        {/* STAGE 2: ENTERPRISE SPLIT-SCREEN AUTHENTICATION PAGE */}
+        {pageStage === 'login' && (
+          <LoginPage
+            userRole={userRole}
+            setUserRole={setUserRole}
+            loginId={loginId}
+            setLoginId={setLoginId}
+            loginPin={loginPin}
+            setLoginPin={setLoginPin}
+            setPortalSubTab={setPortalSubTab}
+            onAuthenticate={() => setPageStage('portal')}
+            onReturnHome={() => setPageStage('landing')}
+            guardianInfo={guardianInfo}
+            setGuardianInfo={setGuardianInfo}
+          />
+        )}
+
+        {/* STAGE 3: UNIFIED FULL-WIDTH AUTHENTICATED PORTAL */}
+        {pageStage === 'portal' && (
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
+            {/* SUB-TAB 1: UNIFIED CO-PILOT DASHBOARD (DEFAULTS TO FULL-WIDTH 2-COLUMN) */}
+            {portalSubTab === 'dual' && (
+              <main className="w-full space-y-6 animate-in fade-in duration-300">
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full items-stretch">
+                  {/* Left Column: Assisted UPI Terminal */}
+                  <div className="xl:col-span-5 w-full flex flex-col">
+                    <SeniorPhone
+                      recipientName={recipientName}
+                      setRecipientName={setRecipientName}
+                      upiId={upiId}
+                      setUpiId={setUpiId}
+                      amount={amount}
+                      setAmount={setAmount}
+                      category={category}
+                      setCategory={setCategory}
+                      isActiveCall={isActiveCall}
+                      setIsActiveCall={setIsActiveCall}
+                      currentMultiplier={currentMultiplier}
+                      handleAuthorizeTransfer={handleAuthorizeTransfer}
+                      balance={balance}
+                      pocketBalance={pocketBalance}
+                      activeEscrow={activeEscrow}
+                      guardianInfo={guardianInfo}
+                      lastGuardianTopUp={lastGuardianTopUp}
+                    />
+                  </div>
+
+                  {/* Right Column: Guardian Supervisory & Co-Sign Engine */}
+                  <div className="xl:col-span-7 w-full flex flex-col">
+                    <GuardianDeck
+                      activeEscrow={activeEscrow}
+                      countdown={countdown}
+                      formatCountdown={formatCountdown}
+                      currentMultiplier={currentMultiplier}
+                      triggerSpeech={triggerSpeech}
+                      handleGuardianOverride={handleGuardianOverride}
+                      handleFreezeAndAbort={handleFreezeAndAbort}
+                      handleSimulateIncident={handleSimulateIncident}
+                      guardianInfo={guardianInfo}
+                      handleGuardianTopUp={handleGuardianTopUp}
+                      handleTransferToPocket={handleTransferToPocket}
+                      balance={balance}
+                      pocketBalance={pocketBalance}
+                      auditLogs={auditLogs}
+                    />
+                  </div>
+                </div>
+              </main>
+            )}
+
+            {/* SUB-TAB 2: SENIOR /pay PORTAL VIEW */}
+            {portalSubTab === 'pay' && (
+              <main className="w-full space-y-6 animate-in fade-in duration-300">
+                <SeniorPortalView
                   recipientName={recipientName}
                   setRecipientName={setRecipientName}
                   upiId={upiId}
@@ -393,13 +443,16 @@ export default function BankShieldApp() {
                   setIsActiveCall={setIsActiveCall}
                   currentMultiplier={currentMultiplier}
                   handleAuthorizeTransfer={handleAuthorizeTransfer}
+                  guardianInfo={guardianInfo}
                   balance={balance}
                   pocketBalance={pocketBalance}
-                  activeEscrow={activeEscrow}
-                  guardianInfo={guardianInfo}
-                  lastGuardianTopUp={lastGuardianTopUp}
                 />
+              </main>
+            )}
 
+            {/* SUB-TAB 3: GUARDIAN /deck */}
+            {portalSubTab === 'guardian' && (
+              <main className="w-full space-y-6 animate-in fade-in duration-300">
                 <GuardianDeck
                   activeEscrow={activeEscrow}
                   countdown={countdown}
@@ -416,193 +469,149 @@ export default function BankShieldApp() {
                   pocketBalance={pocketBalance}
                   auditLogs={auditLogs}
                 />
-              </div>
-            </main>
-          )}
+              </main>
+            )}
 
-          {/* SUB-TAB 2: SENIOR /pay PORTAL VIEW */}
-          {portalSubTab === 'pay' && (
-            <main className="max-w-7xl mx-auto px-4 py-8 space-y-6 animate-in fade-in duration-300">
-              <SeniorPortalView
-                recipientName={recipientName}
-                setRecipientName={setRecipientName}
-                upiId={upiId}
-                setUpiId={setUpiId}
-                amount={amount}
-                setAmount={setAmount}
-                category={category}
-                setCategory={setCategory}
-                isActiveCall={isActiveCall}
-                setIsActiveCall={setIsActiveCall}
-                currentMultiplier={currentMultiplier}
-                handleAuthorizeTransfer={handleAuthorizeTransfer}
-                guardianInfo={guardianInfo}
-                balance={balance}
-                pocketBalance={pocketBalance}
-              />
-            </main>
-          )}
+            {/* SUB-TAB 4: UNIFIED DARK AUDIT HISTORY */}
+            {portalSubTab === 'audit' && (
+              <main className="w-full space-y-6 animate-in fade-in duration-300">
+                <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                    <div>
+                      <span className="text-xs font-black uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/30">
+                        DUAL-PERSPECTIVE AUDIT LEDGER
+                      </span>
+                      <h1 className="text-3xl font-black text-white tracking-tight mt-2">
+                        Transaction & Duress Audit History
+                      </h1>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Complete immutable log of in-flight interventions, escrow holds, and guardian overrides synchronized with Supabase.
+                      </p>
+                    </div>
 
-          {/* SUB-TAB 3: GUARDIAN /deck */}
-          {portalSubTab === 'guardian' && (
-            <main className="max-w-6xl mx-auto px-4 py-8 space-y-6 animate-in fade-in duration-300">
-              <GuardianDeck
-                activeEscrow={activeEscrow}
-                countdown={countdown}
-                formatCountdown={formatCountdown}
-                currentMultiplier={currentMultiplier}
-                triggerSpeech={triggerSpeech}
-                handleGuardianOverride={handleGuardianOverride}
-                handleFreezeAndAbort={handleFreezeAndAbort}
-                handleSimulateIncident={handleSimulateIncident}
-                guardianInfo={guardianInfo}
-                handleGuardianTopUp={handleGuardianTopUp}
-                handleTransferToPocket={handleTransferToPocket}
-                balance={balance}
-                pocketBalance={pocketBalance}
-                auditLogs={auditLogs}
-              />
-            </main>
-          )}
+                    {/* Multi-Format Export Controls */}
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                      <button
+                        onClick={() => exportAuditCSV(auditLogs)}
+                        className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition border border-slate-700 shadow-md flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>CSV</span>
+                      </button>
 
-          {/* SUB-TAB 4: AUDIT HISTORY */}
-          {portalSubTab === 'audit' && (
-            <main className="max-w-6xl mx-auto px-4 py-8 space-y-6 animate-in fade-in duration-300">
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-700 bg-cyan-50 px-3 py-1 rounded-md border border-cyan-200">
-                      DUAL-PERSPECTIVE AUDIT LEDGER
-                    </span>
-                    <h1 className="text-3xl font-extrabold text-slate-900 mt-2">
-                      Transaction & Duress Audit History
-                    </h1>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Complete immutable log of in-flight interventions, escrow holds, and guardian overrides.
-                    </p>
+                      <button
+                        onClick={() => exportAuditODS(auditLogs)}
+                        className="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-emerald-200" />
+                        <span>ODS</span>
+                      </button>
+
+                      <button
+                        onClick={() => downloadAuditPDF(auditLogs)}
+                        className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 border border-slate-700 cursor-pointer"
+                      >
+                        <span>📄</span>
+                        <span>Download Audit (PDF)</span>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Multi-Format Export Controls */}
-                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                    <button
-                      onClick={() => exportAuditCSV(auditLogs)}
-                      className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>CSV</span>
-                    </button>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                    <div className="relative w-full sm:w-80">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Search by Payee, VPA, or TXN ID..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs font-medium focus:border-emerald-500 focus:outline-none"
+                      />
+                    </div>
 
-                    <button
-                      onClick={() => exportAuditODS(auditLogs)}
-                      className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5 text-emerald-200" />
-                      <span>ODS</span>
-                    </button>
-
-                    <button
-                      onClick={() => downloadAuditPDF(auditLogs)}
-                      className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer"
-                    >
-                      <span>📄</span>
-                      <span>Download Audit (PDF)</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                  <div className="relative w-full sm:w-80">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      placeholder="Search by Payee, VPA, or TXN ID..."
-                      value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs font-medium focus:border-emerald-600 focus:outline-none"
-                    />
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <Filter className="w-4 h-4 text-slate-400" />
+                      <span className="text-xs font-bold text-slate-300">Status:</span>
+                      <select
+                        value={statusFilter}
+                        onChange={e => setStatusFilter(e.target.value)}
+                        className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs font-bold focus:border-emerald-500 focus:outline-none"
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="Escrow Hold">Escrow Hold</option>
+                        <option value="Aborted & Frozen">Aborted & Frozen</option>
+                        <option value="Advised & Paid">Advised & Paid</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Guardian Cleared">Guardian Cleared</option>
+                        <option value="Credit Cleared">Credit Cleared</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Filter className="w-4 h-4 text-slate-500" />
-                    <span className="text-xs font-bold text-slate-700">Status:</span>
-                    <select
-                      value={statusFilter}
-                      onChange={e => setStatusFilter(e.target.value)}
-                      className="px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs font-bold focus:border-emerald-600 focus:outline-none"
-                    >
-                      <option value="All">All Statuses</option>
-                      <option value="Escrow Hold">Escrow Hold</option>
-                      <option value="Aborted & Frozen">Aborted & Frozen</option>
-                      <option value="Advised & Paid">Advised & Paid</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Guardian Cleared">Guardian Cleared</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-2xl border border-slate-200">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-100 text-slate-700 uppercase font-bold tracking-wider text-[10px] border-b border-slate-200">
-                      <tr>
-                        <th className="py-3.5 px-4">TXN ID</th>
-                        <th className="py-3.5 px-4">Timestamp</th>
-                        <th className="py-3.5 px-4">Payee / VPA</th>
-                        <th className="py-3.5 px-4">Amount</th>
-                        <th className="py-3.5 px-4">Duress Risk</th>
-                        <th className="py-3.5 px-4">Status</th>
-                        <th className="py-3.5 px-4">Audit Telemetry Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white font-medium">
-                      {filteredAuditLogs.map((log, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50/80 transition">
-                          <td className="py-4 px-4 font-mono font-bold text-slate-900">{log.id}</td>
-                          <td className="py-4 px-4 text-slate-500">{log.timestamp}</td>
-                          <td className="py-4 px-4">
-                            <span className="block font-bold text-slate-900">{log.payee}</span>
-                            <span className="block text-[10px] text-slate-400 font-mono">{log.vpa}</span>
-                          </td>
-                          <td className="py-4 px-4 font-extrabold text-slate-900">
-                            ₹{log.amount.toLocaleString('en-IN')}
-                          </td>
-                          <td className="py-4 px-4">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
-                              log.riskScore >= 75
-                                ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                                : log.riskScore >= 45
-                                ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                            }`}>
-                              {log.riskScore} / 100
-                            </span>
-                          </td>
-                          <td className="py-4 px-4">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black ${
-                              log.status === 'Escrow Hold'
-                                ? 'bg-rose-600 text-white animate-pulse'
-                                : log.status === 'Aborted & Frozen'
-                                ? 'bg-rose-100 text-rose-700 border border-rose-300'
-                                : log.status === 'Guardian Cleared' || log.status === 'Completed'
-                                ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
-                                : 'bg-amber-100 text-amber-800 border border-amber-300'
-                            }`}>
-                              {log.status === 'Escrow Hold' && <Clock className="w-3 h-3 animate-spin" />}
-                              {log.status === 'Aborted & Frozen' && <Ban className="w-3 h-3 text-rose-600" />}
-                              {(log.status === 'Completed' || log.status === 'Guardian Cleared') && <Check className="w-3 h-3 text-emerald-600" />}
-                              {log.status}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4 text-slate-600 text-[11px] max-w-xs truncate">{log.notes}</td>
+                  <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 uppercase font-bold tracking-wider text-[10px] border-b border-slate-800">
+                        <tr>
+                          <th className="py-3.5 px-4">TXN ID</th>
+                          <th className="py-3.5 px-4">Timestamp</th>
+                          <th className="py-3.5 px-4">Payee / VPA</th>
+                          <th className="py-3.5 px-4">Amount</th>
+                          <th className="py-3.5 px-4">Duress Risk</th>
+                          <th className="py-3.5 px-4">Status</th>
+                          <th className="py-3.5 px-4">Audit Telemetry Notes</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800 bg-slate-900 font-medium">
+                        {filteredAuditLogs.map((log, idx) => (
+                          <tr key={idx} className="hover:bg-slate-800/60 transition">
+                            <td className="py-4 px-4 font-mono font-bold text-white">{log.id}</td>
+                            <td className="py-4 px-4 text-slate-400">{log.timestamp}</td>
+                            <td className="py-4 px-4">
+                              <span className="block font-bold text-white">{log.payee}</span>
+                              <span className="block text-[10px] text-slate-400 font-mono">{log.vpa}</span>
+                            </td>
+                            <td className="py-4 px-4 font-extrabold text-white">
+                              ₹{log.amount.toLocaleString('en-IN')}
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
+                                log.riskScore >= 75
+                                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                  : log.riskScore >= 45
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              }`}>
+                                {log.riskScore} / 100
+                              </span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black ${
+                                log.status === 'Escrow Hold'
+                                  ? 'bg-rose-600 text-white animate-pulse'
+                                  : log.status === 'Aborted & Frozen'
+                                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                  : log.status === 'Guardian Cleared' || log.status === 'Completed' || log.status === 'Credit Cleared'
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              }`}>
+                                {log.status === 'Escrow Hold' && <Clock className="w-3 h-3 animate-spin" />}
+                                {log.status === 'Aborted & Frozen' && <Ban className="w-3 h-3 text-rose-400" />}
+                                {(log.status === 'Completed' || log.status === 'Guardian Cleared' || log.status === 'Credit Cleared') && <Check className="w-3 h-3 text-emerald-400" />}
+                                {log.status}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4 text-slate-300 text-[11px] max-w-xs truncate">{log.notes}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            </main>
-          )}
-        </div>
-      )}
+              </main>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

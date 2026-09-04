@@ -27,19 +27,12 @@ export const Navigation: React.FC<NavigationProps> = ({
   handleFreezeAndAbort,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
 }) => {
-  const isSenior = userRole === 'senior' || userRole === 'customer';
-  const guardianInitials = guardianInfo.name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() || 'AK';
-
   return (
     <>
-      <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-slate-100 shadow-md">
+      {/* Sticky Dark Header Bar */}
+      <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 text-slate-100 shadow-xl">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          {/* Brand Logo */}
+          {/* Brand Logo & Dynamic Protection Status */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setPageStage('landing')}>
             <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-inner">
               <Shield className="w-5 h-5" />
@@ -49,10 +42,15 @@ export const Navigation: React.FC<NavigationProps> = ({
                 <span className="font-black text-lg sm:text-xl tracking-tight text-white">
                   BankShield<span className="text-emerald-400">.AI</span>
                 </span>
-                <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono">
-                  SENIOR SAFETY ESCROW
+                <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono">
+                  DUAL-CUSTODY CO-PILOT
                 </span>
               </div>
+              {pageStage === 'portal' && (
+                <p className="text-[10px] text-slate-400 font-medium hidden md:block">
+                  <span className="text-emerald-400 font-bold">{guardianInfo.name}</span> protecting <span className="text-white font-bold">Ramesh Kumar</span>
+                </p>
+              )}
             </div>
           </div>
 
@@ -74,82 +72,71 @@ export const Navigation: React.FC<NavigationProps> = ({
             </button>
           ) : (
             <>
-              {/* Role-Based Dynamic Sub-Tabs */}
-              <nav className="flex items-center gap-1 p-1 bg-slate-950 border border-slate-800 rounded-2xl">
-                {isSenior ? (
-                  <>
-                    <button
-                      onClick={() => setPortalSubTab('pay')}
-                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                        portalSubTab === 'pay' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <Smartphone className="w-3.5 h-3.5" />
-                      <span>Senior /pay</span>
-                    </button>
+              {/* Central Unified Console Tabs */}
+              <nav className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl">
+                <button
+                  onClick={() => setPortalSubTab('dual')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                    portalSubTab === 'dual'
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Monitor className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Co-Pilot Console</span>
+                  <span className="sm:hidden">Console</span>
+                </button>
 
-                    <button
-                      onClick={() => setPortalSubTab('audit')}
-                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                        portalSubTab === 'audit' ? 'bg-slate-800 text-white shadow-md border border-slate-700' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <Activity className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Transaction History</span>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => setPortalSubTab('guardian')}
-                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                        portalSubTab === 'guardian' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <ShieldAlert className="w-3.5 h-3.5" />
-                      <span>Guardian /deck</span>
-                    </button>
+                <button
+                  onClick={() => setPortalSubTab('pay')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                    portalSubTab === 'pay'
+                      ? 'bg-slate-800 text-white shadow-md border border-slate-700'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Senior /pay</span>
+                </button>
 
-                    <button
-                      onClick={() => setPortalSubTab('dual')}
-                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                        portalSubTab === 'dual' ? 'bg-slate-800 text-white shadow-md border border-slate-700' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <Monitor className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Dual View Monitor</span>
-                    </button>
+                <button
+                  onClick={() => setPortalSubTab('guardian')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                    portalSubTab === 'guardian'
+                      ? 'bg-rose-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>Guardian /deck</span>
+                </button>
 
-                    <button
-                      onClick={() => setPortalSubTab('audit')}
-                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                        portalSubTab === 'audit' ? 'bg-slate-800 text-white shadow-md border border-slate-700' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>Audit Ledger</span>
-                    </button>
-                  </>
-                )}
+                <button
+                  onClick={() => setPortalSubTab('audit')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                    portalSubTab === 'audit'
+                      ? 'bg-slate-800 text-white shadow-md border border-slate-700'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Audit History</span>
+                </button>
               </nav>
 
-              {/* User Profile Badge & Exit */}
+              {/* Profile & Exit */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2.5 pl-2 text-xs font-semibold text-slate-300">
-                  <div className={`w-8 h-8 rounded-full font-black flex items-center justify-center text-[10px] border shadow-xs ${
-                    isSenior
-                      ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                      : 'bg-rose-500/20 border-rose-500/40 text-rose-400'
-                  }`}>
-                    {isSenior ? 'RK' : guardianInitials}
+                <div className="flex items-center gap-2 pl-2 text-xs font-semibold text-slate-300">
+                  <div className="w-8 h-8 rounded-full font-black flex items-center justify-center text-[10px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 shadow-xs">
+                    AK
                   </div>
 
-                  <div className="hidden sm:block text-left">
+                  <div className="hidden lg:block text-left">
                     <span className="block font-black text-white leading-tight">
-                      {isSenior ? 'Ramesh Kumar' : guardianInfo.name}
+                      {guardianInfo.name}
                     </span>
                     <span className="block text-[10px] text-slate-400 font-mono leading-none">
-                      {isSenior ? `A/C ...9241 • Guardian: ${guardianInfo.name.split(' ')[0]}` : 'Guardian Co-Pilot'}
+                      Protecting Ramesh Kumar
                     </span>
                   </div>
 
@@ -167,9 +154,9 @@ export const Navigation: React.FC<NavigationProps> = ({
         </div>
       </header>
 
-      {/* Real-Time Incident Alert Banner (Pulsing Red Bar) */}
+      {/* Global Real-Time Incident Alert Banner (Pulsing Red Emergency Bar) */}
       {pageStage === 'portal' && activeEscrow && activeEscrow.status === 'Escrow Hold' && (
-        <div className="w-full bg-rose-600 text-white text-xs py-2.5 px-6 font-semibold shadow-xl border-b border-rose-500">
+        <div className="w-full bg-rose-600 text-white text-xs py-2.5 px-6 font-semibold shadow-xl border-b border-rose-500 animate-in slide-in-from-top-2 duration-200">
           <div className="w-full flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 truncate">
               <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping shrink-0" />
@@ -181,12 +168,12 @@ export const Navigation: React.FC<NavigationProps> = ({
               <span className="text-[11px] bg-rose-700/90 px-2.5 py-0.5 rounded-md text-rose-100 border border-rose-500 shrink-0 hidden md:inline-block font-mono">
                 Sub-50ms Circuit Breaker Armed
               </span>
-              {!isSenior && (
+              {portalSubTab !== 'dual' && portalSubTab !== 'guardian' && (
                 <button
-                  onClick={() => setPortalSubTab('guardian')}
+                  onClick={() => setPortalSubTab('dual')}
                   className="px-3 py-1 rounded-xl bg-white text-rose-700 font-black hover:bg-rose-50 transition text-xs shadow-xs cursor-pointer"
                 >
-                  Inspect Deck
+                  Review Incident
                 </button>
               )}
               <button

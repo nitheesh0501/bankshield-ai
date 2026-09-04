@@ -112,18 +112,6 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
     handleAuthorizeTransfer({ preventDefault: () => {} } as React.FormEvent);
   };
 
-  // Risk Score Preview
-  const numAmount = parseFloat(amount) || 0;
-  const evalResult = evaluateDuressRisk({
-    amount: numAmount,
-    category,
-    isCallActive: isActiveCall,
-    payeeVpa: upiId,
-    historicalAvg: 1200,
-  });
-
-  const previewScore = Math.min(100, evalResult.score + (isNewBeneficiary ? 25 : 0));
-
   const triggerSpeech = () => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     try {
@@ -161,29 +149,29 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       
-      {/* 1. HEADER ACCOUNT & SAFE POCKET BANNER */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+      {/* 1. HEADER ACCOUNT & SAFE POCKET BANNER (DARK FINTECH THEME) */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden text-slate-100">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left Side: Account Info */}
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
                 Senior Privilege Savings A/C
               </span>
-              <span className="text-xs text-slate-500 font-mono">No: 501009849241</span>
+              <span className="text-xs text-slate-400 font-mono">No: 501009849241</span>
             </div>
 
             <div>
-              <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Account Holder</span>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Ramesh Kumar (Age: 68)</h1>
+              <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Account Holder</span>
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Ramesh Kumar (Age: 68)</h1>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
               <div>
-                <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Safe Pocket Balance (UPI Lite Pool)</span>
-                <span className="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">
+                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Safe Pocket Balance (UPI Lite Pool)</span>
+                <span className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
                   ₹ {pocketBalance.toLocaleString('en-IN')}.00
                 </span>
               </div>
@@ -192,9 +180,9 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowFullBalance(!showFullBalance)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-1.5 border border-slate-300 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 cursor-pointer"
                 >
-                  {showFullBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 text-cyan-600" />}
+                  {showFullBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 text-cyan-400" />}
                   <span>{showFullBalance ? 'Hide Savings' : `Main Savings: ₹${balance.toLocaleString('en-IN')}`}</span>
                 </button>
               </div>
@@ -202,22 +190,22 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
           </div>
 
           {/* Right Side: Protection Status Badges */}
-          <div className="space-y-3 bg-slate-50 p-5 rounded-2xl border border-slate-200 lg:max-w-md w-full">
+          <div className="space-y-3 bg-slate-950 p-5 rounded-2xl border border-slate-800 lg:max-w-md w-full">
             <div className="flex items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Assisted Safety Active
               </span>
-              <span className="text-[10px] font-mono font-bold text-slate-500">v2.4 EDGE</span>
+              <span className="text-[10px] font-mono font-bold text-slate-400">v2.4 EDGE</span>
             </div>
 
-            <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold pt-1">
-              <UserCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="flex items-center gap-2.5 text-xs text-slate-300 font-semibold pt-1">
+              <UserCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Nominated Guardian: <strong>{guardianInfo.name} ({guardianInfo.relation})</strong></span>
             </div>
 
-            <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium pt-1 border-t border-slate-200">
-              <ShieldCheck className="w-4 h-4 text-cyan-600 shrink-0" />
+            <div className="flex items-center gap-2.5 text-xs text-slate-400 font-medium pt-1 border-t border-slate-800">
+              <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
               <span>Safety Rule: <strong>Pocket Balance ≤ ₹{pocketBalance.toLocaleString('en-IN')}</strong> | Co-Pilot Vault Armed</span>
             </div>
           </div>
@@ -225,24 +213,24 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
       </div>
 
       {/* 2. TWO-COLUMN DASHBOARD LAYOUT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* LEFT COLUMN: TRANSFER FORM */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-              <Send className="w-5 h-5 text-emerald-600" />
+        <div className="lg:col-span-7 bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+          <div className="border-b border-slate-800 pb-4">
+            <h2 className="text-xl font-black text-white flex items-center gap-2">
+              <Send className="w-5 h-5 text-emerald-400" />
               <span>Send Money via Assisted UPI</span>
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               Transactions within your ₹{pocketBalance.toLocaleString('en-IN')} Safe Pocket clear instantly. Larger transfers route to Ananya for 1-tap co-signing.
             </p>
           </div>
 
           {/* Quick Attack Vector Test Presets */}
           <div className="space-y-2.5">
-            <span className="block text-[11px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1">
-              <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-600" />
+            <span className="block text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+              <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
               <span>Quick Test Scam Presets:</span>
             </span>
 
@@ -257,10 +245,10 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: false,
                   newBen: false,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-xs transition cursor-pointer"
               >
-                <span className="block font-bold text-slate-900 text-[11px]">Safe Groceries</span>
-                <span className="block text-[10px] text-emerald-700 font-bold">₹450 (Pocket)</span>
+                <span className="block font-bold text-white text-[11px]">Safe Groceries</span>
+                <span className="block text-[10px] text-emerald-400 font-bold">₹450 (Pocket)</span>
               </button>
 
               <button
@@ -273,10 +261,10 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: true,
                   newBen: true,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-200 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-xs transition cursor-pointer"
               >
-                <span className="block font-bold text-slate-900 text-[11px]">Utility Cutoff Scam</span>
-                <span className="block text-[10px] text-amber-700 font-bold">₹48,500 (Assisted)</span>
+                <span className="block font-bold text-white text-[11px]">Utility Cutoff Scam</span>
+                <span className="block text-[10px] text-amber-400 font-bold">₹48,500 (Assisted)</span>
               </button>
 
               <button
@@ -289,10 +277,10 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: true,
                   newBen: true,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-xs transition cursor-pointer"
               >
-                <span className="block font-bold text-slate-900 text-[11px]">Digital Arrest</span>
-                <span className="block text-[10px] text-rose-700 font-bold">₹85,000 (Blocked)</span>
+                <span className="block font-bold text-white text-[11px]">Digital Arrest</span>
+                <span className="block text-[10px] text-rose-400 font-bold">₹85,000 (Blocked)</span>
               </button>
 
               <button
@@ -305,10 +293,10 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                   call: false,
                   newBen: false,
                 })}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-cyan-50 border border-slate-200 text-left text-xs transition cursor-pointer"
+                className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-xs transition cursor-pointer"
               >
-                <span className="block font-bold text-slate-900 text-[11px]">Hospital Emergency</span>
-                <span className="block text-[10px] text-cyan-700 font-bold">₹60,000 (Assisted)</span>
+                <span className="block font-bold text-white text-[11px]">Hospital Emergency</span>
+                <span className="block text-[10px] text-cyan-400 font-bold">₹60,000 (Assisted)</span>
               </button>
             </div>
           </div>
@@ -316,31 +304,31 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
           {/* Form */}
           <form onSubmit={handleInitiatePayment} className="space-y-4 pt-2">
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">Recipient Name</label>
+              <label className="block text-xs font-bold text-slate-300">Recipient Name</label>
               <input
                 type="text"
                 required
                 value={recipientName}
                 onChange={e => setRecipientName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:border-emerald-600 focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-bold text-sm focus:border-emerald-500 focus:outline-none transition"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">Recipient UPI Address</label>
+              <label className="block text-xs font-bold text-slate-300">Recipient UPI Address</label>
               <input
                 type="text"
                 required
                 value={upiId}
                 onChange={e => setUpiId(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-xs focus:border-emerald-600 focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono text-xs focus:border-emerald-500 focus:outline-none transition"
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold text-slate-700">Transfer Amount (₹ INR)</label>
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+                <label className="block text-xs font-bold text-slate-300">Transfer Amount (₹ INR)</label>
+                <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/30">
                   Pocket Pool: ₹{pocketBalance.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -349,16 +337,16 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 required
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-extrabold text-xl focus:border-emerald-600 focus:outline-none transition"
+                className="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-extrabold text-xl focus:border-emerald-500 focus:outline-none transition"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">Category / Purpose</label>
+              <label className="block text-xs font-bold text-slate-300">Category / Purpose</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-xs focus:border-emerald-600 focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-bold text-xs focus:border-emerald-500 focus:outline-none transition"
               >
                 <option value="Regular Household Expense">Regular Household Expense</option>
                 <option value="Law Enforcement / Police Clearance">Law Enforcement / Police Clearance</option>
@@ -368,21 +356,21 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
             </div>
 
             {/* Sensor Switch */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-100 text-rose-700 animate-pulse' : 'bg-slate-200 text-slate-500'}`}>
+                <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse' : 'bg-slate-800 text-slate-400'}`}>
                   <PhoneCall className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="block text-xs font-bold text-slate-900">Simulate Background Phone Call</span>
-                  <span className="text-[11px] text-slate-500">Auto-routes transaction to Ananya</span>
+                  <span className="block text-xs font-bold text-white">Simulate Background Phone Call</span>
+                  <span className="text-[11px] text-slate-400">Auto-routes transaction to Ananya</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsActiveCall(!isActiveCall)}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                  isActiveCall ? 'bg-rose-600' : 'bg-slate-300'
+                  isActiveCall ? 'bg-rose-600' : 'bg-slate-800'
                 }`}
               >
                 <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
@@ -391,7 +379,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
 
             <button
               type="submit"
-              className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer mt-4"
+              className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-base transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer mt-4"
             >
               <ShieldCheck className="w-5 h-5 text-emerald-200" />
               <span>Verify & Execute Payment (BankShield Monitored)</span>
@@ -401,7 +389,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
 
         {/* RIGHT COLUMN: VOICE ASSIST & SAFETY METER */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-slate-900 text-white border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <span className="text-xs font-extrabold text-rose-400 uppercase tracking-wide flex items-center gap-1.5">
                 <Volume2 className="w-4 h-4" />
@@ -427,35 +415,35 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
           </div>
 
           {/* Guardian Info */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-3 text-xs">
-            <span className="block font-extrabold text-slate-900 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-3 text-xs text-slate-100">
+            <span className="block font-extrabold text-white uppercase tracking-wider text-[11px] border-b border-slate-800 pb-2">
               Guardian Co-Pilot Telemetry:
             </span>
 
-            <div className="space-y-2 text-slate-600">
+            <div className="space-y-2 text-slate-300">
               <div className="flex items-center justify-between">
                 <span>Designated Guardian:</span>
-                <strong className="text-slate-900">{guardianInfo.name} ({guardianInfo.phone})</strong>
+                <strong className="text-white">{guardianInfo.name} ({guardianInfo.phone})</strong>
               </div>
               <div className="flex items-center justify-between">
                 <span>Real-Time Sync:</span>
-                <strong className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono text-[10px]">n8n Push Active</strong>
+                <strong className="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 font-mono text-[10px]">n8n Push Active</strong>
               </div>
             </div>
           </div>
 
           {/* Emergency Alert Button */}
-          <div className="p-4 bg-rose-50 border-2 border-rose-300 rounded-3xl space-y-3">
+          <div className="p-4 bg-rose-950/80 border-2 border-rose-600/50 rounded-3xl space-y-3">
             <button
               type="button"
               onClick={handleEmergencyButton}
-              className="w-full py-3.5 rounded-2xl bg-white hover:bg-rose-100 border-2 border-rose-600 text-rose-700 font-extrabold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>🚨 Pressured? Call Guardian {guardianInfo.name} Now</span>
             </button>
 
             {emergencyAlertSent && (
-              <span className="block text-[11px] font-bold text-rose-800 text-center">
+              <span className="block text-[11px] font-bold text-rose-300 text-center">
                 ✓ Priority emergency alert dispatched to {guardianInfo.name}!
               </span>
             )}
