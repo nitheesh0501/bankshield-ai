@@ -163,29 +163,33 @@ export const Navigation: React.FC<NavigationProps> = ({
 
       {/* Real-time incident alert banner (Pulsing Red Bar) */}
       {pageStage === 'portal' && activeEscrow && activeEscrow.status === 'Escrow Hold' && (
-        <div className="bg-rose-600 text-white px-4 py-2.5 shadow-md flex items-center justify-between text-xs sm:text-sm animate-in slide-in-from-top duration-300">
-          <div className="flex items-center gap-2 font-bold max-w-4xl truncate">
-            <Radio className="w-4 h-4 animate-ping text-white shrink-0" />
-            <span className="truncate">
-              🚨 REAL-TIME DURESS INCIDENT: Ramesh Kumar transfer of ₹{activeEscrow.amount.toLocaleString('en-IN')} held in Escrow ({formatCountdown(countdown)} remaining).
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {!isSenior && (
+        <div className="w-full bg-rose-600 text-white text-xs py-2.5 px-4 font-semibold shadow-inner">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 truncate">
+              <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping shrink-0" />
+              <span className="truncate font-bold">
+                🚨 ACTIVE ESCROW HOLD: ₹{activeEscrow.amount.toLocaleString('en-IN')} transfer paused pending Guardian Ananya's review ({formatCountdown(countdown)} remaining).
+              </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[11px] bg-rose-700/80 px-2.5 py-0.5 rounded text-rose-100 border border-rose-500 shrink-0 hidden md:inline-block font-mono">
+                Funds Protected On-Device
+              </span>
+              {!isSenior && (
+                <button
+                  onClick={() => setPortalSubTab('guardian')}
+                  className="px-3 py-1 rounded bg-white text-rose-700 font-extrabold hover:bg-rose-50 transition text-xs shadow-xs cursor-pointer"
+                >
+                  Inspect Deck
+                </button>
+              )}
               <button
-                onClick={() => setPortalSubTab('guardian')}
-                className="px-3 py-1 rounded bg-white text-rose-700 font-extrabold hover:bg-rose-50 transition text-xs shadow-xs cursor-pointer"
+                onClick={handleFreezeAndAbort}
+                className="px-3 py-1 rounded bg-rose-950 text-white font-extrabold hover:bg-rose-900 transition text-xs border border-rose-400 cursor-pointer"
               >
-                Inspect Deck
+                Instant Freeze
               </button>
-            )}
-            <button
-              onClick={handleFreezeAndAbort}
-              className="px-3 py-1 rounded bg-rose-950 text-white font-extrabold hover:bg-rose-900 transition text-xs border border-rose-400 cursor-pointer"
-            >
-              Instant Freeze
-            </button>
+            </div>
           </div>
         </div>
       )}

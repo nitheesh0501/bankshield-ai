@@ -16,7 +16,8 @@ import {
   User,
   ShoppingBag,
   HeartPulse,
-  Milk
+  ZapOff,
+  ArrowUpRight
 } from 'lucide-react';
 import { evaluateDuressRisk } from '../backend/riskEngine';
 
@@ -214,7 +215,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 type="button"
                 onClick={() => selectScenarioPreset({
                   payee: 'DCP Cyber Cell Official Escrow',
-                  vpa: 'dcp.cyber.cell@official-escrow',
+                  vpa: 'dcp.cybercell.official@okhdfc',
                   amt: 85000,
                   cat: 'Law Enforcement / Police Clearance',
                   call: true,
@@ -380,7 +381,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700">Calculated Risk Score:</span>
-                <span className={`text-lg font-black ${
+                <span className={`text-xl font-black ${
                   previewScore >= 75 ? 'text-rose-600' : previewScore >= 45 ? 'text-amber-600' : 'text-emerald-600'
                 }`}>
                   {previewScore} / 100
@@ -388,7 +389,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+              <div className="w-full h-3.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
                 <div
                   className={`h-full transition-all duration-300 ${
                     previewScore >= 75 ? 'bg-rose-600' : previewScore >= 45 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -397,7 +398,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
                 />
               </div>
 
-              <span className="block text-[11px] text-slate-500 font-medium pt-1">
+              <span className="block text-[11px] text-slate-600 font-semibold pt-1">
                 {previewScore >= 75
                   ? '🚨 High Duress Alert: Triggers 15-min Guardian Escrow Hold'
                   : previewScore >= 45
@@ -494,83 +495,110 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Card 1 */}
-          <button
-            type="button"
-            onClick={() => selectScenarioPreset({
-              payee: 'Apollo Pharmacy & Clinic',
-              vpa: 'apollo.pharmacy@upi',
-              amt: 2450,
-              cat: 'Medical Emergency',
-              call: false,
-              newBen: false,
-            })}
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 text-left transition cursor-pointer space-y-2 group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                <HeartPulse className="w-5 h-5" />
+          {/* Card 1: Apollo Pharmacy & Clinic */}
+          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                  <HeartPulse className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
+                  Routine Healthcare
+                </span>
               </div>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">Verified</span>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">Apollo Pharmacy & Clinic</h4>
+                <p className="text-[11px] text-slate-500 font-mono">apollo.pharmacy@upi</p>
+                <p className="text-[11px] text-slate-500 mt-1">Last Paid: <strong>Yesterday (₹2,450)</strong></p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700">Apollo Pharmacy</h4>
-              <p className="text-[11px] text-slate-500 font-mono">apollo.pharmacy@upi</p>
-              <p className="text-[10px] text-slate-400 mt-1">Routine • Last paid 2 days ago (₹2,450)</p>
-            </div>
-          </button>
 
-          {/* Card 2 */}
-          <button
-            type="button"
-            onClick={() => selectScenarioPreset({
-              payee: 'Nilgiris Daily Groceries',
-              vpa: 'nilgiris.groceries@upi',
-              amt: 350,
-              cat: 'Regular Household Expense',
-              call: false,
-              newBen: false,
-            })}
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 text-left transition cursor-pointer space-y-2 group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                <ShoppingBag className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">Verified</span>
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700">Nilgiris Groceries</h4>
-              <p className="text-[11px] text-slate-500 font-mono">nilgiris.groceries@upi</p>
-              <p className="text-[10px] text-slate-400 mt-1">Daily spend • Verified merchant (₹350)</p>
-            </div>
-          </button>
+            <button
+              type="button"
+              onClick={() => selectScenarioPreset({
+                payee: 'Apollo Pharmacy & Clinic',
+                vpa: 'apollo.pharmacy@upi',
+                amt: 1000,
+                cat: 'Medical Emergency',
+                call: false,
+                newBen: false,
+              })}
+              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>Quick Pay ₹1,000</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
-          {/* Card 3 */}
-          <button
-            type="button"
-            onClick={() => selectScenarioPreset({
-              payee: 'Milk & Dairy Vendor',
-              vpa: 'dairy.vendor@upi',
-              amt: 1200,
-              cat: 'Regular Household Expense',
-              call: false,
-              newBen: false,
-            })}
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 text-left transition cursor-pointer space-y-2 group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                <Milk className="w-5 h-5" />
+          {/* Card 2: Nilgiris Daily Groceries */}
+          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
+                  Verified Merchant
+                </span>
               </div>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">Verified</span>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">Nilgiris Daily Groceries</h4>
+                <p className="text-[11px] text-slate-500 font-mono">nilgiris.groceries@upi</p>
+                <p className="text-[11px] text-slate-500 mt-1">Last Paid: <strong>30 Aug (₹350)</strong></p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700">Milk & Dairy Vendor</h4>
-              <p className="text-[11px] text-slate-500 font-mono">dairy.vendor@upi</p>
-              <p className="text-[10px] text-slate-400 mt-1">Monthly • Verified supplier (₹1,200)</p>
+
+            <button
+              type="button"
+              onClick={() => selectScenarioPreset({
+                payee: 'Nilgiris Daily Groceries',
+                vpa: 'nilgiris.groceries@upi',
+                amt: 450,
+                cat: 'Regular Household Expense',
+                call: false,
+                newBen: false,
+              })}
+              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>Quick Pay ₹450</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Card 3: TNEB Electricity Bill */}
+          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold">
+                  <ZapOff className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-cyan-800 bg-cyan-100 border border-cyan-300 px-2 py-0.5 rounded">
+                  Utility Recurring
+                </span>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">TNEB Electricity Bill</h4>
+                <p className="text-[11px] text-slate-500 font-mono">tneb.billing@gov</p>
+                <p className="text-[11px] text-slate-500 mt-1">Monthly Bill Due: <strong>₹1,850</strong></p>
+              </div>
             </div>
-          </button>
+
+            <button
+              type="button"
+              onClick={() => selectScenarioPreset({
+                payee: 'TNEB Electricity Billing',
+                vpa: 'tneb.billing@gov',
+                amt: 1850,
+                cat: 'Regular Household Expense',
+                call: false,
+                newBen: false,
+              })}
+              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>Pay Bill ₹1,850</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+            </button>
+          </div>
         </div>
       </div>
 
