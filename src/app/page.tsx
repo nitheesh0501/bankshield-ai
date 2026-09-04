@@ -34,6 +34,9 @@ export default function BankShieldApp() {
   const [portalSubTab, setPortalSubTab] = useState<PortalSubTab>('pay');
   const [userRole, setUserRole] = useState<UserRole>('senior');
 
+  // Account Balance State
+  const [balance, setBalance] = useState<number>(142800);
+
   // Guardian Info State (Single Source of Truth)
   const [guardianInfo, setGuardianInfo] = useState<GuardianInfo>({
     name: 'Ananya Kumar',
@@ -112,6 +115,11 @@ export default function BankShieldApp() {
     if (!amount || parseFloat(amount) <= 0) return;
 
     const numAmount = parseFloat(amount);
+    if (numAmount > balance) {
+      alert(`Insufficient account balance (Available: ₹${balance.toLocaleString('en-IN')}).`);
+      return;
+    }
+
     const evalResult = evaluateDuressRisk({
       amount: numAmount,
       category,
@@ -140,12 +148,15 @@ export default function BankShieldApp() {
       setActiveEscrow(newAuditItem);
       setCountdown(847);
       triggerSpeech();
+      // Funds placed under escrow hold — balance remains untouched in Ramesh's account until authorized
     } else {
+      // Safe transfer (Score < 75) — deduct balance immediately
+      setBalance(prev => Math.max(0, prev - numAmount));
       setActiveEscrow(null);
     }
   };
 
-  // Guardian Freeze & Abort Action
+  // Guardian Freeze & Abort Action (Aborted -> Funds remain untouched in Ramesh's account)
   const handleFreezeAndAbort = () => {
     stopSpeech();
     if (activeEscrow) {
@@ -161,11 +172,17 @@ export default function BankShieldApp() {
     }
   };
 
-  // Guardian Override Action
+  // Guardian Override Action (Authorized -> Balance deducted upon clearance)
   const handleGuardianOverride = () => {
     stopSpeech();
     if (activeEscrow) {
       const updatedId = activeEscrow.id;
+      const escrowAmt = activeEscrow.amount;
+      if (balance < escrowAmt) {
+        alert(`Insufficient account balance (Available: ₹${balance.toLocaleString('en-IN')}) to settle this escrow transfer.`);
+        return;
+      }
+      setBalance(prev => Math.max(0, prev - escrowAmt));
       setAuditLogs(prev =>
         prev.map(item =>
           item.id === updatedId
@@ -279,6 +296,7 @@ export default function BankShieldApp() {
                   setIsActiveCall={setIsActiveCall}
                   currentMultiplier={currentMultiplier}
                   handleAuthorizeTransfer={handleAuthorizeTransfer}
+                  balance={balance}
                 />
 
                 <GuardianDeck
@@ -313,6 +331,7 @@ export default function BankShieldApp() {
                 currentMultiplier={currentMultiplier}
                 handleAuthorizeTransfer={handleAuthorizeTransfer}
                 guardianInfo={guardianInfo}
+                balance={balance}
               />
             </main>
           )}

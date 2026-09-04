@@ -36,6 +36,7 @@ interface SeniorPortalViewProps {
   currentMultiplier: string;
   handleAuthorizeTransfer: (e: React.FormEvent) => void;
   guardianInfo?: GuardianInfo;
+  balance?: number;
 }
 
 export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
@@ -52,6 +53,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   currentMultiplier,
   handleAuthorizeTransfer,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
+  balance = 142800,
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isNewBeneficiary, setIsNewBeneficiary] = useState(true);
@@ -128,7 +130,7 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
             <div>
               <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Available Clear Balance</span>
               <span className="text-3xl sm:text-4xl font-extrabold text-emerald-600 tracking-tight">
-                ₹ 1,42,800.00
+                ₹ {balance.toLocaleString('en-IN')}.00
               </span>
             </div>
           </div>

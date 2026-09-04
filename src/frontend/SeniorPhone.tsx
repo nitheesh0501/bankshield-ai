@@ -15,6 +15,7 @@ interface SeniorPhoneProps {
   setIsActiveCall: (val: boolean) => void;
   currentMultiplier: string;
   handleAuthorizeTransfer: (e: React.FormEvent) => void;
+  balance?: number;
 }
 
 export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
@@ -30,6 +31,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
   setIsActiveCall,
   currentMultiplier,
   handleAuthorizeTransfer,
+  balance = 142800,
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
 
@@ -85,10 +87,20 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             </div>
             <div>
               <h4 className="text-sm font-bold text-white leading-tight">Ramesh Kumar (Age: 68)</h4>
-              <p className="text-[11px] text-zinc-400 font-mono leading-normal mt-0.5">Savings A/C ...9241 • Bal: ₹1,42,800</p>
+              <p className="text-[11px] text-zinc-400 font-mono leading-normal mt-0.5">Savings A/C ...9241 • Bal: ₹{balance.toLocaleString('en-IN')}</p>
             </div>
           </div>
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        </div>
+
+        {/* Dynamic Available Clear Balance Display */}
+        <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col">
+          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+            Available Clear Balance
+          </span>
+          <p className="text-2xl font-black text-emerald-400 tracking-tight mt-0.5">
+            ₹ {balance.toLocaleString('en-IN')}.00
+          </p>
         </div>
 
         {/* Quick Test Scam Scenarios Selector */}
