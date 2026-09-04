@@ -212,6 +212,35 @@ export default function BankShieldApp() {
     }
   };
 
+  // Guardian Allowance Top-Up State & Handler
+  const [lastGuardianTopUp, setLastGuardianTopUp] = useState<{ amount: number; time: string } | null>(null);
+
+  const handleGuardianTopUp = (topUpAmt: number) => {
+    if (topUpAmt <= 0) return;
+    setBalance(prev => prev + topUpAmt);
+
+    const creditItem: AuditItem = {
+      id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+      timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      payee: 'Guardian Top-Up (Ananya Kumar)',
+      vpa: 'ananya.kumar@okaxis',
+      amount: topUpAmt,
+      riskScore: 0,
+      status: 'Credit Cleared',
+      notes: 'Allowance credited by Primary Custodian',
+    };
+
+    setAuditLogs(prev => appendAuditRecord(prev, creditItem));
+    setLastGuardianTopUp({
+      amount: topUpAmt,
+      time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    });
+
+    setTimeout(() => {
+      setLastGuardianTopUp(null);
+    }, 6000);
+  };
+
   // Simulate Incident Trigger
   const handleSimulateIncident = () => {
     setRecipientName('DCP Cyber Cell Official Escrow');
@@ -332,6 +361,7 @@ export default function BankShieldApp() {
                   balance={balance}
                   activeEscrow={activeEscrow}
                   guardianInfo={guardianInfo}
+                  lastGuardianTopUp={lastGuardianTopUp}
                 />
 
                 <GuardianDeck
@@ -344,6 +374,7 @@ export default function BankShieldApp() {
                   handleFreezeAndAbort={handleFreezeAndAbort}
                   handleSimulateIncident={handleSimulateIncident}
                   guardianInfo={guardianInfo}
+                  handleGuardianTopUp={handleGuardianTopUp}
                 />
               </div>
             </main>
@@ -384,6 +415,7 @@ export default function BankShieldApp() {
                 handleFreezeAndAbort={handleFreezeAndAbort}
                 handleSimulateIncident={handleSimulateIncident}
                 guardianInfo={guardianInfo}
+                handleGuardianTopUp={handleGuardianTopUp}
               />
             </main>
           )}

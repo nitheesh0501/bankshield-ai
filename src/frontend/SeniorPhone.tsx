@@ -44,6 +44,7 @@ interface SeniorPhoneProps {
   balance?: number;
   activeEscrow?: AuditItem | null;
   guardianInfo?: GuardianInfo;
+  lastGuardianTopUp?: { amount: number; time: string } | null;
 }
 
 export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
@@ -62,6 +63,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
   balance = 142800,
   activeEscrow = null,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
+  lastGuardianTopUp = null,
 }) => {
   // UI Toggles & States
   const [showFullBalance, setShowFullBalance] = useState(false);
@@ -230,6 +232,19 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           </button>
         </div>
 
+        {/* INCOMING GUARDIAN CREDIT TOP-UP BANNER */}
+        {lastGuardianTopUp && (
+          <div className="p-4 rounded-3xl bg-emerald-950/90 border-2 border-emerald-400 text-center space-y-1.5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-center gap-1.5 text-emerald-400 font-black text-xs uppercase tracking-wider">
+              <Sparkles className="w-4 h-4 text-emerald-300" />
+              <span>Allowance Top-Up Received</span>
+            </div>
+            <p className="text-xs font-extrabold text-white leading-relaxed">
+              Daughter Ananya added <strong className="text-emerald-400 font-black text-sm">₹{lastGuardianTopUp.amount.toLocaleString('en-IN')}.00</strong> to your safe spending balance!
+            </p>
+          </div>
+        )}
+
         {/* 1. SAFE POCKET BALANCE CARD */}
         <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-950/80 via-slate-900 to-emerald-900/60 border border-emerald-500/30 space-y-3 relative shadow-lg">
           <div className="flex items-center justify-between">
@@ -268,9 +283,8 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           )}
         </div>
 
-        {/* 2. CORE ACCESSIBLE UPI NAVIGATION TILES (Oversized Touch Targets) */}
+        {/* 2. CORE ACCESSIBLE UPI NAVIGATION TILES */}
         <div className="grid grid-cols-3 gap-2.5">
-          {/* Tile 1: Scan QR */}
           <button
             type="button"
             onClick={() => setIsQrModalOpen(true)}
@@ -280,7 +294,6 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             <span className="text-xs font-extrabold leading-tight">Scan Any QR</span>
           </button>
 
-          {/* Tile 2: Pay Phone Number */}
           <button
             type="button"
             onClick={() => setIsPhonePayModalOpen(true)}
@@ -290,7 +303,6 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             <span className="text-xs font-extrabold leading-tight">Pay Contact</span>
           </button>
 
-          {/* Tile 3: Voice Assist */}
           <button
             type="button"
             onClick={handleMicClick}
@@ -301,13 +313,12 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
           </button>
         </div>
 
-        {/* 3. FREQUENT & TRUSTED PAYEES (Avatar Grid) */}
+        {/* 3. FREQUENT & TRUSTED PAYEES */}
         <div className="space-y-2.5">
           <span className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider">
             Frequent & Trusted Payees:
           </span>
           <div className="grid grid-cols-4 gap-2">
-            {/* Contact 1: Ananya */}
             <button
               type="button"
               onClick={() => {
@@ -327,7 +338,6 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               <span className="text-[9px] text-emerald-400 font-semibold">Daughter</span>
             </button>
 
-            {/* Contact 2: Apollo Pharmacy */}
             <button
               type="button"
               onClick={() => {
@@ -347,7 +357,6 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               <span className="text-[9px] text-slate-400 font-semibold">Medicine</span>
             </button>
 
-            {/* Contact 3: Local Milkman */}
             <button
               type="button"
               onClick={() => {
@@ -367,7 +376,6 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               <span className="text-[9px] text-slate-400 font-semibold">Daily</span>
             </button>
 
-            {/* Contact 4: Electricity Bill */}
             <button
               type="button"
               onClick={() => {
@@ -529,7 +537,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
             </button>
           </div>
 
-          {/* Big Oversized Pay Button (Min 48px target) */}
+          {/* Big Oversized Pay Button */}
           <button
             type="submit"
             className="w-full py-4 min-h-[52px] rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-black text-base transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer"
@@ -633,8 +641,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
       {/* SENIOR MPIN VERIFICATION MODAL (924180) */}
       {isPinModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative">
-            
+          <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 text-white relative">
             <button
               type="button"
               onClick={() => setIsPinModalOpen(false)}
@@ -705,7 +712,7 @@ export const SeniorPhone: React.FC<SeniorPhoneProps> = ({
               </div>
             )}
 
-            {/* Touch Keypad */}
+            {/* Keypad */}
             <div className="grid grid-cols-3 gap-2 pt-1">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
                 <button

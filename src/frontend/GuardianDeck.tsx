@@ -14,7 +14,11 @@ import {
   Delete,
   ShieldCheck,
   Check,
-  Smartphone
+  Smartphone,
+  PlusCircle,
+  IndianRupee,
+  Sparkles,
+  ArrowUpRight
 } from 'lucide-react';
 import { AuditItem, GuardianInfo } from '../types';
 
@@ -28,6 +32,7 @@ interface GuardianDeckProps {
   handleFreezeAndAbort: () => void;
   handleSimulateIncident: () => void;
   guardianInfo?: GuardianInfo;
+  handleGuardianTopUp?: (amount: number) => void;
 }
 
 export const GuardianDeck: React.FC<GuardianDeckProps> = ({
@@ -40,16 +45,35 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
   handleFreezeAndAbort,
   handleSimulateIncident,
   guardianInfo = { name: 'Ananya Kumar', relation: 'Daughter', phone: '+91 98765 43210', webhookUrl: '' },
+  handleGuardianTopUp,
 }) => {
   // Guardian MPIN Modal State (432100)
   const [isGuardianPinModalOpen, setIsGuardianPinModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'override' | 'topup'>('override');
   const [guardianPin, setGuardianPin] = useState('');
   const [pinError, setPinError] = useState('');
   const [isShaking, setIsShaking] = useState(false);
 
+  // Top-Up Form State
+  const [topUpAmountInput, setTopUpAmountInput] = useState('2000');
+  const [topUpToast, setTopUpToast] = useState<string | null>(null);
+
   const GUARDIAN_MPIN = '432100'; // Designated Guardian Ananya's MPIN
 
   const handleOpenApproveModal = () => {
+    setModalMode('override');
+    setGuardianPin('');
+    setPinError('');
+    setIsGuardianPinModalOpen(true);
+  };
+
+  const handleOpenTopUpModal = () => {
+    const num = Number(topUpAmountInput);
+    if (!num || num <= 0) {
+      alert('Please enter a valid allowance top-up amount.');
+      return;
+    }
+    setModalMode('topup');
     setGuardianPin('');
     setPinError('');
     setIsGuardianPinModalOpen(true);
@@ -78,7 +102,19 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
     setIsGuardianPinModalOpen(false);
     setGuardianPin('');
     setPinError('');
-    handleGuardianOverride();
+
+    if (modalMode === 'override') {
+      handleGuardianOverride();
+    } else if (modalMode === 'topup') {
+      const amt = Number(topUpAmountInput);
+      if (handleGuardianTopUp && amt > 0) {
+        handleGuardianTopUp(amt);
+        setTopUpToast(`₹${amt.toLocaleString('en-IN')} added to Ramesh's balance successfully.`);
+        setTimeout(() => {
+          setTopUpToast(null);
+        }, 5000);
+      }
+    }
   };
 
   const handleCallRamesh = () => {
@@ -86,7 +122,25 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
   };
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl overflow-hidden">
+    <div className="w-full bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl overflow-hidden relative">
+      
+      {/* Success Toast Banner for Top-Up */}
+      {topUpToast && (
+        <div className="p-4 rounded-2xl bg-emerald-600 text-white font-extrabold text-sm shadow-xl flex items-center justify-between animate-in zoom-in-95 duration-200">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-200" />
+            <span>{topUpToast}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTopUpToast(null)}
+            className="text-emerald-200 hover:text-white p-1"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* 1. Header Layout */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-slate-100">
         <div className="space-y-1.5 max-w-md">
@@ -139,10 +193,72 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
         </span>
       </div>
 
-      {/* 2. INCOMING ASSISTED PAY CARD (FamPay Parent View) */}
+      {/* 2. GUARDIAN ALLOWANCE / POCKET TOP-UP CARD */}
+      <div className="p-5 rounded-3xl bg-slate-900 text-white border border-slate-800 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
+              <PlusCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-white leading-tight">Top-Up Senior Pocket / Add Allowance</h3>
+              <p className="text-[11px] text-slate-400 font-medium">Directly credits Ramesh's balance & recalculates 5% safe cap in real time</p>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded border border-emerald-500/30">
+            SUPABASE AUDIT LEDGER
+          </span>
+        </div>
+
+        {/* Quick Add Chips & Custom Input */}
+        <div className="space-y-3">
+          <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            Quick Add Allowance Chips:
+          </span>
+          <div className="grid grid-cols-4 gap-2">
+            {[500, 1000, 2000, 5000].map(amt => (
+              <button
+                key={amt}
+                type="button"
+                onClick={() => setTopUpAmountInput(amt.toString())}
+                className={`py-2 rounded-xl text-xs font-black transition cursor-pointer border ${
+                  topUpAmountInput === amt.toString()
+                    ? 'bg-emerald-600 border-emerald-400 text-white shadow-md'
+                    : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                }`}
+              >
+                + ₹{amt.toLocaleString('en-IN')}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3 pt-1">
+            <div className="relative flex-1">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+              <input
+                type="number"
+                value={topUpAmountInput}
+                onChange={e => setTopUpAmountInput(e.target.value)}
+                placeholder="Enter custom amount"
+                className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-extrabold text-sm focus:border-emerald-500 focus:outline-none transition"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleOpenTopUpModal}
+              className="py-2.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <Sparkles className="w-4 h-4 text-emerald-200" />
+              <span>Send Allowance</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. INCOMING ASSISTED PAY CARD (FamPay Parent View) */}
       {activeEscrow && activeEscrow.status === 'Escrow Hold' ? (
         <div className="bg-rose-50/80 border-2 border-rose-500 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-in zoom-in-95 duration-200">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-rose-200">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-rose-500/20 text-rose-600 flex items-center justify-center shrink-0 border border-rose-300">
@@ -162,7 +278,6 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
             </div>
           </div>
 
-          {/* Transaction Summary Card */}
           <div className="p-5 rounded-2xl bg-white border border-rose-200 space-y-3 shadow-sm">
             <span className="text-[11px] font-bold tracking-wider text-slate-500 uppercase block">
               Attempted Outflow Transfer Details:
@@ -205,7 +320,7 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons: Approve, Decline, Remote Intercom */}
+          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-rose-200">
             <button
               type="button"
@@ -278,19 +393,19 @@ export const GuardianDeck: React.FC<GuardianDeckProps> = ({
                 Guardian Co-Pilot Authorization
               </h3>
               <p className="text-xs text-slate-400 font-medium">
-                Enter Ananya's 6-Digit Guardian MPIN
+                {modalMode === 'topup' ? 'Authorize Allowance Top-Up Funding' : 'Authorize Escrow Transfer'}
               </p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-1">
               <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                Authorizing Transfer For Ramesh:
+                {modalMode === 'topup' ? 'Top-Up Amount to Ramesh:' : 'Authorizing Transfer For Ramesh:'}
               </span>
               <div className="text-xl font-black text-emerald-400">
-                ₹ {activeEscrow ? activeEscrow.amount.toLocaleString('en-IN') : '0'}.00
+                ₹ {modalMode === 'topup' ? Number(topUpAmountInput || 0).toLocaleString('en-IN') : (activeEscrow ? activeEscrow.amount.toLocaleString('en-IN') : '0')}.00
               </div>
               <div className="text-xs text-white font-bold truncate">
-                {activeEscrow ? activeEscrow.payee : 'Beneficiary'}
+                {modalMode === 'topup' ? 'Credit to Ramesh Savings A/C' : (activeEscrow ? activeEscrow.payee : 'Beneficiary')}
               </div>
             </div>
 
