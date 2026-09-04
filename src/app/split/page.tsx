@@ -1,5 +1,5 @@
 import BankShieldApp from '../page';
 
 export default function SplitPage() {
-  return <BankShieldApp initialStage="portal" initialSubTab="dual" />;
+  return <BankShieldApp />;
 }

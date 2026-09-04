@@ -69,7 +69,6 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
   const [isNewBeneficiary, setIsNewBeneficiary] = useState(true);
   const [emergencyAlertSent, setEmergencyAlertSent] = useState(false);
   const [showFullBalance, setShowFullBalance] = useState(false);
-  const [activeSeniorTab, setActiveSeniorTab] = useState<'send' | 'passbook'>('send');
 
   // UPI PIN Verification State
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
@@ -190,322 +189,267 @@ export const SeniorPortalView: React.FC<SeniorPortalViewProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Simple Senior Balance & Help Summary */}
-          <div className="space-y-3 bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200 lg:max-w-md w-full">
+          {/* Right Side: Protection Status Badges */}
+          <div className="space-y-3 bg-slate-50 p-5 rounded-2xl border border-slate-200 lg:max-w-md w-full">
             <div className="flex items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                Senior Protection Active
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                Assisted Safety Active
               </span>
-              <span className="text-[11px] font-bold text-emerald-800">BankShield Monitored</span>
+              <span className="text-[10px] font-mono font-bold text-slate-500">v2.4 EDGE</span>
             </div>
 
-            <div className="text-xs text-slate-700 font-semibold space-y-1">
-              <p>All daily spending up to <strong className="text-emerald-800">₹{pocketBalance.toLocaleString('en-IN')}</strong> clears instantly without friction.</p>
-              <p className="text-[11px] text-slate-500">Larger transfers automatically route to your daughter Ananya for 1-tap safety approval.</p>
+            <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold pt-1">
+              <UserCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>Nominated Guardian: <strong>{guardianInfo.name} ({guardianInfo.relation})</strong></span>
+            </div>
+
+            <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium pt-1 border-t border-slate-200">
+              <ShieldCheck className="w-4 h-4 text-cyan-700 shrink-0" />
+              <span>Safety Rule: <strong>Pocket Balance ≤ ₹{pocketBalance.toLocaleString('en-IN')}</strong> | Co-Pilot Vault Armed</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. TAB CONTROLS & DASHBOARD LAYOUT */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-          <button
-            type="button"
-            onClick={() => setActiveSeniorTab('send')}
-            className={`px-5 py-2.5 rounded-2xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-              activeSeniorTab === 'send'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-            }`}
-          >
-            <Send className="w-4 h-4 text-emerald-400" />
-            <span>Send Money via UPI</span>
-          </button>
+      {/* 2. TWO-COLUMN DASHBOARD LAYOUT */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* LEFT COLUMN: TRANSFER FORM */}
+        <div className="lg:col-span-7 bg-white border border-slate-200 text-slate-900 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div className="border-b border-slate-100 pb-4">
+            <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
+              <Send className="w-5 h-5 text-emerald-600" />
+              <span>Send Money via Assisted UPI</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Transactions within your ₹{pocketBalance.toLocaleString('en-IN')} Safe Pocket clear instantly. Larger transfers route to Ananya for 1-tap co-signing.
+            </p>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setActiveSeniorTab('passbook')}
-            className={`px-5 py-2.5 rounded-2xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-              activeSeniorTab === 'passbook'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-            }`}
-          >
-            <Activity className="w-4 h-4 text-cyan-400" />
-            <span>Senior Passbook & History</span>
-          </button>
+          {/* Quick Attack Vector Test Presets */}
+          <div className="space-y-2.5">
+            <span className="block text-[11px] font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
+              <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-600" />
+              <span>Quick Test Scam Presets:</span>
+            </span>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => selectScenarioPreset({
+                  payee: 'Nilgiris Daily Groceries',
+                  vpa: 'nilgiris.groceries@upi',
+                  amt: 450,
+                  cat: 'Regular Household Expense',
+                  call: false,
+                  newBen: false,
+                })}
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
+              >
+                <span className="block font-bold text-slate-900 text-[11px]">Safe Groceries</span>
+                <span className="block text-[10px] text-emerald-700 font-bold">₹450 (Pocket)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => selectScenarioPreset({
+                  payee: 'Rajesh Electricals Utility Cell',
+                  vpa: 'electricity.cutoff.pay@upi',
+                  amt: 48500,
+                  cat: 'Utility Disconnection Threat',
+                  call: true,
+                  newBen: true,
+                })}
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
+              >
+                <span className="block font-bold text-slate-900 text-[11px]">Utility Cutoff Scam</span>
+                <span className="block text-[10px] text-amber-800 font-bold">₹48,500 (Assisted)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => selectScenarioPreset({
+                  payee: 'DCP Cyber Cell Official Escrow',
+                  vpa: 'dcp.cybercell.official@okhdfc',
+                  amt: 85000,
+                  cat: 'Law Enforcement / Police Clearance',
+                  call: true,
+                  newBen: true,
+                })}
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
+              >
+                <span className="block font-bold text-slate-900 text-[11px]">Digital Arrest</span>
+                <span className="block text-[10px] text-rose-800 font-bold">₹85,000 (Blocked)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => selectScenarioPreset({
+                  payee: 'City Hospital ICU Dept',
+                  vpa: 'city.hospital.icu@upi',
+                  amt: 60000,
+                  cat: 'Medical Emergency',
+                  call: false,
+                  newBen: false,
+                })}
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
+              >
+                <span className="block font-bold text-slate-900 text-[11px]">Hospital Emergency</span>
+                <span className="block text-[10px] text-cyan-800 font-bold">₹60,000 (Assisted)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleInitiatePayment} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-700">Recipient Name</label>
+              <input
+                type="text"
+                required
+                value={recipientName}
+                onChange={e => setRecipientName(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-700">Recipient UPI Address</label>
+              <input
+                type="text"
+                required
+                value={upiId}
+                onChange={e => setUpiId(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-700">Transfer Amount (₹ INR)</label>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+                  Pocket Pool: ₹{pocketBalance.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <input
+                type="number"
+                required
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                className="w-full px-4 py-3.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-black text-xl focus:border-emerald-600 focus:bg-white focus:outline-none transition"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-700">Category / Purpose</label>
+              <select
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-xs focus:border-emerald-600 focus:outline-none transition"
+              >
+                <option value="Regular Household Expense">Regular Household Expense</option>
+                <option value="Law Enforcement / Police Clearance">Law Enforcement / Police Clearance</option>
+                <option value="Utility Disconnection Threat">Utility Disconnection Threat</option>
+                <option value="Medical Emergency">Medical Emergency</option>
+              </select>
+            </div>
+
+            {/* Sensor Switch */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-100 text-rose-700 border border-rose-300 animate-pulse' : 'bg-slate-200 text-slate-500'}`}>
+                  <PhoneCall className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="block text-xs font-extrabold text-slate-900">Simulate Background Phone Call</span>
+                  <span className="text-[11px] text-slate-500">Auto-routes transaction to Ananya</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsActiveCall(!isActiveCall)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                  isActiveCall ? 'bg-rose-600' : 'bg-slate-300'
+                }`}
+              >
+                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base transition shadow-md flex items-center justify-center gap-2 cursor-pointer mt-4"
+            >
+              <ShieldCheck className="w-5 h-5 text-emerald-200" />
+              <span>Verify & Execute Payment (BankShield Monitored)</span>
+            </button>
+          </form>
         </div>
 
-        {activeSeniorTab === 'passbook' ? (
-          /* PASSBOOK TAB VIEW */
-          <div className="bg-white border border-slate-200 text-slate-900 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-            <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-black text-slate-900">Passbook & Account History</h2>
-                <p className="text-xs text-slate-500 mt-1">Simple view of all recent transactions with legible status indicators.</p>
-              </div>
-              <span className="text-xs font-mono font-bold text-slate-500">Ramesh Kumar A/C</span>
+        {/* RIGHT COLUMN: VOICE ASSIST & SAFETY METER */}
+        <div className="lg:col-span-5 space-y-6">
+          <div className="bg-slate-900 text-white border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <span className="text-xs font-extrabold text-rose-400 uppercase tracking-wide flex items-center gap-1.5">
+                <Volume2 className="w-4 h-4" />
+                <span>Voice Guidance Assistant</span>
+              </span>
+              <span className="text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded">
+                Active
+              </span>
             </div>
 
-            <div className="space-y-3">
-              {[
-                { id: 'TXN-7094', name: 'DCP Cyber Cell Official Escrow', amount: 85000, date: 'Today, 10:15 AM', status: 'Paused by Co-Pilot', type: 'blocked' },
-                { id: 'TXN-6812', name: 'Apollo Pharmacy Central', amount: 450, date: 'Today, 08:30 AM', status: 'Cleared via Safe Pocket', type: 'cleared' },
-                { id: 'TXN-6744', name: 'Nilgiris Daily Groceries', amount: 1200, date: 'Yesterday', status: 'Cleared via Safe Pocket', type: 'cleared' },
-                { id: 'TXN-6401', name: 'Rajesh Electricals Utility Cell', amount: 48500, date: '02 Sep 2026', status: 'Paused by Co-Pilot', type: 'blocked' },
-                { id: 'TXN-6110', name: 'Daughter Ananya Allowance Top-Up', amount: 2000, date: '01 Sep 2026', status: 'Credit Cleared', type: 'credit' },
-              ].map((item, idx) => (
-                <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4 hover:bg-slate-100/80 transition">
-                  <div className="space-y-1">
-                    <h4 className="text-base font-black text-slate-900">{item.name}</h4>
-                    <p className="text-xs text-slate-500 font-medium">{item.date} • <span className="font-mono text-slate-400">{item.id}</span></p>
-                  </div>
+            <p className="text-xs text-slate-300 leading-relaxed font-normal">
+              "Police and utility companies never ask for money over phone calls. Disconnect the call now."
+            </p>
 
-                  <div className="text-right space-y-1">
-                    <div className="text-lg font-black text-slate-900">
-                      {item.type === 'credit' ? '+' : '-'} ₹{item.amount.toLocaleString('en-IN')}
-                    </div>
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-extrabold ${
-                      item.type === 'cleared' || item.type === 'credit'
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                        : 'bg-rose-100 text-rose-800 border border-rose-300'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+            <button
+              type="button"
+              onClick={triggerSpeech}
+              className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Volume2 className={`w-4 h-4 ${isSpeaking ? 'animate-bounce' : ''}`} />
+              <span>🔊 Read Aloud in Plain Language</span>
+            </button>
+          </div>
+
+          {/* Guardian Info */}
+          <div className="bg-white border border-slate-200 text-slate-900 rounded-3xl p-6 shadow-xl space-y-3 text-xs">
+            <span className="block font-black text-slate-900 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">
+              Guardian Co-Pilot Telemetry:
+            </span>
+
+            <div className="space-y-2 text-slate-600">
+              <div className="flex items-center justify-between">
+                <span>Designated Guardian:</span>
+                <strong className="text-slate-900">{guardianInfo.name} ({guardianInfo.phone})</strong>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Real-Time Sync:</span>
+                <strong className="text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono text-[10px]">n8n Push Active</strong>
+              </div>
             </div>
           </div>
-        ) : (
-          /* SEND MONEY TAB VIEW */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            {/* LEFT COLUMN: TRANSFER FORM */}
-            <div className="lg:col-span-7 bg-white border border-slate-200 text-slate-900 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-              <div className="border-b border-slate-100 pb-4">
-                <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                  <Send className="w-5 h-5 text-emerald-600" />
-                  <span>Send Money via Assisted UPI</span>
-                </h2>
-                <p className="text-xs text-slate-500 mt-1">
-                  Transactions within your ₹{pocketBalance.toLocaleString('en-IN')} Safe Pocket clear instantly. Larger transfers route to Ananya for 1-tap co-signing.
-                </p>
-              </div>
 
-              {/* Quick Attack Vector Test Presets */}
-              <div className="space-y-2.5">
-                <span className="block text-[11px] font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
-                  <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-600" />
-                  <span>Quick Test Scam Presets:</span>
-                </span>
+          {/* Emergency Alert Button */}
+          <div className="p-4 bg-rose-50 border-2 border-rose-200 rounded-3xl space-y-3">
+            <button
+              type="button"
+              onClick={handleEmergencyButton}
+              className="w-full py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>🚨 Pressured? Call Guardian {guardianInfo.name} Now</span>
+            </button>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => selectScenarioPreset({
-                      payee: 'Nilgiris Daily Groceries',
-                      vpa: 'nilgiris.groceries@upi',
-                      amt: 450,
-                      cat: 'Regular Household Expense',
-                      call: false,
-                      newBen: false,
-                    })}
-                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
-                  >
-                    <span className="block font-bold text-slate-900 text-[11px]">Safe Groceries</span>
-                    <span className="block text-[10px] text-emerald-700 font-bold">₹450 (Pocket)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => selectScenarioPreset({
-                      payee: 'Rajesh Electricals Utility Cell',
-                      vpa: 'electricity.cutoff.pay@upi',
-                      amt: 48500,
-                      cat: 'Utility Disconnection Threat',
-                      call: true,
-                      newBen: true,
-                    })}
-                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
-                  >
-                    <span className="block font-bold text-slate-900 text-[11px]">Utility Cutoff Scam</span>
-                    <span className="block text-[10px] text-amber-800 font-bold">₹48,500 (Assisted)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => selectScenarioPreset({
-                      payee: 'DCP Cyber Cell Official Escrow',
-                      vpa: 'dcp.cybercell.official@okhdfc',
-                      amt: 85000,
-                      cat: 'Law Enforcement / Police Clearance',
-                      call: true,
-                      newBen: true,
-                    })}
-                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
-                  >
-                    <span className="block font-bold text-slate-900 text-[11px]">Digital Arrest</span>
-                    <span className="block text-[10px] text-rose-800 font-bold">₹85,000 (Blocked)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => selectScenarioPreset({
-                      payee: 'City Hospital ICU Dept',
-                      vpa: 'city.hospital.icu@upi',
-                      amt: 60000,
-                      cat: 'Medical Emergency',
-                      call: false,
-                      newBen: false,
-                    })}
-                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left text-xs transition cursor-pointer"
-                  >
-                    <span className="block font-bold text-slate-900 text-[11px]">Hospital Emergency</span>
-                    <span className="block text-[10px] text-cyan-800 font-bold">₹60,000 (Assisted)</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleInitiatePayment} className="space-y-4 pt-2">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">Recipient Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={recipientName}
-                    onChange={e => setRecipientName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">Recipient UPI Address</label>
-                  <input
-                    type="text"
-                    required
-                    value={upiId}
-                    onChange={e => setUpiId(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-xs font-bold text-slate-700">Transfer Amount (₹ INR)</label>
-                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
-                      Pocket Pool: ₹{pocketBalance.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <input
-                    type="number"
-                    required
-                    value={amount}
-                    onChange={e => setAmount(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-black text-xl focus:border-emerald-600 focus:bg-white focus:outline-none transition"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">Category / Purpose</label>
-                  <select
-                    value={category}
-                    onChange={e => setCategory(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-xs focus:border-emerald-600 focus:outline-none transition"
-                  >
-                    <option value="Regular Household Expense">Regular Household Expense</option>
-                    <option value="Law Enforcement / Police Clearance">Law Enforcement / Police Clearance</option>
-                    <option value="Utility Disconnection Threat">Utility Disconnection Threat</option>
-                    <option value="Medical Emergency">Medical Emergency</option>
-                  </select>
-                </div>
-
-                {/* Sensor Switch */}
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-xl ${isActiveCall ? 'bg-rose-100 text-rose-700 border border-rose-300 animate-pulse' : 'bg-slate-200 text-slate-500'}`}>
-                      <PhoneCall className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="block text-xs font-extrabold text-slate-900">Simulate Background Phone Call</span>
-                      <span className="text-[11px] text-slate-500">Auto-routes transaction to Ananya</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsActiveCall(!isActiveCall)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                      isActiveCall ? 'bg-rose-600' : 'bg-slate-300'
-                    }`}
-                  >
-                    <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${isActiveCall ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base transition shadow-md flex items-center justify-center gap-2 cursor-pointer mt-4"
-                >
-                  <ShieldCheck className="w-5 h-5 text-emerald-200" />
-                  <span>Verify & Execute Payment (BankShield Monitored)</span>
-                </button>
-              </form>
-            </div>
-
-            {/* RIGHT COLUMN: VOICE ASSIST & ACCESSIBLE RED EMERGENCY HELP BUTTON */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="bg-slate-900 text-white border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <span className="text-xs font-extrabold text-rose-400 uppercase tracking-wide flex items-center gap-1.5">
-                    <Volume2 className="w-4 h-4" />
-                    <span>Voice Guidance Assistant</span>
-                  </span>
-                  <span className="text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded">
-                    Active
-                  </span>
-                </div>
-
-                <p className="text-xs text-slate-300 leading-relaxed font-normal">
-                  "Police and utility companies never ask for money over phone calls. Disconnect the call now."
-                </p>
-
-                <button
-                  type="button"
-                  onClick={triggerSpeech}
-                  className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Volume2 className={`w-4 h-4 ${isSpeaking ? 'animate-bounce' : ''}`} />
-                  <span>🔊 Read Aloud in Plain Language</span>
-                </button>
-              </div>
-
-              {/* Single Accessible Red Help Button */}
-              <div className="p-5 bg-rose-50 border-2 border-rose-300 rounded-3xl space-y-3 shadow-md">
-                <span className="block text-xs font-black uppercase tracking-wider text-rose-900 text-center">
-                  Need Help or Suspicious Call?
-                </span>
-                <button
-                  type="button"
-                  onClick={handleEmergencyButton}
-                  className="w-full py-4 rounded-2xl bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-black text-sm transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <PhoneCall className="w-5 h-5 text-white animate-bounce" />
-                  <span>Call Daughter Ananya (+91 98765 43210)</span>
-                </button>
-
-                {emergencyAlertSent && (
-                  <span className="block text-xs font-bold text-rose-800 text-center animate-in fade-in">
-                    ✓ Priority call connecting to Daughter Ananya...
-                  </span>
-                )}
-              </div>
-            </div>
-
+            {emergencyAlertSent && (
+              <span className="block text-[11px] font-bold text-rose-800 text-center">
+                ✓ Priority emergency alert dispatched to {guardianInfo.name}!
+              </span>
+            )}
           </div>
-        )}
+        </div>
+
       </div>
 
       {/* SENIOR MPIN MODAL (924180) */}
